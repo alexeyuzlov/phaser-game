@@ -1,0 +1,42 @@
+module Sample.Prefab {
+    export enum DIRECTION {
+        LEFT,
+        RIGHT,
+        UP,
+        DOWN
+    }
+
+    export class Runner extends Phaser.Sprite {
+        gravity:number = 300;
+        velocity:number = 100;
+        direction:DIRECTION = DIRECTION.RIGHT;
+
+        constructor(game:Phaser.Game, x:number, y:number) {
+            super(game, x, y, 'runner', 0);
+
+            game.physics.arcade.enable(this);
+            this.body.gravity.y = this.gravity;
+
+            game.add.existing(this);
+        }
+
+        update() {
+            if (this.body.blocked.left) {
+                this.direction = DIRECTION.RIGHT;
+            } else if (this.body.blocked.right) {
+                this.direction = DIRECTION.LEFT;
+            }
+
+            switch (this.direction) {
+                case DIRECTION.LEFT :
+                    this.body.velocity.x = -this.velocity;
+                    break;
+                case DIRECTION.RIGHT :
+                    this.body.velocity.x = this.velocity;
+                    break;
+                default :
+                    this.body.velocity.x = 0;
+            }
+        }
+    }
+}

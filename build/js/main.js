@@ -42,6 +42,7 @@ var Sample;
                 this.load.image('menu-background', 'assets/images/menu-background.png');
 
                 this.load.image('player', 'assets/images/player.png');
+                this.load.image('runner', 'assets/images/runner.png');
             };
 
             Preload.prototype.create = function () {
@@ -111,6 +112,54 @@ var Sample;
 })(Sample || (Sample = {}));
 var Sample;
 (function (Sample) {
+    (function (Prefab) {
+        (function (DIRECTION) {
+            DIRECTION[DIRECTION["LEFT"] = 0] = "LEFT";
+            DIRECTION[DIRECTION["RIGHT"] = 1] = "RIGHT";
+            DIRECTION[DIRECTION["UP"] = 2] = "UP";
+            DIRECTION[DIRECTION["DOWN"] = 3] = "DOWN";
+        })(Prefab.DIRECTION || (Prefab.DIRECTION = {}));
+        var DIRECTION = Prefab.DIRECTION;
+
+        var Runner = (function (_super) {
+            __extends(Runner, _super);
+            function Runner(game, x, y) {
+                _super.call(this, game, x, y, 'runner', 0);
+                this.gravity = 300;
+                this.velocity = 100;
+                this.direction = 1 /* RIGHT */;
+
+                game.physics.arcade.enable(this);
+                this.body.gravity.y = this.gravity;
+
+                game.add.existing(this);
+            }
+            Runner.prototype.update = function () {
+                if (this.body.blocked.left) {
+                    this.direction = 1 /* RIGHT */;
+                } else if (this.body.blocked.right) {
+                    this.direction = 0 /* LEFT */;
+                }
+
+                switch (this.direction) {
+                    case 0 /* LEFT */:
+                        this.body.velocity.x = -this.velocity;
+                        break;
+                    case 1 /* RIGHT */:
+                        this.body.velocity.x = this.velocity;
+                        break;
+                    default:
+                        this.body.velocity.x = 0;
+                }
+            };
+            return Runner;
+        })(Phaser.Sprite);
+        Prefab.Runner = Runner;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
     (function (State) {
         var Level1 = (function (_super) {
             __extends(Level1, _super);
@@ -133,13 +182,16 @@ var Sample;
                 this.layer = this.map.createLayer('mainLayer');
                 this.layer.resizeWorld();
 
-                this.player = new Sample.Prefab.Player(this.game, 10, 10);
+                this.player = new Sample.Prefab.Player(this.game, 610, 10);
+
+                this.runner = new Sample.Prefab.Runner(this.game, 640, 230);
 
                 this.game.camera.follow(this.player);
             };
 
             Level1.prototype.update = function () {
                 this.game.physics.arcade.collide(this.player, this.layer);
+                this.game.physics.arcade.collide(this.runner, this.layer);
             };
             return Level1;
         })(Phaser.State);
