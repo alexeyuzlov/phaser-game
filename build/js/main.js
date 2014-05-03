@@ -40,10 +40,12 @@ var Sample;
                 this.load.setPreloadSprite(this.preloadBar);
 
                 this.load.image('menu-background', 'assets/images/menu-background.png');
+
+                this.load.image('player', 'assets/images/player.png');
             };
 
             Preload.prototype.create = function () {
-                this.game.state.start('menu');
+                this.game.state.start('level1');
             };
             return Preload;
         })(Phaser.State);
@@ -63,7 +65,7 @@ var Sample;
                 var _this = this;
                 this.background = this.add.sprite(80, 0, 'menu-background');
                 this.input.onDown.addOnce(function () {
-                    _this.game.state.start('main');
+                    _this.game.state.start('level1');
                 });
             };
             return Menu;
@@ -74,18 +76,37 @@ var Sample;
 })(Sample || (Sample = {}));
 var Sample;
 (function (Sample) {
+    (function (Prefab) {
+        var Player = (function (_super) {
+            __extends(Player, _super);
+            function Player(game, x, y) {
+                _super.call(this, game, x, y, 'player', 0);
+
+                game.add.existing(this);
+            }
+            Player.prototype.update = function () {
+            };
+            return Player;
+        })(Phaser.Sprite);
+        Prefab.Player = Player;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
     (function (State) {
-        var Main = (function (_super) {
-            __extends(Main, _super);
-            function Main() {
+        var Level1 = (function (_super) {
+            __extends(Level1, _super);
+            function Level1() {
                 _super.apply(this, arguments);
             }
-            Main.prototype.create = function () {
-                this.stage.backgroundColor = 0x000000;
+            Level1.prototype.create = function () {
+                this.stage.backgroundColor = '#99CCFF';
+                this.player = new Sample.Prefab.Player(this.game, 10, 10);
             };
-            return Main;
+            return Level1;
         })(Phaser.State);
-        State.Main = Main;
+        State.Level1 = Level1;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
 })(Sample || (Sample = {}));
@@ -94,12 +115,13 @@ var Sample;
     var Game = (function (_super) {
         __extends(Game, _super);
         function Game() {
-            _super.call(this, 640, 480, Phaser.AUTO, 'game-div');
+            _super.call(this, 640, 480, Phaser.AUTO, 'game');
 
             this.state.add('boot', Sample.State.Boot);
             this.state.add('preload', Sample.State.Preload);
             this.state.add('menu', Sample.State.Menu);
-            this.state.add('main', Sample.State.Main);
+
+            this.state.add('level1', Sample.State.Level1);
 
             this.state.start('boot');
         }

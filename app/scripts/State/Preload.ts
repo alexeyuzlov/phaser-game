@@ -8,11 +8,11 @@ module Sample.State {
 
             this.load.image('menu-background', 'assets/images/menu-background.png');
 
-            // Load remaining assets here
+            this.load.image('player', 'assets/images/player.png');
         }
 
         create() {
-            this.game.state.start('menu');
+            this.game.state.start('level1');
         }
     }
 }
