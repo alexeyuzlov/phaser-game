@@ -81,10 +81,27 @@ var Sample;
             __extends(Player, _super);
             function Player(game, x, y) {
                 _super.call(this, game, x, y, 'player', 0);
+                this.gravity = 300;
+                this.velocity = 300;
+                this.jumpHeight = 150;
+
+                game.physics.arcade.enable(this);
+                this.body.gravity.y = this.gravity;
 
                 game.add.existing(this);
             }
             Player.prototype.update = function () {
+                if (this.game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
+                    this.body.velocity.x = this.velocity;
+                } else if (this.game.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
+                    this.body.velocity.x = -this.velocity;
+                } else {
+                    this.body.velocity.x = 0;
+                }
+
+                if (this.game.input.keyboard.isDown(Phaser.Keyboard.UP)) {
+                    this.body.velocity.y = -this.jumpHeight;
+                }
             };
             return Player;
         })(Phaser.Sprite);
@@ -100,9 +117,29 @@ var Sample;
             function Level1() {
                 _super.apply(this, arguments);
             }
+            Level1.prototype.preload = function () {
+                this.game.load.tilemap('map', 'assets/levels/level1.json', null, Phaser.Tilemap.TILED_JSON);
+                this.game.load.image('tiles', 'assets/images/tiles.png');
+            };
+
             Level1.prototype.create = function () {
-                this.stage.backgroundColor = '#99CCFF';
+                this.game.physics.startSystem(Phaser.Physics.ARCADE);
+
+                this.map = this.game.add.tilemap('map');
+                this.map.addTilesetImage('tiles');
+
+                this.map.setCollisionByIndex(1);
+
+                this.layer = this.map.createLayer('mainLayer');
+                this.layer.resizeWorld();
+
                 this.player = new Sample.Prefab.Player(this.game, 10, 10);
+
+                this.game.camera.follow(this.player);
+            };
+
+            Level1.prototype.update = function () {
+                this.game.physics.arcade.collide(this.player, this.layer);
             };
             return Level1;
         })(Phaser.State);
