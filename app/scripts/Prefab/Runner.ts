@@ -10,6 +10,7 @@ module Sample.Prefab {
         gravity:number = 300;
         velocity:number = 100;
         direction:DIRECTION = DIRECTION.RIGHT;
+        visibleDistance:number = 800;
 
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'runner');
@@ -22,6 +23,8 @@ module Sample.Prefab {
         }
 
         update() {
+            if (!this.inCamera) return;
+
             if (this.body.blocked.left) {
                 this.direction = DIRECTION.RIGHT;
             } else if (this.body.blocked.right) {

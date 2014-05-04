@@ -16,7 +16,7 @@ module Sample.State {
         }
 
         create() {
-            this.game.state.start('menu');
+            this.game.state.start('zone1level1');
         }
     }
 }

@@ -27,6 +27,8 @@ module Sample.Prefab {
         }
 
         update() {
+            if (!this.inCamera) return;
+
             if (this.game.time.now - this.lastBulletShotAt < this.shotDelay) return;
             this.lastBulletShotAt = this.game.time.now;
 
