@@ -11,6 +11,9 @@ module Sample.Prefab {
             this.body.gravity.y = this.gravity;
             this.anchor.set(0.5, 0.5);
 
+            this.alive = true;
+            //this.health = 101;
+
             game.add.existing(this);
         }
 

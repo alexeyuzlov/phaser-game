@@ -12,9 +12,11 @@ module Sample.State {
         map:Phaser.Tilemap;
         layer:Phaser.TilemapLayer;
 
-        runners: Phaser.Group;
-        shooters: Phaser.Group;
-        fliers: Phaser.Group;
+        runners:Phaser.Group;
+        fliers:Phaser.Group;
+
+        shooters:Phaser.Group;
+        bullets:Phaser.Group;
 
         preload() {
             this.game.load.tilemap('map', 'assets/levels/1-1.json', null, Phaser.Tilemap.TILED_JSON);
@@ -53,6 +55,14 @@ module Sample.State {
             this.game.physics.arcade.collide(this.player, this.layer);
             this.game.physics.arcade.collide(this.runners, this.layer);
             this.game.physics.arcade.collide(this.shooters, this.layer);
+
+            this.shooters.forEach((shooter)=> {
+                this.game.physics.arcade.collide(this.player, shooter.bullets, (player, bullet)=> {
+                    bullet.kill();
+                    this.player.damage(50);
+                });
+            }, null);
+
 
             if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
                 this.game.state.start('zone1level2');
