@@ -1,13 +1,16 @@
 /// <reference path='../Prefab/Player.ts'/>
 /// <reference path='../Prefab/Runner.ts'/>
 /// <reference path='../Prefab/Flier.ts'/>
+/// <reference path='../Prefab/Shooter.ts'/>
 
 module Sample.State {
+
     export class Level1 extends Phaser.State {
         player:Prefab.Player;
 
         runner:Prefab.Runner;
         flier:Prefab.Flier;
+        shooter:Prefab.Shooter;
 
         map:Phaser.Tilemap;
         layer:Phaser.TilemapLayer;
@@ -39,6 +42,9 @@ module Sample.State {
             this.runner = new Prefab.Runner(this.game, 740, 230);
             this.flier = new Prefab.Flier(this.game, 240, 130, this.runner);
 
+            this.shooter = new Prefab.Shooter(this.game, 700, 380);
+
+
             //
 
             this.game.camera.follow(this.player);
@@ -47,6 +53,7 @@ module Sample.State {
         update() {
             this.game.physics.arcade.collide(this.player, this.layer);
             this.game.physics.arcade.collide(this.runner, this.layer);
+            this.game.physics.arcade.collide(this.shooter, this.layer);
         }
     }
 }

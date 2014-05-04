@@ -5,7 +5,7 @@ module Sample.Prefab {
         jumpHeight: number = 150;
 
         constructor(game:Phaser.Game, x:number, y:number) {
-            super(game, x, y, 'player', 0);
+            super(game, x, y, 'player');
 
             game.physics.arcade.enable(this);
             this.body.gravity.y = this.gravity;

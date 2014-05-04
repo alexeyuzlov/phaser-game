@@ -12,7 +12,7 @@ module Sample.Prefab {
         direction:DIRECTION = DIRECTION.RIGHT;
 
         constructor(game:Phaser.Game, x:number, y:number) {
-            super(game, x, y, 'runner', 0);
+            super(game, x, y, 'runner');
 
             game.physics.arcade.enable(this);
             this.body.gravity.y = this.gravity;

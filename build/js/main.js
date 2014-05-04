@@ -45,6 +45,8 @@ var Sample;
 
                 this.load.image('runner', 'assets/images/runner.png');
                 this.load.image('flier', 'assets/images/flier.png');
+                this.load.image('bullet', 'assets/images/bullet.png');
+                this.load.image('shooter', 'assets/images/shooter.png');
             };
 
             Preload.prototype.create = function () {
@@ -83,7 +85,7 @@ var Sample;
         var Player = (function (_super) {
             __extends(Player, _super);
             function Player(game, x, y) {
-                _super.call(this, game, x, y, 'player', 0);
+                _super.call(this, game, x, y, 'player');
                 this.gravity = 300;
                 this.velocity = 300;
                 this.jumpHeight = 150;
@@ -127,7 +129,7 @@ var Sample;
         var Runner = (function (_super) {
             __extends(Runner, _super);
             function Runner(game, x, y) {
-                _super.call(this, game, x, y, 'runner', 0);
+                _super.call(this, game, x, y, 'runner');
                 this.gravity = 300;
                 this.velocity = 100;
                 this.direction = 1 /* RIGHT */;
@@ -168,7 +170,7 @@ var Sample;
         var Flier = (function (_super) {
             __extends(Flier, _super);
             function Flier(game, x, y, target) {
-                _super.call(this, game, x, y, 'flier', 0);
+                _super.call(this, game, x, y, 'flier');
                 this.target = target;
                 this.speed = 150;
 
@@ -194,6 +196,80 @@ var Sample;
             return Flier;
         })(Phaser.Sprite);
         Prefab.Flier = Flier;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
+        var Bullet = (function (_super) {
+            __extends(Bullet, _super);
+            function Bullet(game, x, y) {
+                _super.call(this, game, x, y, 'bullet');
+                this.speed = 300;
+
+                game.physics.arcade.enable(this);
+                this.anchor.set(0.5, 0.5);
+                this.kill();
+
+                this.checkWorldBounds = true;
+                this.outOfBoundsKill = true;
+
+                game.add.existing(this);
+            }
+            Bullet.prototype.update = function () {
+            };
+            return Bullet;
+        })(Phaser.Sprite);
+        Prefab.Bullet = Bullet;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
+        var Shooter = (function (_super) {
+            __extends(Shooter, _super);
+            function Shooter(game, x, y) {
+                _super.call(this, game, x, y, 'shooter');
+                this.gravity = 300;
+                this.lastBulletShotAt = 0;
+                this.countBullets = 1;
+                this.shotDelay = 3000;
+
+                game.physics.arcade.enable(this);
+                this.body.gravity.y = this.gravity;
+
+                this.anchor.set(0.5, 0.5);
+
+                this.bullets = this.game.add.group();
+                for (var i = 0; i < this.countBullets; i++) {
+                    var bullet = new Prefab.Bullet(game, 0, 0);
+                    this.bullets.add(bullet);
+                }
+
+                game.add.existing(this);
+            }
+            Shooter.prototype.update = function () {
+                if (this.game.time.now - this.lastBulletShotAt < this.shotDelay)
+                    return;
+                this.lastBulletShotAt = this.game.time.now;
+
+                var bullet = this.bullets.getFirstDead();
+
+                if (bullet === null || bullet === undefined)
+                    return;
+
+                bullet.revive();
+
+                bullet.reset(this.x, this.y);
+
+                bullet.body.velocity.x = -bullet.speed;
+                bullet.body.velocity.y = 0;
+            };
+            return Shooter;
+        })(Phaser.Sprite);
+        Prefab.Shooter = Shooter;
     })(Sample.Prefab || (Sample.Prefab = {}));
     var Prefab = Sample.Prefab;
 })(Sample || (Sample = {}));
@@ -226,12 +302,15 @@ var Sample;
                 this.runner = new Sample.Prefab.Runner(this.game, 740, 230);
                 this.flier = new Sample.Prefab.Flier(this.game, 240, 130, this.runner);
 
+                this.shooter = new Sample.Prefab.Shooter(this.game, 700, 380);
+
                 this.game.camera.follow(this.player);
             };
 
             Level1.prototype.update = function () {
                 this.game.physics.arcade.collide(this.player, this.layer);
                 this.game.physics.arcade.collide(this.runner, this.layer);
+                this.game.physics.arcade.collide(this.shooter, this.layer);
             };
             return Level1;
         })(Phaser.State);

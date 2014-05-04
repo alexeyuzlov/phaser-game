@@ -12,6 +12,9 @@ module Sample.State {
 
             this.load.image('runner', 'assets/images/runner.png');
             this.load.image('flier', 'assets/images/flier.png');
+            this.load.image('bullet', 'assets/images/bullet.png');
+            this.load.image('shooter', 'assets/images/shooter.png');
+
         }
 
         create() {

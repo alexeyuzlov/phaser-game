@@ -5,7 +5,7 @@ module Sample.Prefab {
         speed:number = 150;
 
         constructor(game:Phaser.Game, x:number, y:number, private target:Phaser.Sprite) {
-            super(game, x, y, 'flier', 0);
+            super(game, x, y, 'flier');
 
             this.minDistance = target.width / 2;
 
