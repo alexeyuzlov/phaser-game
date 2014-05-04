@@ -30,28 +30,14 @@ module Sample.Prefab {
             if (this.game.time.now - this.lastBulletShotAt < this.shotDelay) return;
             this.lastBulletShotAt = this.game.time.now;
 
-            // Get a dead bullet from the pool
             var bullet = this.bullets.getFirstDead();
 
-            // If there aren't any bullets available then don't shoot
             if (bullet === null || bullet === undefined) return;
 
-            // Revive the bullet
-            // This makes the bullet "alive"
             bullet.revive();
-
-            // Bullets should kill themselves when they leave the world.
-            // Phaser takes care of this for me by setting this flag
-            // but you can do it yourself by killing the bullet if
-            // its x,y coordinates are outside of the world.
-
-
-            // Set the bullet position to the gun position.
             bullet.reset(this.x, this.y);
 
-            // Shoot it
             bullet.body.velocity.x = -bullet.speed;
-            bullet.body.velocity.y = 0;
         }
     }
 }

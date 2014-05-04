@@ -4,9 +4,12 @@ module Sample.State {
 
         create() {
             this.background = this.add.sprite(80, 0, 'menu-background');
-            this.input.onDown.addOnce(() => {
-                this.game.state.start('level1');
-            });
+        }
+
+        update() {
+            if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+                this.game.state.start('zone1level1');
+            }
         }
     }
 }

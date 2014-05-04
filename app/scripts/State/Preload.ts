@@ -8,17 +8,15 @@ module Sample.State {
 
             this.load.image('menu-background', 'assets/images/menu-background.png');
 
-            this.load.image('player', 'assets/images/player.png');
-
-            this.load.image('runner', 'assets/images/runner.png');
-            this.load.image('flier', 'assets/images/flier.png');
-            this.load.image('bullet', 'assets/images/bullet.png');
-            this.load.image('shooter', 'assets/images/shooter.png');
-
+            this.load.image('player', 'assets/images/prefabs/player.png');
+            this.load.image('runner', 'assets/images/prefabs/runner.png');
+            this.load.image('flier', 'assets/images/prefabs/flier.png');
+            this.load.image('bullet', 'assets/images/prefabs/bullet.png');
+            this.load.image('shooter', 'assets/images/prefabs/shooter.png');
         }
 
         create() {
-            this.game.state.start('level1');
+            this.game.state.start('menu');
         }
     }
 }

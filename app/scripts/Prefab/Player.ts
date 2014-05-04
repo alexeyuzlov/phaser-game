@@ -1,8 +1,8 @@
 module Sample.Prefab {
     export class Player extends Phaser.Sprite {
-        gravity: number = 300;
-        velocity: number = 300;
-        jumpHeight: number = 150;
+        gravity:number = 300;
+        velocity:number = 300;
+        jumpHeight:number = 150;
 
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'player');
@@ -15,12 +15,10 @@ module Sample.Prefab {
         }
 
         update() {
-            if (this.game.input.keyboard.isDown(Phaser.Keyboard.RIGHT))
-            {
+            if (this.game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
                 this.body.velocity.x = this.velocity;
             }
-            else if (this.game.input.keyboard.isDown(Phaser.Keyboard.LEFT))
-            {
+            else if (this.game.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
                 this.body.velocity.x = -this.velocity;
             }
             else {
