@@ -42,7 +42,9 @@ var Sample;
                 this.load.image('menu-background', 'assets/images/menu-background.png');
 
                 this.load.image('player', 'assets/images/player.png');
+
                 this.load.image('runner', 'assets/images/runner.png');
+                this.load.image('flier', 'assets/images/flier.png');
             };
 
             Preload.prototype.create = function () {
@@ -88,6 +90,7 @@ var Sample;
 
                 game.physics.arcade.enable(this);
                 this.body.gravity.y = this.gravity;
+                this.anchor.set(0.5, 0.5);
 
                 game.add.existing(this);
             }
@@ -131,6 +134,7 @@ var Sample;
 
                 game.physics.arcade.enable(this);
                 this.body.gravity.y = this.gravity;
+                this.anchor.set(0.5, 0.5);
 
                 game.add.existing(this);
             }
@@ -160,6 +164,41 @@ var Sample;
 })(Sample || (Sample = {}));
 var Sample;
 (function (Sample) {
+    (function (Prefab) {
+        var Flier = (function (_super) {
+            __extends(Flier, _super);
+            function Flier(game, x, y, target) {
+                _super.call(this, game, x, y, 'flier', 0);
+                this.target = target;
+                this.speed = 150;
+
+                this.minDistance = target.width / 2;
+
+                game.physics.arcade.enable(this);
+                this.anchor.set(0.5, 0.5);
+
+                game.add.existing(this);
+            }
+            Flier.prototype.update = function () {
+                var distance = Phaser.Math.distance(this.x, this.y, this.target.x, this.target.y);
+
+                if (distance > this.minDistance) {
+                    var rotation = Phaser.Math.angleBetween(this.x, this.y, this.target.x, this.target.y);
+
+                    this.body.velocity.x = Math.cos(rotation) * this.speed;
+                    this.body.velocity.y = Math.sin(rotation) * this.speed;
+                } else {
+                    this.body.velocity.setTo(0, 0);
+                }
+            };
+            return Flier;
+        })(Phaser.Sprite);
+        Prefab.Flier = Flier;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
     (function (State) {
         var Level1 = (function (_super) {
             __extends(Level1, _super);
@@ -182,9 +221,10 @@ var Sample;
                 this.layer = this.map.createLayer('mainLayer');
                 this.layer.resizeWorld();
 
-                this.player = new Sample.Prefab.Player(this.game, 610, 10);
+                this.player = new Sample.Prefab.Player(this.game, 510, 10);
 
-                this.runner = new Sample.Prefab.Runner(this.game, 640, 230);
+                this.runner = new Sample.Prefab.Runner(this.game, 740, 230);
+                this.flier = new Sample.Prefab.Flier(this.game, 240, 130, this.runner);
 
                 this.game.camera.follow(this.player);
             };

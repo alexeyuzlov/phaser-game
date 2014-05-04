@@ -9,7 +9,9 @@ module Sample.State {
             this.load.image('menu-background', 'assets/images/menu-background.png');
 
             this.load.image('player', 'assets/images/player.png');
+
             this.load.image('runner', 'assets/images/runner.png');
+            this.load.image('flier', 'assets/images/flier.png');
         }
 
         create() {
