@@ -8,7 +8,7 @@ module Sample.State {
 
         update() {
             if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-                this.game.state.start('zone1level1');
+                this.game.state.start(Levels.Zone1Level1.toString());
             }
         }
     }

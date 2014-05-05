@@ -1,12 +1,9 @@
-/// <reference path='../../../Prefab/Player.ts'/>
+/// <reference path='../../Levels/Level.ts'/>
 
 module Sample.State {
 
-    export class Zone2Level3 extends Phaser.State {
-        player:Prefab.Player;
-
-        map:Phaser.Tilemap;
-        layer:Phaser.TilemapLayer;
+    export class Zone2Level3 extends Level {
+        nextLevel: string = Levels.Zone3Level1.toString();
 
         preload() {
             this.game.load.tilemap('map', 'assets/levels/2-3.json', null, Phaser.Tilemap.TILED_JSON);
@@ -14,35 +11,11 @@ module Sample.State {
         }
 
         create() {
-            this.game.physics.startSystem(Phaser.Physics.ARCADE);
-
-            //
-
-            this.map = this.game.add.tilemap('map');
-            this.map.addTilesetImage('zone');
-
-            this.map.setCollisionByIndex(1);
-
-            this.layer = this.map.createLayer('main');
-            this.layer.resizeWorld();
-
-            //
-
-            this.player = new Prefab.Player(this.game, 120, 120);
-
-            //
-
-            //
-
-            this.game.camera.follow(this.player);
+            super.create();
         }
 
         update() {
-            this.game.physics.arcade.collide(this.player, this.layer);
-
-            if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-                this.game.state.start('zone3level1');
-            }
+            super.update();
         }
     }
 }
