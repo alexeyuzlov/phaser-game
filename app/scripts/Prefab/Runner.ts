@@ -1,15 +1,13 @@
 module Sample.Prefab {
-    export enum DIRECTION {
-        LEFT,
-        RIGHT,
-        UP,
-        DOWN
+    export enum Direction {
+        Left,
+        Right,
     }
 
     export class Runner extends Phaser.Sprite {
         gravity:number = 300;
         velocity:number = 100;
-        direction:DIRECTION = DIRECTION.RIGHT;
+        direction:Direction = Direction.Right;
         visibleDistance:number = 800;
 
         constructor(game:Phaser.Game, x:number, y:number) {
@@ -28,16 +26,16 @@ module Sample.Prefab {
             if (!this.inCamera) return;
 
             if (this.body.blocked.left) {
-                this.direction = DIRECTION.RIGHT;
+                this.direction = Direction.Right;
             } else if (this.body.blocked.right) {
-                this.direction = DIRECTION.LEFT;
+                this.direction = Direction.Left;
             }
 
             switch (this.direction) {
-                case DIRECTION.LEFT :
+                case Direction.Left :
                     this.body.velocity.x = -this.velocity;
                     break;
-                case DIRECTION.RIGHT :
+                case Direction.Right :
                     this.body.velocity.x = this.velocity;
                     break;
                 default :

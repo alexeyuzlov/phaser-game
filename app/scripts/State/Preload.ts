@@ -8,7 +8,7 @@ module Sample.State {
 
             this.load.image('menu-background', 'assets/images/menu-background.png');
 
-            this.load.image('player', 'assets/images/prefabs/player.png');
+            this.load.spritesheet('player', 'assets/images/prefabs/player.png', 13, 32, 4);
             this.load.image('weapon', 'assets/images/prefabs/weapon.png');
 
             this.load.image('runner', 'assets/images/prefabs/runner.png');
