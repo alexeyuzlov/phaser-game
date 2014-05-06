@@ -1,17 +1,13 @@
 module Sample.Prefab {
-    export class Bullet extends Phaser.Sprite {
-        speed: number = 300;
+    export class Weapon extends Phaser.Sprite {
         damagePoint: number = 50;
 
         constructor(game:Phaser.Game, x:number, y:number) {
-            super(game, x, y, 'bullet');
+            super(game, x, y, 'weapon');
 
             game.physics.arcade.enable(this);
             this.anchor.set(0.5, 0.5);
             this.kill();
-
-            this.checkWorldBounds = true;
-            this.outOfBoundsKill = true;
 
             game.add.existing(this);
         }

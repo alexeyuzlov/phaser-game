@@ -19,6 +19,8 @@ module Sample.Prefab {
             this.body.gravity.y = this.gravity;
             this.anchor.set(0.5, 0.5);
 
+            this.alive = true;
+
             game.add.existing(this);
         }
 

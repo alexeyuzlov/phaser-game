@@ -23,11 +23,14 @@ module Sample.Prefab {
                 this.bullets.add(bullet);
             }
 
+            this.alive = true;
+
             game.add.existing(this);
         }
 
         update() {
             if (!this.inCamera) return;
+            if (!this.alive) return;
 
             if (this.game.time.now - this.lastBulletShotAt < this.shotDelay) return;
             this.lastBulletShotAt = this.game.time.now;

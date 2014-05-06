@@ -32,8 +32,6 @@ module Sample {
     }
 
     export class Game extends Phaser.Game {
-        currentLevel: number = 1;
-
         constructor() {
             super(640, 480, Phaser.AUTO, 'game');
 

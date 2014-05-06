@@ -14,10 +14,10 @@ module Sample.State {
 
         player:Prefab.Player;
 
+        allEnemies:Phaser.Group;
+        shooters:Phaser.Group;
         runners:Phaser.Group;
         fliers:Phaser.Group;
-        shooters:Phaser.Group;
-        bullets:Phaser.Group;
 
         create() {
             this.game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -31,6 +31,8 @@ module Sample.State {
 
             this.player = new Prefab.Player(this.game, 120, 120);
 
+            this.allEnemies = this.game.add.group();
+
             this.shooters = this.game.add.group();
             this.map.createFromObjects('enemies', 3, 'shooter', 0, true, false, this.shooters, Prefab.Shooter);
 
@@ -43,18 +45,30 @@ module Sample.State {
                 flier.setTarget(this.player);
             }, null);
 
+            this.allEnemies.add(this.runners);
+            this.allEnemies.add(this.shooters);
+            this.allEnemies.add(this.fliers);
+
             this.game.camera.follow(this.player);
         }
 
         private checkCollide() {
             this.game.physics.arcade.collide(this.player, this.layer);
-            this.game.physics.arcade.collide(this.runners, this.layer);
+
             this.game.physics.arcade.collide(this.shooters, this.layer);
+            this.game.physics.arcade.collide(this.runners, this.layer);
+
+            this.allEnemies.forEach((enemyGroup) => {
+                this.game.physics.arcade.overlap(this.player.weapon, enemyGroup, (weapon, enemy)=> {
+                    weapon.kill();
+                    enemy.damage(weapon.damagePoint);
+                });
+            }, null);
 
             this.shooters.forEach((shooter)=> {
-                this.game.physics.arcade.collide(this.player, shooter.bullets, (player, bullet)=> {
+                this.game.physics.arcade.overlap(this.player, shooter.bullets, (player, bullet)=> {
                     bullet.kill();
-                    this.player.damage(50);
+                    this.player.damage(bullet.damage);
                 });
             }, null);
         }
