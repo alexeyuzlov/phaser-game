@@ -1,8 +1,4 @@
 module Sample.Prefab {
-    export enum Direction {
-        Left,
-        Right,
-    }
 
     export class Runner extends Phaser.Sprite {
         gravity:number = 300;

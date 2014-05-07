@@ -2,12 +2,13 @@
 
 module Sample.Prefab {
 
-    export class Player extends Phaser.Sprite {
+    export class Player extends Phaser.Sprite implements IDirection {
         gravity:number = 300;
         velocity:number = 300;
         jumpHeight:number = 150;
-        weapon: Prefab.Weapon;
-        direction: Direction = Direction.Right;
+
+        weapon:Prefab.Weapon;
+        direction:Direction = Direction.Right;
 
         // healhPoints - Phaser include health points
         manaPoints:number = 100;
@@ -25,6 +26,7 @@ module Sample.Prefab {
             this.animations.add('walk', null, 10, true);
 
             this.weapon = new Prefab.Weapon(game, 0, 0);
+            this.weapon.setOwner(this);
 
             game.add.existing(this);
         }
@@ -55,19 +57,7 @@ module Sample.Prefab {
         }
 
         attack() {
-            if (this.game.input.keyboard.isDown(Phaser.Keyboard.Z)) {
-                this.weapon.revive();
-
-                if (this.direction == Direction.Right) {
-                    this.weapon.scale.x = 1;
-                    this.weapon.reset(this.x + this.weapon.width, this.y);
-                }
-
-                if (this.direction == Direction.Left) {
-                    this.weapon.scale.x = -1;
-                    this.weapon.reset(this.x + this.weapon.width, this.y);
-                }
-            }
+            this.weapon.attack();
         }
 
         superspeed() {

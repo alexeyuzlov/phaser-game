@@ -60,13 +60,12 @@ module Sample.State {
 
             this.allEnemies.forEach((enemyGroup) => {
                 this.game.physics.arcade.overlap(this.player.weapon, enemyGroup, (weapon, enemy)=> {
-                    weapon.kill();
                     enemy.damage(weapon.damagePoint);
                 });
             }, null);
 
             this.shooters.forEach((shooter)=> {
-                this.game.physics.arcade.overlap(this.player, shooter.bullets, (player, bullet)=> {
+                this.game.physics.arcade.collide(this.player, shooter.bullets, (player, bullet)=> {
                     bullet.kill();
                     this.player.damage(bullet.damage);
                 });
