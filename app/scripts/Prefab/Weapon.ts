@@ -21,8 +21,9 @@ module Sample.Prefab {
         }
 
         attack() {
-
-            if (this.game.input.keyboard.isDown(Phaser.Keyboard.Z) && !this.isAttackState && !this.isAttackKeyPressed) {
+            if (this.game.input.keyboard.isDown(settings.keys.attack)
+                && !this.isAttackState
+                && !this.isAttackKeyPressed) {
                 this.isAttackKeyPressed = true;
                 this.isAttackState = true;
                 this.attackStateAt = Date.now();
@@ -41,7 +42,7 @@ module Sample.Prefab {
                 }
             }
 
-            if (!this.game.input.keyboard.isDown(Phaser.Keyboard.Z)) {
+            if (!this.game.input.keyboard.isDown(settings.keys.attack)) {
                 this.isAttackKeyPressed = false;
             }
 

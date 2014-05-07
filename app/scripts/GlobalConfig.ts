@@ -24,6 +24,23 @@
 /// <reference path='State/GameOver.ts'/>
 
 module Sample {
+
+    class SettingsClass  {
+        keys: any;
+
+        constructor() {
+            this.keys = {
+                moveLeft: Phaser.Keyboard.LEFT,
+                moveRight: Phaser.Keyboard.RIGHT,
+                jump: Phaser.Keyboard.UP,
+                attack: Phaser.Keyboard.Z,
+                superkey: Phaser.Keyboard.SPACEBAR
+            }
+        }
+    }
+
+    export var settings: any = new SettingsClass();
+
     export enum Levels {
         Zone1Level1, Zone1Level2, Zone1Level3,
         Zone2Level1, Zone2Level2, Zone2Level3,

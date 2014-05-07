@@ -3,9 +3,12 @@
 module Sample.Prefab {
 
     export class Player extends Phaser.Sprite implements IDirection {
-        gravity:number = 300;
-        velocity:number = 300;
-        jumpHeight:number = 150;
+        private gravity:number = 300;
+        private velocity:number = 300;
+
+        jumpHeight:number = 300;
+        isJumpState:boolean = false;
+        isActiveJumpKey:boolean = false;
 
         weapon:Prefab.Weapon;
         direction:Direction = Direction.Right;
@@ -32,19 +35,32 @@ module Sample.Prefab {
         }
 
         jump() {
-            if (this.game.input.keyboard.isDown(Phaser.Keyboard.UP)) {
+            if (this.game.input.keyboard.isDown(settings.keys.jump)
+                && !this.isJumpState
+                && this.body.blocked.down
+                && !this.isActiveJumpKey) {
+                this.isActiveJumpKey = true;
+                this.isJumpState = true;
                 this.body.velocity.y = -this.jumpHeight;
+            }
+
+            if (!this.game.input.keyboard.isDown(settings.keys.jump)) {
+                this.isActiveJumpKey = false;
+            }
+
+            if (this.body.blocked.down) {
+                this.isJumpState = false;
             }
         }
 
         move() {
-            if (this.game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
+            if (this.game.input.keyboard.isDown(settings.keys.moveRight)) {
                 this.body.velocity.x = this.velocity;
                 this.animations.play('walk');
                 this.direction = Direction.Right;
                 this.scale.x = 1;
             }
-            else if (this.game.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
+            else if (this.game.input.keyboard.isDown(settings.keys.moveLeft)) {
                 this.body.velocity.x = -this.velocity;
                 this.animations.play('walk');
                 this.direction = Direction.Left;
