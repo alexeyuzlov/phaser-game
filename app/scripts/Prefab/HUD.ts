@@ -8,9 +8,6 @@ module Sample.Prefab {
         manaText: string = "Mana: 100";
         manaState: Phaser.Text;
 
-        livesCounterText: string = "Lives: 3";
-        livesCounterState: Phaser.Text;
-
         currentLevelText: string = "Level: 1-1";
         currentLevelState: Phaser.Text;
 
@@ -36,17 +33,26 @@ module Sample.Prefab {
             this.currentLevelState = this.game.add.text(this.x + 280, this.y + 8, this.currentLevelText, this.textStyle);
             this.addChild(this.currentLevelState);
 
-            this.scoreState = this.game.add.text(this.x + 420, this.y + 8, this.scoreText, this.textStyle);
+            this.scoreState = this.game.add.text(this.x + 550, this.y + 8, this.scoreText, this.textStyle);
             this.addChild(this.scoreState);
-
-            this.livesCounterState = this.game.add.text(this.x + 550, this.y + 8, this.livesCounterText, this.textStyle);
-            this.addChild(this.livesCounterState);
 
             game.add.existing(this);
         }
 
-        update() {
+        setHealthState(health: number) {
+            this.healthState.text = "Health: " + health.toString();
+        }
 
+        setManaState(mana: number) {
+            this.manaState.text = "Mana: " + mana.toString();
+        }
+
+        setLevelState(level) {
+            this.currentLevelState.text = "Level: " + Sample.State.Level.GetLevelName(level); /* Sample.State.Level.GetLevelByName() */
+        }
+
+        setScoreState(score: number) {
+            this.scoreState.text = "Score: " + score.toString();
         }
     }
 }

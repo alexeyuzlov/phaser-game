@@ -3,6 +3,7 @@
 module Sample.State {
 
     export class Zone2Level3 extends Level {
+        currentLevel: Levels = Levels.Zone2Level3;
         nextLevel: string = Levels.Zone3Level1.toString();
 
         preload() {

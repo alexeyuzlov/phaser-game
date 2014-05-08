@@ -9,7 +9,10 @@
 module Sample.State {
 
     export class Level extends Phaser.State {
+        currentLevel: Levels;
         nextLevel: string;
+
+        score: number = 0;
 
         map:Phaser.Tilemap;
         layer:Phaser.TilemapLayer;
@@ -57,12 +60,13 @@ module Sample.State {
 
             // HUD MANAGER
             this.hud = new Prefab.HUD(this.game, 0, 0);
+            this.hud.setLevelState(this.currentLevel);
 
             // POST-SETTINGS
             this.game.camera.follow(this.player);
         }
 
-        private checkCollide() {
+        private doCollide() {
             this.game.physics.arcade.collide(this.player, this.layer);
 
             this.game.physics.arcade.collide(this.shooters, this.layer);
@@ -80,15 +84,38 @@ module Sample.State {
                 this.game.physics.arcade.collide(this.player, shooter.bullets, (player, bullet)=> {
                     bullet.kill();
                     this.player.damage(bullet.damage);
+                    this.hud.setScoreState(this.score++);
                 });
             }, null);
         }
 
         update() {
-            this.checkCollide();
+            this.doCollide();
 
             if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
                 this.game.state.start(this.nextLevel.toString());
+            }
+        }
+
+        static GetLevelName(level: Levels) {
+            switch (level) {
+                case Levels.Zone1Level1: return '1-1';
+                case Levels.Zone1Level2: return '1-2';
+                case Levels.Zone1Level3: return '1-3';
+
+                case Levels.Zone2Level1: return '2-1';
+                case Levels.Zone2Level2: return '2-2';
+                case Levels.Zone2Level3: return '2-3';
+
+                case Levels.Zone3Level1: return '3-1';
+                case Levels.Zone3Level2: return '3-2';
+                case Levels.Zone3Level3: return '3-3';
+
+                case Levels.Zone4Level1: return '4-1';
+                case Levels.Zone4Level2: return '4-2';
+                case Levels.Zone4Level3: return '4-3';
+
+                default: return 'X-X';
             }
         }
     }
