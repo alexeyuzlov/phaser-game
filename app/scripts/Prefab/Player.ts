@@ -15,6 +15,10 @@ module Sample.Prefab {
 
         manaPoints:number = 100;
 
+        immortalState: boolean = false;
+        immortalStateAt: number = Date.now();
+        immortalDuration: number = 3000;
+
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'player');
 
@@ -24,13 +28,20 @@ module Sample.Prefab {
 
             this.alive = true;
             this.health = 100;
-
+            this.smoothed = true;
             this.animations.add('walk', null, 10, true);
 
             this.weapon = new Prefab.Weapon(game, 0, 0);
             this.weapon.setOwner(this);
 
             game.add.existing(this);
+        }
+
+        makeDamage(damagePoint) {
+            this.damage(damagePoint);
+            this.immortalStateAt = Date.now();
+            this.immortalState = true;
+            this.alpha = 0.5;
         }
 
         jump() {
@@ -83,10 +94,18 @@ module Sample.Prefab {
 
         }
 
+        state() {
+            if (this.immortalState && (Date.now() - this.immortalStateAt) > this.immortalDuration) {
+                this.alpha = 1;
+                this.immortalState = false;
+            }
+        }
+
         update() {
             this.move();
             this.jump();
             this.attack();
+            this.state();
         }
     }
 }

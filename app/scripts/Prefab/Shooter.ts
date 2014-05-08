@@ -24,6 +24,7 @@ module Sample.Prefab {
             }
 
             this.alive = true;
+            this.health = 10;
 
             game.add.existing(this);
         }

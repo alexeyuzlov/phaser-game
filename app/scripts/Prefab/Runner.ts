@@ -13,6 +13,7 @@ module Sample.Prefab {
             this.anchor.set(0.5, 0.5);
 
             this.alive = true;
+            this.health = 10;
 
             game.add.existing(this);
         }

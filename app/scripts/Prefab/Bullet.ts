@@ -1,7 +1,7 @@
 module Sample.Prefab {
     export class Bullet extends Phaser.Sprite {
         speed: number = 300;
-        damagePoint: number = 50;
+        damagePoint: number = 30;
 
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'bullet');

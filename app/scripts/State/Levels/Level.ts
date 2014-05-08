@@ -76,6 +76,8 @@ module Sample.State {
             this.allEnemies.forEach((enemyGroup) => {
                 this.game.physics.arcade.overlap(this.player.weapon, enemyGroup, (weapon, enemy)=> {
                     enemy.damage(weapon.damagePoint);
+                    this.score++;
+                    this.hud.setScoreState(this.score);
                 });
             }, null);
 
@@ -83,8 +85,12 @@ module Sample.State {
             this.shooters.forEach((shooter)=> {
                 this.game.physics.arcade.collide(this.player, shooter.bullets, (player, bullet)=> {
                     bullet.kill();
-                    this.player.damage(bullet.damage);
-                    this.hud.setScoreState(this.score++);
+
+                    if (!this.player.immortalState) {
+                        this.player.makeDamage(bullet.damagePoint);
+
+                        this.hud.setHealthState(this.player.health);
+                    }
                 });
             }, null);
         }

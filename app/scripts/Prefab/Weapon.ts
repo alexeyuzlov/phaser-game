@@ -1,6 +1,6 @@
 module Sample.Prefab {
     export class Weapon extends Phaser.Sprite {
-        damagePoint: number = 50;
+        damagePoint: number = 30;
 
         isAttackState: boolean = false;
         isAttackKeyPressed: boolean = false;
