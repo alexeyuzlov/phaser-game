@@ -1,10 +1,9 @@
 module Sample.Prefab {
 
-    export class Runner extends Phaser.Sprite {
+    export class Runner extends Phaser.Sprite implements IDirection {
         gravity:number = 300;
         velocity:number = 100;
         direction:Direction = Direction.Right;
-        visibleDistance:number = 800;
 
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'runner');

@@ -13,7 +13,6 @@ module Sample.Prefab {
         weapon:Prefab.Weapon;
         direction:Direction = Direction.Right;
 
-        // healhPoints - Phaser include health points
         manaPoints:number = 100;
 
         constructor(game:Phaser.Game, x:number, y:number) {
@@ -23,8 +22,8 @@ module Sample.Prefab {
             this.body.gravity.y = this.gravity;
             this.anchor.set(0.5, 0.5);
 
-            //this.alive = true;
-            //this.health = 101;
+            this.alive = true;
+            this.health = 100;
 
             this.animations.add('walk', null, 10, true);
 
