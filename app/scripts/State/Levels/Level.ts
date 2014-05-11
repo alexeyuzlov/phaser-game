@@ -73,6 +73,7 @@ module Sample.State {
             this.game.physics.arcade.collide(this.runners, this.layer);
 
             // check weapon activity
+            /*
             this.allEnemies.forEach((enemyGroup) => {
                 this.game.physics.arcade.overlap(this.player.weapon, enemyGroup, (weapon, enemy)=> {
                     enemy.damage(weapon.damagePoint);
@@ -80,6 +81,7 @@ module Sample.State {
                     this.hud.setScoreState(this.score);
                 });
             }, null);
+            */
 
             // check bullets activity
             this.shooters.forEach((shooter)=> {

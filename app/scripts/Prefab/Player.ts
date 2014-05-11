@@ -1,23 +1,28 @@
-/// <reference path='../Prefab/Weapon.ts'/>
-
 module Sample.Prefab {
 
     export class Player extends Phaser.Sprite implements IDirection {
         private gravity:number = 300;
         private velocity:number = 300;
-
+        damagePoint:number = 30;
         jumpHeight:number = 300;
-        isJumpState:boolean = false;
-        isActiveJumpKey:boolean = false;
 
-        weapon:Prefab.Weapon;
+        isJumpState:boolean = false;
+        immortalState:boolean = false;
+        attackState:boolean = false;
+        isMoveState:boolean = false;
+
         direction:Direction = Direction.Right;
 
         manaPoints:number = 100;
 
-        immortalState: boolean = false;
-        immortalStateAt: number = Date.now();
-        immortalDuration: number = 3000;
+        immortalStateAt:number = Date.now();
+        attackStateAt:number = Date.now();
+
+        immortalDuration:number = 3000;
+        attackDuration:number = 300;
+
+        isActiveJumpKey:boolean = false;
+        isAttackKeyPressed:boolean = false;
 
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'player');
@@ -28,11 +33,11 @@ module Sample.Prefab {
 
             this.alive = true;
             this.health = 100;
-            this.smoothed = true;
-            this.animations.add('walk', null, 10, true);
 
-            this.weapon = new Prefab.Weapon(game, 0, 0);
-            this.weapon.setOwner(this);
+            //this.smoothed = true;
+
+            this.animations.add('walk', Phaser.Animation.generateFrameNames('player-walk-', 1, 4, '.png', 0), 10, true);
+            this.animations.add('attack', Phaser.Animation.generateFrameNames('player-attack-', 1, 3, '.png', 0), 10, true);
 
             game.add.existing(this);
         }
@@ -65,39 +70,59 @@ module Sample.Prefab {
 
         move() {
             if (this.game.input.keyboard.isDown(settings.keys.moveRight)) {
+                this.isMoveState = true;
                 this.body.velocity.x = this.velocity;
-                this.animations.play('walk');
                 this.direction = Direction.Right;
                 this.scale.x = 1;
             }
             else if (this.game.input.keyboard.isDown(settings.keys.moveLeft)) {
+                this.isMoveState = true;
                 this.body.velocity.x = -this.velocity;
-                this.animations.play('walk');
                 this.direction = Direction.Left;
                 this.scale.x = -1;
             }
             else {
+                this.isMoveState = false;
                 this.body.velocity.x = 0;
-                this.animations.stop('walk', true);
             }
         }
 
         attack() {
-            this.weapon.attack();
+            if (this.game.input.keyboard.isDown(settings.keys.attack) && !this.attackState && !this.isAttackKeyPressed) {
+                this.isAttackKeyPressed = true;
+                this.attackState = true;
+                this.attackStateAt = Date.now();
+            }
+
+            if (!this.game.input.keyboard.isDown(settings.keys.attack)) {
+                this.isAttackKeyPressed = false;
+            }
+
+            if ((Date.now() - this.attackStateAt) > this.attackDuration) {
+                this.attackState = false;
+            }
         }
 
         superspeed() {
-
+            // for big jump
         }
 
         superattack() {
-
+            // distance attack
         }
 
-        state() {
+       state() {
             if (this.immortalState && (Date.now() - this.immortalStateAt) > this.immortalDuration) {
                 this.alpha = 1;
                 this.immortalState = false;
+            }
+
+            if (this.attackState) {
+                this.animations.play('attack');
+            } else if (this.isMoveState) {
+                this.animations.play('walk');
+            } else {
+                this.animations.stop();
             }
         }
 
@@ -105,6 +130,7 @@ module Sample.Prefab {
             this.move();
             this.jump();
             this.attack();
+
             this.state();
         }
     }
