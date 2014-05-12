@@ -8,7 +8,7 @@ module Sample.State {
 
             this.load.image('menu-background', 'assets/images/menu-background.png');
 
-            this.load.atlasXML('player', 'assets/images/prefabs/player.png', 'assets/images/prefabs/player.xml');
+            this.load.atlasXML('player', 'assets/images/prefabs/player/player.png', 'assets/images/prefabs/player/player.xml');
 
             this.load.image('runner', 'assets/images/prefabs/runner.png');
             this.load.image('flier', 'assets/images/prefabs/flier.png');
@@ -19,7 +19,7 @@ module Sample.State {
         }
 
         create() {
-            this.game.state.start(Levels.Zone2Level1.toString());
+            this.game.state.start(Levels.Zone1Level1.toString());
         }
     }
 }

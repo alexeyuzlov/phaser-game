@@ -32,8 +32,11 @@ module Sample {
             this.keys = {
                 moveLeft: Phaser.Keyboard.LEFT,
                 moveRight: Phaser.Keyboard.RIGHT,
-                jump: Phaser.Keyboard.UP,
-                attack: Phaser.Keyboard.Z,
+                sit: Phaser.Keyboard.DOWN,
+                jump: Phaser.Keyboard.Z,
+                attack: Phaser.Keyboard.X,
+                superAttack: Phaser.Keyboard.A,
+                superSpeed: Phaser.Keyboard.S,
                 superkey: Phaser.Keyboard.SPACEBAR
             }
         }

@@ -41,7 +41,7 @@ var Sample;
 
                 this.load.image('menu-background', 'assets/images/menu-background.png');
 
-                this.load.atlasXML('player', 'assets/images/prefabs/player.png', 'assets/images/prefabs/player.xml');
+                this.load.atlasXML('player', 'assets/images/prefabs/player/player.png', 'assets/images/prefabs/player/player.xml');
 
                 this.load.image('runner', 'assets/images/prefabs/runner.png');
                 this.load.image('flier', 'assets/images/prefabs/flier.png');
@@ -52,7 +52,7 @@ var Sample;
             };
 
             Preload.prototype.create = function () {
-                this.game.state.start(3 /* Zone2Level1 */.toString());
+                this.game.state.start(0 /* Zone1Level1 */.toString());
             };
             return Preload;
         })(Phaser.State);
@@ -91,15 +91,20 @@ var Sample;
             function Player(game, x, y) {
                 _super.call(this, game, x, y, 'player');
                 this.gravity = 300;
-                this.acceleration = 1500;
+                this.acceleration = 1000;
+                this.drag = 1000;
                 this.maxSpeed = 300;
+                this.superSpeedPower = 600;
                 this.damagePoint = 30;
-                this.jumpHeight = 300;
-                this.isJumpState = false;
+                this.jumpPower = 300;
                 this.immortalState = false;
                 this.attackState = false;
-                this.isMoveState = false;
+                this.moveState = false;
+                this.sitState = false;
+                this.superSpeedState = false;
+                this.superAttakState = false;
                 this.direction = 1 /* Right */;
+                this.healthPoints = 10000;
                 this.manaPoints = 100;
                 this.immortalStateAt = Date.now();
                 this.attackStateAt = Date.now();
@@ -110,16 +115,18 @@ var Sample;
 
                 game.physics.arcade.enable(this);
                 this.body.gravity.y = this.gravity;
-                this.anchor.set(0.5, 0.5);
+                this.anchor.set(0.5, 1);
 
-                this.body.drag.x = this.acceleration;
+                this.body.drag.x = this.drag;
                 this.body.maxVelocity.x = this.maxSpeed;
 
                 this.alive = true;
-                this.health = 100;
+                this.health = this.healthPoints;
 
+                this.animations.add('stay', ['player-walk-1.png'], 10, true);
                 this.animations.add('walk', Phaser.Animation.generateFrameNames('player-walk-', 1, 4, '.png', 0), 10, true);
                 this.animations.add('attack', Phaser.Animation.generateFrameNames('player-attack-', 1, 3, '.png', 0), 10, true);
+                this.animations.add('sit', ['player-sit-1.png'], 10, true);
 
                 game.add.existing(this);
             }
@@ -131,34 +138,29 @@ var Sample;
             };
 
             Player.prototype.jump = function () {
-                if (this.game.input.keyboard.isDown(Sample.settings.keys.jump) && !this.isJumpState && this.body.blocked.down && !this.isActiveJumpKey) {
+                if (this.game.input.keyboard.isDown(Sample.settings.keys.jump) && this.body.blocked.down && !this.isActiveJumpKey) {
                     this.isActiveJumpKey = true;
-                    this.isJumpState = true;
-                    this.body.velocity.y = -this.jumpHeight;
+                    this.body.velocity.y = -this.jumpPower;
                 }
 
                 if (!this.game.input.keyboard.isDown(Sample.settings.keys.jump)) {
                     this.isActiveJumpKey = false;
                 }
-
-                if (this.body.blocked.down) {
-                    this.isJumpState = false;
-                }
             };
 
             Player.prototype.move = function () {
                 if (this.game.input.keyboard.isDown(Sample.settings.keys.moveRight)) {
-                    this.isMoveState = true;
+                    this.moveState = true;
                     this.body.acceleration.x = this.acceleration;
                     this.direction = 1 /* Right */;
                     this.scale.x = 1;
                 } else if (this.game.input.keyboard.isDown(Sample.settings.keys.moveLeft)) {
-                    this.isMoveState = true;
+                    this.moveState = true;
                     this.body.acceleration.x = -this.acceleration;
                     this.direction = 0 /* Left */;
                     this.scale.x = -1;
                 } else {
-                    this.isMoveState = false;
+                    this.moveState = false;
                     this.body.acceleration.x = 0;
                 }
             };
@@ -179,10 +181,33 @@ var Sample;
                 }
             };
 
-            Player.prototype.superspeed = function () {
+            Player.prototype.superSpeed = function () {
+                if (this.game.input.keyboard.isDown(Sample.settings.keys.superSpeed) && this.body.blocked.down && !this.attackState) {
+                    this.superSpeedState = true;
+                }
+
+                if (!this.game.input.keyboard.isDown(Sample.settings.keys.superSpeed)) {
+                    this.superSpeedState = false;
+                }
+
+                if (this.superSpeedState) {
+                    this.body.maxVelocity.x = this.superSpeedPower;
+                } else {
+                    this.body.maxVelocity.x = this.maxSpeed;
+                }
             };
 
-            Player.prototype.superattack = function () {
+            Player.prototype.superAttack = function () {
+            };
+
+            Player.prototype.sit = function () {
+                if (this.game.input.keyboard.isDown(Sample.settings.keys.sit)) {
+                    this.sitState = true;
+                }
+
+                if (!this.game.input.keyboard.isDown(Sample.settings.keys.sit)) {
+                    this.sitState = false;
+                }
             };
 
             Player.prototype.state = function () {
@@ -193,17 +218,25 @@ var Sample;
 
                 if (this.attackState) {
                     this.animations.play('attack');
-                } else if (this.isMoveState) {
+                } else if (this.moveState) {
                     this.animations.play('walk');
+                } else if (this.sitState) {
+                    this.animations.play('sit');
                 } else {
-                    this.animations.stop();
+                    this.animations.play('stay');
                 }
+
+                this.body.width = this.animations.currentFrame.width;
+                this.body.height = this.animations.currentFrame.height;
             };
 
             Player.prototype.update = function () {
                 this.move();
                 this.jump();
                 this.attack();
+                this.sit();
+                this.superSpeed();
+                this.superAttack();
 
                 this.state();
             };
@@ -1038,8 +1071,11 @@ var Sample;
             this.keys = {
                 moveLeft: Phaser.Keyboard.LEFT,
                 moveRight: Phaser.Keyboard.RIGHT,
-                jump: Phaser.Keyboard.UP,
-                attack: Phaser.Keyboard.Z,
+                sit: Phaser.Keyboard.DOWN,
+                jump: Phaser.Keyboard.Z,
+                attack: Phaser.Keyboard.X,
+                superAttack: Phaser.Keyboard.A,
+                superSpeed: Phaser.Keyboard.S,
                 superkey: Phaser.Keyboard.SPACEBAR
             };
         }
