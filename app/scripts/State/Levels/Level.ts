@@ -9,10 +9,10 @@
 module Sample.State {
 
     export class Level extends Phaser.State {
-        currentLevel: Levels;
-        nextLevel: string;
+        currentLevel:Levels;
+        nextLevel:string;
 
-        score: number = 0;
+        score:number = 0;
 
         map:Phaser.Tilemap;
         layer:Phaser.TilemapLayer;
@@ -24,7 +24,7 @@ module Sample.State {
         runners:Phaser.Group;
         fliers:Phaser.Group;
 
-        hud: Prefab.HUD;
+        hud:Prefab.HUD;
 
         create() {
             // PRE-SETTINGS
@@ -74,14 +74,14 @@ module Sample.State {
 
             // check weapon activity
             /*
-            this.allEnemies.forEach((enemyGroup) => {
-                this.game.physics.arcade.overlap(this.player.weapon, enemyGroup, (weapon, enemy)=> {
-                    enemy.damage(weapon.damagePoint);
-                    this.score++;
-                    this.hud.setScoreState(this.score);
-                });
-            }, null);
-            */
+             this.allEnemies.forEach((enemyGroup) => {
+             this.game.physics.arcade.overlap(this.player.weapon, enemyGroup, (weapon, enemy)=> {
+             enemy.damage(weapon.damagePoint);
+             this.score++;
+             this.hud.setScoreState(this.score);
+             });
+             }, null);
+             */
 
             // check bullets activity
             this.shooters.forEach((shooter)=> {
@@ -105,25 +105,38 @@ module Sample.State {
             }
         }
 
-        static GetLevelName(level: Levels) {
+        static GetLevelName(level:Levels) {
             switch (level) {
-                case Levels.Zone1Level1: return '1-1';
-                case Levels.Zone1Level2: return '1-2';
-                case Levels.Zone1Level3: return '1-3';
+                case Levels.Zone1Level1:
+                    return '1-1';
+                case Levels.Zone1Level2:
+                    return '1-2';
+                case Levels.Zone1Level3:
+                    return '1-3';
 
-                case Levels.Zone2Level1: return '2-1';
-                case Levels.Zone2Level2: return '2-2';
-                case Levels.Zone2Level3: return '2-3';
+                case Levels.Zone2Level1:
+                    return '2-1';
+                case Levels.Zone2Level2:
+                    return '2-2';
+                case Levels.Zone2Level3:
+                    return '2-3';
 
-                case Levels.Zone3Level1: return '3-1';
-                case Levels.Zone3Level2: return '3-2';
-                case Levels.Zone3Level3: return '3-3';
+                case Levels.Zone3Level1:
+                    return '3-1';
+                case Levels.Zone3Level2:
+                    return '3-2';
+                case Levels.Zone3Level3:
+                    return '3-3';
 
-                case Levels.Zone4Level1: return '4-1';
-                case Levels.Zone4Level2: return '4-2';
-                case Levels.Zone4Level3: return '4-3';
+                case Levels.Zone4Level1:
+                    return '4-1';
+                case Levels.Zone4Level2:
+                    return '4-2';
+                case Levels.Zone4Level3:
+                    return '4-3';
 
-                default: return 'X-X';
+                default:
+                    return 'X-X';
             }
         }
     }

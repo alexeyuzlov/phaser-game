@@ -91,7 +91,8 @@ var Sample;
             function Player(game, x, y) {
                 _super.call(this, game, x, y, 'player');
                 this.gravity = 300;
-                this.velocity = 300;
+                this.acceleration = 1500;
+                this.maxSpeed = 300;
                 this.damagePoint = 30;
                 this.jumpHeight = 300;
                 this.isJumpState = false;
@@ -110,6 +111,9 @@ var Sample;
                 game.physics.arcade.enable(this);
                 this.body.gravity.y = this.gravity;
                 this.anchor.set(0.5, 0.5);
+
+                this.body.drag.x = this.acceleration;
+                this.body.maxVelocity.x = this.maxSpeed;
 
                 this.alive = true;
                 this.health = 100;
@@ -145,17 +149,17 @@ var Sample;
             Player.prototype.move = function () {
                 if (this.game.input.keyboard.isDown(Sample.settings.keys.moveRight)) {
                     this.isMoveState = true;
-                    this.body.velocity.x = this.velocity;
+                    this.body.acceleration.x = this.acceleration;
                     this.direction = 1 /* Right */;
                     this.scale.x = 1;
                 } else if (this.game.input.keyboard.isDown(Sample.settings.keys.moveLeft)) {
                     this.isMoveState = true;
-                    this.body.velocity.x = -this.velocity;
+                    this.body.acceleration.x = -this.acceleration;
                     this.direction = 0 /* Left */;
                     this.scale.x = -1;
                 } else {
                     this.isMoveState = false;
-                    this.body.velocity.x = 0;
+                    this.body.acceleration.x = 0;
                 }
             };
 
@@ -552,6 +556,31 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (State) {
+        var Zone1 = (function (_super) {
+            __extends(Zone1, _super);
+            function Zone1() {
+                _super.apply(this, arguments);
+            }
+            Zone1.prototype.preload = function () {
+                this.game.load.image('zone', 'assets/images/levels/zone1.png');
+            };
+
+            Zone1.prototype.create = function () {
+                _super.prototype.create.call(this);
+            };
+
+            Zone1.prototype.update = function () {
+                _super.prototype.update.call(this);
+            };
+            return Zone1;
+        })(State.Level);
+        State.Zone1 = Zone1;
+    })(Sample.State || (Sample.State = {}));
+    var State = Sample.State;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (State) {
         var Zone1Level1 = (function (_super) {
             __extends(Zone1Level1, _super);
             function Zone1Level1() {
@@ -560,8 +589,8 @@ var Sample;
                 this.nextLevel = 1 /* Zone1Level2 */.toString();
             }
             Zone1Level1.prototype.preload = function () {
+                _super.prototype.preload.call(this);
                 this.game.load.tilemap('map', 'assets/levels/1-1.json', null, Phaser.Tilemap.TILED_JSON);
-                this.game.load.image('zone', 'assets/images/levels/zone1.png');
             };
 
             Zone1Level1.prototype.create = function () {
@@ -572,7 +601,7 @@ var Sample;
                 _super.prototype.update.call(this);
             };
             return Zone1Level1;
-        })(State.Level);
+        })(State.Zone1);
         State.Zone1Level1 = Zone1Level1;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
@@ -588,8 +617,8 @@ var Sample;
                 this.nextLevel = 2 /* Zone1Level3 */.toString();
             }
             Zone1Level2.prototype.preload = function () {
+                _super.prototype.preload.call(this);
                 this.game.load.tilemap('map', 'assets/levels/1-2.json', null, Phaser.Tilemap.TILED_JSON);
-                this.game.load.image('zone', 'assets/images/levels/zone1.png');
             };
 
             Zone1Level2.prototype.create = function () {
@@ -600,7 +629,7 @@ var Sample;
                 _super.prototype.update.call(this);
             };
             return Zone1Level2;
-        })(State.Level);
+        })(State.Zone1);
         State.Zone1Level2 = Zone1Level2;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
@@ -616,8 +645,8 @@ var Sample;
                 this.nextLevel = 3 /* Zone2Level1 */.toString();
             }
             Zone1Level3.prototype.preload = function () {
+                _super.prototype.preload.call(this);
                 this.game.load.tilemap('map', 'assets/levels/1-3.json', null, Phaser.Tilemap.TILED_JSON);
-                this.game.load.image('zone', 'assets/images/levels/zone1.png');
             };
 
             Zone1Level3.prototype.create = function () {
@@ -628,8 +657,60 @@ var Sample;
                 _super.prototype.update.call(this);
             };
             return Zone1Level3;
-        })(State.Level);
+        })(State.Zone1);
         State.Zone1Level3 = Zone1Level3;
+    })(Sample.State || (Sample.State = {}));
+    var State = Sample.State;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (State) {
+        var Zone2 = (function (_super) {
+            __extends(Zone2, _super);
+            function Zone2() {
+                _super.apply(this, arguments);
+                this.LIGHT_RADIUS = 100;
+            }
+            Zone2.prototype.preload = function () {
+                this.game.load.image('zone', 'assets/images/levels/zone2.png');
+            };
+
+            Zone2.prototype.create = function () {
+                _super.prototype.create.call(this);
+
+                this.shadowTexture = this.game.add.bitmapData(this.game.width, this.game.height);
+
+                this.lightSprite = this.game.add.image(0, 0, this.shadowTexture);
+
+                this.lightSprite.blendMode = PIXI.blendModes.MULTIPLY;
+
+                this.game.input.activePointer.x = this.game.width / 2;
+                this.game.input.activePointer.y = this.game.height / 2;
+            };
+
+            Zone2.prototype.update = function () {
+                _super.prototype.update.call(this);
+                this.updateShadowTexture();
+            };
+
+            Zone2.prototype.updateShadowTexture = function () {
+                this.shadowTexture.context.fillStyle = 'rgb(100, 100, 100)';
+                this.shadowTexture.context.fillRect(0, 0, this.game.width, this.game.height);
+
+                var gradient = this.shadowTexture.context.createRadialGradient(this.game.input.activePointer.x, this.game.input.activePointer.y, this.LIGHT_RADIUS * 0.75, this.game.input.activePointer.x, this.game.input.activePointer.y, this.LIGHT_RADIUS);
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
+                gradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
+
+                this.shadowTexture.context.beginPath();
+                this.shadowTexture.context.fillStyle = gradient;
+                this.shadowTexture.context.arc(this.game.input.activePointer.x, this.game.input.activePointer.y, this.LIGHT_RADIUS, 0, Math.PI * 2);
+                this.shadowTexture.context.fill();
+
+                this.shadowTexture.dirty = true;
+            };
+            return Zone2;
+        })(State.Level);
+        State.Zone2 = Zone2;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
 })(Sample || (Sample = {}));
@@ -644,8 +725,8 @@ var Sample;
                 this.nextLevel = 4 /* Zone2Level2 */.toString();
             }
             Zone2Level1.prototype.preload = function () {
+                _super.prototype.preload.call(this);
                 this.game.load.tilemap('map', 'assets/levels/2-1.json', null, Phaser.Tilemap.TILED_JSON);
-                this.game.load.image('zone', 'assets/images/levels/zone2.png');
             };
 
             Zone2Level1.prototype.create = function () {
@@ -656,7 +737,7 @@ var Sample;
                 _super.prototype.update.call(this);
             };
             return Zone2Level1;
-        })(State.Level);
+        })(State.Zone2);
         State.Zone2Level1 = Zone2Level1;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
@@ -672,8 +753,8 @@ var Sample;
                 this.nextLevel = 5 /* Zone2Level3 */.toString();
             }
             Zone2Level2.prototype.preload = function () {
+                _super.prototype.preload.call(this);
                 this.game.load.tilemap('map', 'assets/levels/2-2.json', null, Phaser.Tilemap.TILED_JSON);
-                this.game.load.image('zone', 'assets/images/levels/zone2.png');
             };
 
             Zone2Level2.prototype.create = function () {
@@ -684,7 +765,7 @@ var Sample;
                 _super.prototype.update.call(this);
             };
             return Zone2Level2;
-        })(State.Level);
+        })(State.Zone2);
         State.Zone2Level2 = Zone2Level2;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
@@ -700,8 +781,8 @@ var Sample;
                 this.nextLevel = 6 /* Zone3Level1 */.toString();
             }
             Zone2Level3.prototype.preload = function () {
+                _super.prototype.preload.call(this);
                 this.game.load.tilemap('map', 'assets/levels/2-3.json', null, Phaser.Tilemap.TILED_JSON);
-                this.game.load.image('zone', 'assets/images/levels/zone2.png');
             };
 
             Zone2Level3.prototype.create = function () {
@@ -712,8 +793,35 @@ var Sample;
                 _super.prototype.update.call(this);
             };
             return Zone2Level3;
-        })(State.Level);
+        })(State.Zone2);
         State.Zone2Level3 = Zone2Level3;
+    })(Sample.State || (Sample.State = {}));
+    var State = Sample.State;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (State) {
+        var Zone3 = (function (_super) {
+            __extends(Zone3, _super);
+            function Zone3() {
+                _super.apply(this, arguments);
+            }
+            Zone3.prototype.preload = function () {
+                this.game.load.image('zone', 'assets/images/levels/zone3.png');
+            };
+
+            Zone3.prototype.create = function () {
+                _super.prototype.create.call(this);
+
+                this.player.body.drag.x = 10;
+            };
+
+            Zone3.prototype.update = function () {
+                _super.prototype.update.call(this);
+            };
+            return Zone3;
+        })(State.Level);
+        State.Zone3 = Zone3;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
 })(Sample || (Sample = {}));
@@ -728,8 +836,8 @@ var Sample;
                 this.nextLevel = 7 /* Zone3Level2 */.toString();
             }
             Zone3Level1.prototype.preload = function () {
+                _super.prototype.preload.call(this);
                 this.game.load.tilemap('map', 'assets/levels/3-1.json', null, Phaser.Tilemap.TILED_JSON);
-                this.game.load.image('zone', 'assets/images/levels/zone3.png');
             };
 
             Zone3Level1.prototype.create = function () {
@@ -740,7 +848,7 @@ var Sample;
                 _super.prototype.update.call(this);
             };
             return Zone3Level1;
-        })(State.Level);
+        })(State.Zone3);
         State.Zone3Level1 = Zone3Level1;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
@@ -756,8 +864,8 @@ var Sample;
                 this.nextLevel = 8 /* Zone3Level3 */.toString();
             }
             Zone3Level2.prototype.preload = function () {
+                _super.prototype.preload.call(this);
                 this.game.load.tilemap('map', 'assets/levels/3-2.json', null, Phaser.Tilemap.TILED_JSON);
-                this.game.load.image('zone', 'assets/images/levels/zone3.png');
             };
 
             Zone3Level2.prototype.create = function () {
@@ -768,7 +876,7 @@ var Sample;
                 _super.prototype.update.call(this);
             };
             return Zone3Level2;
-        })(State.Level);
+        })(State.Zone3);
         State.Zone3Level2 = Zone3Level2;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
@@ -784,8 +892,8 @@ var Sample;
                 this.nextLevel = 9 /* Zone4Level1 */.toString();
             }
             Zone3Level3.prototype.preload = function () {
+                _super.prototype.preload.call(this);
                 this.game.load.tilemap('map', 'assets/levels/3-3.json', null, Phaser.Tilemap.TILED_JSON);
-                this.game.load.image('zone', 'assets/images/levels/zone3.png');
             };
 
             Zone3Level3.prototype.create = function () {
@@ -796,8 +904,33 @@ var Sample;
                 _super.prototype.update.call(this);
             };
             return Zone3Level3;
-        })(State.Level);
+        })(State.Zone3);
         State.Zone3Level3 = Zone3Level3;
+    })(Sample.State || (Sample.State = {}));
+    var State = Sample.State;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (State) {
+        var Zone4 = (function (_super) {
+            __extends(Zone4, _super);
+            function Zone4() {
+                _super.apply(this, arguments);
+            }
+            Zone4.prototype.preload = function () {
+                this.game.load.image('zone', 'assets/images/levels/zone4.png');
+            };
+
+            Zone4.prototype.create = function () {
+                _super.prototype.create.call(this);
+            };
+
+            Zone4.prototype.update = function () {
+                _super.prototype.update.call(this);
+            };
+            return Zone4;
+        })(State.Level);
+        State.Zone4 = Zone4;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
 })(Sample || (Sample = {}));
@@ -812,8 +945,8 @@ var Sample;
                 this.nextLevel = 10 /* Zone4Level2 */.toString();
             }
             Zone4Level1.prototype.preload = function () {
+                _super.prototype.preload.call(this);
                 this.game.load.tilemap('map', 'assets/levels/4-1.json', null, Phaser.Tilemap.TILED_JSON);
-                this.game.load.image('zone', 'assets/images/levels/zone4.png');
             };
 
             Zone4Level1.prototype.create = function () {
@@ -824,7 +957,7 @@ var Sample;
                 _super.prototype.update.call(this);
             };
             return Zone4Level1;
-        })(State.Level);
+        })(State.Zone4);
         State.Zone4Level1 = Zone4Level1;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
@@ -840,8 +973,8 @@ var Sample;
                 this.nextLevel = 11 /* Zone4Level3 */.toString();
             }
             Zone4Level2.prototype.preload = function () {
+                _super.prototype.preload.call(this);
                 this.game.load.tilemap('map', 'assets/levels/4-2.json', null, Phaser.Tilemap.TILED_JSON);
-                this.game.load.image('zone', 'assets/images/levels/zone4.png');
             };
 
             Zone4Level2.prototype.create = function () {
@@ -852,7 +985,7 @@ var Sample;
                 _super.prototype.update.call(this);
             };
             return Zone4Level2;
-        })(State.Level);
+        })(State.Zone4);
         State.Zone4Level2 = Zone4Level2;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
@@ -868,8 +1001,8 @@ var Sample;
                 this.nextLevel = 'gameOver';
             }
             Zone4Level3.prototype.preload = function () {
+                _super.prototype.preload.call(this);
                 this.game.load.tilemap('map', 'assets/levels/4-3.json', null, Phaser.Tilemap.TILED_JSON);
-                this.game.load.image('zone', 'assets/images/levels/zone4.png');
             };
 
             Zone4Level3.prototype.create = function () {
@@ -880,7 +1013,7 @@ var Sample;
                 _super.prototype.update.call(this);
             };
             return Zone4Level3;
-        })(State.Level);
+        })(State.Zone4);
         State.Zone4Level3 = Zone4Level3;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;

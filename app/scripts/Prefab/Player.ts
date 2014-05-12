@@ -2,7 +2,10 @@ module Sample.Prefab {
 
     export class Player extends Phaser.Sprite implements IDirection {
         private gravity:number = 300;
-        private velocity:number = 300;
+
+        acceleration:number = 1500;
+        private maxSpeed:number = 300;
+
         damagePoint:number = 30;
         jumpHeight:number = 300;
 
@@ -30,6 +33,9 @@ module Sample.Prefab {
             game.physics.arcade.enable(this);
             this.body.gravity.y = this.gravity;
             this.anchor.set(0.5, 0.5);
+
+            this.body.drag.x = this.acceleration;
+            this.body.maxVelocity.x = this.maxSpeed;
 
             this.alive = true;
             this.health = 100;
@@ -71,19 +77,19 @@ module Sample.Prefab {
         move() {
             if (this.game.input.keyboard.isDown(settings.keys.moveRight)) {
                 this.isMoveState = true;
-                this.body.velocity.x = this.velocity;
+                this.body.acceleration.x = this.acceleration;
                 this.direction = Direction.Right;
                 this.scale.x = 1;
             }
             else if (this.game.input.keyboard.isDown(settings.keys.moveLeft)) {
                 this.isMoveState = true;
-                this.body.velocity.x = -this.velocity;
+                this.body.acceleration.x = -this.acceleration;
                 this.direction = Direction.Left;
                 this.scale.x = -1;
             }
             else {
                 this.isMoveState = false;
-                this.body.velocity.x = 0;
+                this.body.acceleration.x = 0;
             }
         }
 
