@@ -52,7 +52,7 @@ var Sample;
             };
 
             Preload.prototype.create = function () {
-                this.game.state.start(0 /* Zone1Level1 */.toString());
+                this.game.state.start(3 /* Zone2Level1 */.toString());
             };
             return Preload;
         })(Phaser.State);
@@ -669,7 +669,7 @@ var Sample;
             __extends(Zone2, _super);
             function Zone2() {
                 _super.apply(this, arguments);
-                this.LIGHT_RADIUS = 100;
+                this.lightRadius = 100;
             }
             Zone2.prototype.preload = function () {
                 this.game.load.image('zone', 'assets/images/levels/zone2.png');
@@ -681,29 +681,25 @@ var Sample;
                 this.shadowTexture = this.game.add.bitmapData(this.game.width, this.game.height);
 
                 this.lightSprite = this.game.add.image(0, 0, this.shadowTexture);
-
                 this.lightSprite.blendMode = PIXI.blendModes.MULTIPLY;
-
-                this.game.input.activePointer.x = this.game.width / 2;
-                this.game.input.activePointer.y = this.game.height / 2;
+                this.lightSprite.fixedToCamera = true;
             };
 
             Zone2.prototype.update = function () {
                 _super.prototype.update.call(this);
-                this.updateShadowTexture();
             };
 
-            Zone2.prototype.updateShadowTexture = function () {
-                this.shadowTexture.context.fillStyle = 'rgb(100, 100, 100)';
+            Zone2.prototype.shadowUpdate = function () {
+                this.shadowTexture.context.fillStyle = '#000000';
                 this.shadowTexture.context.fillRect(0, 0, this.game.width, this.game.height);
 
-                var gradient = this.shadowTexture.context.createRadialGradient(this.game.input.activePointer.x, this.game.input.activePointer.y, this.LIGHT_RADIUS * 0.75, this.game.input.activePointer.x, this.game.input.activePointer.y, this.LIGHT_RADIUS);
+                var gradient = this.shadowTexture.context.createRadialGradient(this.player.body.x, this.player.body.y, this.lightRadius * 0.75, this.player.body.x, this.player.body.y, this.lightRadius);
                 gradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
                 gradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
 
                 this.shadowTexture.context.beginPath();
                 this.shadowTexture.context.fillStyle = gradient;
-                this.shadowTexture.context.arc(this.game.input.activePointer.x, this.game.input.activePointer.y, this.LIGHT_RADIUS, 0, Math.PI * 2);
+                this.shadowTexture.context.arc(this.player.body.x, this.player.body.y, this.lightRadius, 0, Math.PI * 2);
                 this.shadowTexture.context.fill();
 
                 this.shadowTexture.dirty = true;
