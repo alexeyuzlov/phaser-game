@@ -1,10 +1,15 @@
 /// <reference path='../../Prefab/Player.ts'/>
 
+/// <reference path='../../Prefab/Barb.ts'/>
+/// <reference path='../../Prefab/Ice.ts'/>
+
 /// <reference path='../../Prefab/Runner.ts'/>
 /// <reference path='../../Prefab/Shooter.ts'/>
 /// <reference path='../../Prefab/Flier.ts'/>
 
 /// <reference path='../../Prefab/HUD.ts'/>
+
+/// <reference path='../../Prefab/ExitDoor.ts'/>
 
 module Sample.State {
 
@@ -18,6 +23,10 @@ module Sample.State {
         layer:Phaser.TilemapLayer;
 
         player:Prefab.Player;
+        exitDoor:Prefab.ExitDoor;
+
+        barbs:Phaser.Group;
+        ice:Phaser.Group;
 
         allEnemies:Phaser.Group;
         shooters:Phaser.Group;
@@ -38,8 +47,17 @@ module Sample.State {
             this.layer = this.map.createLayer('main');
             this.layer.resizeWorld();
 
-            // PREFABS
-            this.player = new Prefab.Player(this.game, 120, 120);
+            // PREFABS SINGLE
+            this.exitDoor = new Prefab.ExitDoor(this.game, 10, this.game.world.height - 64 - 200);
+
+            this.player = new Prefab.Player(this.game, 220, this.game.world.height - 100);
+
+            // PREFABS MULTIPLE
+            this.barbs = this.game.add.group();
+            this.map.createFromObjects('objects', 6, 'barb', 0, true, false, this.barbs, Prefab.Barb);
+
+            this.ice = this.game.add.group();
+            this.map.createFromObjects('objects', 8, 'ice', 0, true, false, this.ice, Prefab.Ice);
 
             this.shooters = this.game.add.group();
             this.map.createFromObjects('enemies', 3, 'shooter', 0, true, false, this.shooters, Prefab.Shooter);
@@ -68,6 +86,9 @@ module Sample.State {
 
         private doCollide() {
             this.game.physics.arcade.collide(this.player, this.layer);
+            this.game.physics.arcade.collide(this.player, this.exitDoor, (player, exitDoor) => {
+                this.startNextLevel();
+            });
 
             this.game.physics.arcade.collide(this.shooters, this.layer);
             this.game.physics.arcade.collide(this.runners, this.layer);
@@ -90,7 +111,6 @@ module Sample.State {
 
                     if (!this.player.immortalState) {
                         this.player.makeDamage(bullet.damagePoint);
-
                         this.hud.setHealthState(this.player.health);
                     }
                 });
@@ -101,8 +121,12 @@ module Sample.State {
             this.doCollide();
 
             if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-                this.game.state.start(this.nextLevel.toString());
+                this.startNextLevel();
             }
+        }
+
+        startNextLevel() {
+            this.game.state.start(this.nextLevel.toString());
         }
 
         static GetLevelName(level:Levels) {

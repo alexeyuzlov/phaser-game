@@ -9,6 +9,10 @@ module Sample.State {
             this.load.image('menu-background', 'assets/images/menu-background.png');
 
             this.load.atlasXML('player', 'assets/images/prefabs/player/player.png', 'assets/images/prefabs/player/player.xml');
+            this.load.image('exitDoor', 'assets/images/prefabs/exitDoor.png');
+
+            this.load.image('barb', 'assets/images/prefabs/barb.png');
+            this.load.image('ice', 'assets/images/prefabs/ice.png');
 
             this.load.image('runner', 'assets/images/prefabs/runner.png');
             this.load.image('flier', 'assets/images/prefabs/flier.png');

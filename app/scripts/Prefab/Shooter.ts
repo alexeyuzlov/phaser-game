@@ -15,7 +15,7 @@ module Sample.Prefab {
             game.physics.arcade.enable(this);
             this.body.gravity.y = this.gravity;
 
-            this.anchor.set(0.5, 0.5);
+            this.anchor.set(1, 0.5);
 
             this.bullets = this.game.add.group();
             for(var i = 0; i < this.countBullets; i++) {

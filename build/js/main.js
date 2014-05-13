@@ -42,6 +42,10 @@ var Sample;
                 this.load.image('menu-background', 'assets/images/menu-background.png');
 
                 this.load.atlasXML('player', 'assets/images/prefabs/player/player.png', 'assets/images/prefabs/player/player.xml');
+                this.load.image('exitDoor', 'assets/images/prefabs/exitDoor.png');
+
+                this.load.image('barb', 'assets/images/prefabs/barb.png');
+                this.load.image('ice', 'assets/images/prefabs/ice.png');
 
                 this.load.image('runner', 'assets/images/prefabs/runner.png');
                 this.load.image('flier', 'assets/images/prefabs/flier.png');
@@ -249,6 +253,40 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (Prefab) {
+        var Barb = (function (_super) {
+            __extends(Barb, _super);
+            function Barb(game, x, y) {
+                _super.call(this, game, x, y, 'barb');
+
+                game.physics.arcade.enable(this);
+                game.add.existing(this);
+            }
+            return Barb;
+        })(Phaser.Sprite);
+        Prefab.Barb = Barb;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
+        var Ice = (function (_super) {
+            __extends(Ice, _super);
+            function Ice(game, x, y) {
+                _super.call(this, game, x, y, 'ice');
+
+                game.physics.arcade.enable(this);
+                game.add.existing(this);
+            }
+            return Ice;
+        })(Phaser.Sprite);
+        Prefab.Ice = Ice;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
         var Runner = (function (_super) {
             __extends(Runner, _super);
             function Runner(game, x, y) {
@@ -259,7 +297,6 @@ var Sample;
 
                 game.physics.arcade.enable(this);
                 this.body.gravity.y = this.gravity;
-                this.anchor.set(0.5, 0.5);
 
                 this.alive = true;
                 this.health = 10;
@@ -333,7 +370,7 @@ var Sample;
                 game.physics.arcade.enable(this);
                 this.body.gravity.y = this.gravity;
 
-                this.anchor.set(0.5, 0.5);
+                this.anchor.set(1, 0.5);
 
                 this.bullets = this.game.add.group();
                 for (var i = 0; i < this.countBullets; i++) {
@@ -475,6 +512,25 @@ var Sample;
 })(Sample || (Sample = {}));
 var Sample;
 (function (Sample) {
+    (function (Prefab) {
+        var ExitDoor = (function (_super) {
+            __extends(ExitDoor, _super);
+            function ExitDoor(game, x, y) {
+                _super.call(this, game, x, y, 'exitDoor');
+
+                game.physics.arcade.enable(this);
+                this.body.immovable = true;
+
+                game.add.existing(this);
+            }
+            return ExitDoor;
+        })(Phaser.Sprite);
+        Prefab.ExitDoor = ExitDoor;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
     (function (State) {
         var Level = (function (_super) {
             __extends(Level, _super);
@@ -493,7 +549,15 @@ var Sample;
                 this.layer = this.map.createLayer('main');
                 this.layer.resizeWorld();
 
-                this.player = new Sample.Prefab.Player(this.game, 120, 120);
+                this.exitDoor = new Sample.Prefab.ExitDoor(this.game, 10, this.game.world.height - 64 - 200);
+
+                this.player = new Sample.Prefab.Player(this.game, 220, this.game.world.height - 100);
+
+                this.barbs = this.game.add.group();
+                this.map.createFromObjects('objects', 6, 'barb', 0, true, false, this.barbs, Sample.Prefab.Barb);
+
+                this.ice = this.game.add.group();
+                this.map.createFromObjects('objects', 8, 'ice', 0, true, false, this.ice, Sample.Prefab.Ice);
 
                 this.shooters = this.game.add.group();
                 this.map.createFromObjects('enemies', 3, 'shooter', 0, true, false, this.shooters, Sample.Prefab.Shooter);
@@ -521,6 +585,9 @@ var Sample;
             Level.prototype.doCollide = function () {
                 var _this = this;
                 this.game.physics.arcade.collide(this.player, this.layer);
+                this.game.physics.arcade.collide(this.player, this.exitDoor, function (player, exitDoor) {
+                    _this.startNextLevel();
+                });
 
                 this.game.physics.arcade.collide(this.shooters, this.layer);
                 this.game.physics.arcade.collide(this.runners, this.layer);
@@ -531,7 +598,6 @@ var Sample;
 
                         if (!_this.player.immortalState) {
                             _this.player.makeDamage(bullet.damagePoint);
-
                             _this.hud.setHealthState(_this.player.health);
                         }
                     });
@@ -542,8 +608,12 @@ var Sample;
                 this.doCollide();
 
                 if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-                    this.game.state.start(this.nextLevel.toString());
+                    this.startNextLevel();
                 }
+            };
+
+            Level.prototype.startNextLevel = function () {
+                this.game.state.start(this.nextLevel.toString());
             };
 
             Level.GetLevelName = function (level) {

@@ -10,7 +10,7 @@ module Sample.Prefab {
 
             game.physics.arcade.enable(this);
             this.body.gravity.y = this.gravity;
-            this.anchor.set(0.5, 0.5);
+            //this.anchor.set(0, 0);
 
             this.alive = true;
             this.health = 10;
