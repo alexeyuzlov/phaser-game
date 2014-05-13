@@ -5,7 +5,7 @@ module Sample.Prefab {
         isActive: boolean = false;
 
         minDistance:number;
-
+        damagePoints: number = 10;
         speed:number = 150;
 
         constructor(game:Phaser.Game, x:number, y:number) {

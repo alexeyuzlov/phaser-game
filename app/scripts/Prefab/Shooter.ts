@@ -9,6 +9,8 @@ module Sample.Prefab {
         countBullets: number = 1;
         shotDelay: number = 3000;
 
+        damagePoints: number = 10;
+
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'shooter');
 

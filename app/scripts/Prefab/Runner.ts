@@ -4,6 +4,7 @@ module Sample.Prefab {
         gravity:number = 300;
         velocity:number = 100;
         direction:Direction = Direction.Right;
+        damagePoints: number = 10;
 
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'runner');
@@ -20,6 +21,7 @@ module Sample.Prefab {
 
         update() {
             if (!this.inCamera) return;
+            if (!this.alive) return;
 
             if (this.body.blocked.left) {
                 this.direction = Direction.Right;

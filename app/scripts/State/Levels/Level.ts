@@ -58,6 +58,9 @@ module Sample.State {
 
             this.ice = this.game.add.group();
             this.map.createFromObjects('objects', 8, 'ice', 0, true, false, this.ice, Prefab.Ice);
+            this.ice.forEach((iceOne) => {
+                iceOne.setTarget(this.player);
+            }, null);
 
             this.shooters = this.game.add.group();
             this.map.createFromObjects('enemies', 3, 'shooter', 0, true, false, this.shooters, Prefab.Shooter);
@@ -90,27 +93,33 @@ module Sample.State {
                 this.startNextLevel();
             });
 
+            this.game.physics.arcade.collide(this.player, this.barbs, (player, barb) => {
+                if (!this.player.immortalState) {
+                    this.player.makeDamage(barb.damagePoints);
+                    this.hud.setHealthState(this.player.health);
+                }
+            });
+
             this.game.physics.arcade.collide(this.shooters, this.layer);
             this.game.physics.arcade.collide(this.runners, this.layer);
 
             // check weapon activity
-            /*
-             this.allEnemies.forEach((enemyGroup) => {
-             this.game.physics.arcade.overlap(this.player.weapon, enemyGroup, (weapon, enemy)=> {
-             enemy.damage(weapon.damagePoint);
-             this.score++;
-             this.hud.setScoreState(this.score);
-             });
-             }, null);
-             */
+            this.allEnemies.forEach((enemyGroup) => {
+                this.game.physics.arcade.overlap(this.player, enemyGroup, (player, enemy)=> {
+                    if (player.attackState) {
+                        enemy.damage(player.damagePoints);
+                    } else if (!this.player.immortalState) {
+                        this.player.makeDamage(enemy.damagePoints);
+                        this.hud.setHealthState(this.player.health);
+                    }
+                });
+            }, null);
 
-            // check bullets activity
             this.shooters.forEach((shooter)=> {
                 this.game.physics.arcade.collide(this.player, shooter.bullets, (player, bullet)=> {
                     bullet.kill();
-
                     if (!this.player.immortalState) {
-                        this.player.makeDamage(bullet.damagePoint);
+                        this.player.makeDamage(bullet.damagePoints);
                         this.hud.setHealthState(this.player.health);
                     }
                 });

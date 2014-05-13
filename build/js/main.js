@@ -99,7 +99,6 @@ var Sample;
                 this.drag = 1000;
                 this.maxSpeed = 300;
                 this.superSpeedPower = 600;
-                this.damagePoint = 30;
                 this.jumpPower = 300;
                 this.immortalState = false;
                 this.attackState = false;
@@ -108,6 +107,7 @@ var Sample;
                 this.superSpeedState = false;
                 this.superAttakState = false;
                 this.direction = 1 /* Right */;
+                this.damagePoints = 50;
                 this.healthPoints = 10000;
                 this.manaPoints = 100;
                 this.immortalStateAt = Date.now();
@@ -123,6 +123,8 @@ var Sample;
 
                 this.body.drag.x = this.drag;
                 this.body.maxVelocity.x = this.maxSpeed;
+
+                this.body.collideWorldBounds = true;
 
                 this.alive = true;
                 this.health = this.healthPoints;
@@ -142,7 +144,7 @@ var Sample;
             };
 
             Player.prototype.jump = function () {
-                if (this.game.input.keyboard.isDown(Sample.settings.keys.jump) && this.body.blocked.down && !this.isActiveJumpKey) {
+                if (this.game.input.keyboard.isDown(Sample.settings.keys.jump) && (this.body.blocked.down || this.body.touching.down) && !this.isActiveJumpKey) {
                     this.isActiveJumpKey = true;
                     this.body.velocity.y = -this.jumpPower;
                 }
@@ -257,8 +259,12 @@ var Sample;
             __extends(Barb, _super);
             function Barb(game, x, y) {
                 _super.call(this, game, x, y, 'barb');
+                this.damagePoints = 50;
 
                 game.physics.arcade.enable(this);
+
+                this.body.immovable = true;
+
                 game.add.existing(this);
             }
             return Barb;
@@ -274,10 +280,31 @@ var Sample;
             __extends(Ice, _super);
             function Ice(game, x, y) {
                 _super.call(this, game, x, y, 'ice');
+                this.distanceToTarget = Math.random() * 100 - 40;
+
+                this.alive = true;
+
+                this.checkWorldBounds = true;
+                this.outOfBoundsKill = true;
 
                 game.physics.arcade.enable(this);
                 game.add.existing(this);
             }
+            Ice.prototype.setTarget = function (target) {
+                this.target = target;
+            };
+
+            Ice.prototype.update = function () {
+                if (!this.inCamera)
+                    return;
+                if (!this.alive)
+                    return;
+
+                if (Math.abs(this.target.x - this.body.x) < this.distanceToTarget && this.target.y > this.body.y) {
+                    this.body.gravity.y = 100;
+                    this.body.acceleration.y = 1000;
+                }
+            };
             return Ice;
         })(Phaser.Sprite);
         Prefab.Ice = Ice;
@@ -294,6 +321,7 @@ var Sample;
                 this.gravity = 300;
                 this.velocity = 100;
                 this.direction = 1 /* Right */;
+                this.damagePoints = 10;
 
                 game.physics.arcade.enable(this);
                 this.body.gravity.y = this.gravity;
@@ -305,6 +333,8 @@ var Sample;
             }
             Runner.prototype.update = function () {
                 if (!this.inCamera)
+                    return;
+                if (!this.alive)
                     return;
 
                 if (this.body.blocked.left) {
@@ -338,7 +368,7 @@ var Sample;
             function Bullet(game, x, y) {
                 _super.call(this, game, x, y, 'bullet');
                 this.speed = 300;
-                this.damagePoint = 30;
+                this.damagePoints = 30;
 
                 game.physics.arcade.enable(this);
                 this.anchor.set(0.5, 0.5);
@@ -366,6 +396,7 @@ var Sample;
                 this.lastBulletShotAt = 0;
                 this.countBullets = 1;
                 this.shotDelay = 3000;
+                this.damagePoints = 10;
 
                 game.physics.arcade.enable(this);
                 this.body.gravity.y = this.gravity;
@@ -417,6 +448,7 @@ var Sample;
             function Flier(game, x, y) {
                 _super.call(this, game, x, y, 'flier');
                 this.isActive = false;
+                this.damagePoints = 10;
                 this.speed = 150;
 
                 game.physics.arcade.enable(this);
@@ -558,6 +590,9 @@ var Sample;
 
                 this.ice = this.game.add.group();
                 this.map.createFromObjects('objects', 8, 'ice', 0, true, false, this.ice, Sample.Prefab.Ice);
+                this.ice.forEach(function (iceOne) {
+                    iceOne.setTarget(_this.player);
+                }, null);
 
                 this.shooters = this.game.add.group();
                 this.map.createFromObjects('enemies', 3, 'shooter', 0, true, false, this.shooters, Sample.Prefab.Shooter);
@@ -589,15 +624,32 @@ var Sample;
                     _this.startNextLevel();
                 });
 
+                this.game.physics.arcade.collide(this.player, this.barbs, function (player, barb) {
+                    if (!_this.player.immortalState) {
+                        _this.player.makeDamage(barb.damagePoints);
+                        _this.hud.setHealthState(_this.player.health);
+                    }
+                });
+
                 this.game.physics.arcade.collide(this.shooters, this.layer);
                 this.game.physics.arcade.collide(this.runners, this.layer);
+
+                this.allEnemies.forEach(function (enemyGroup) {
+                    _this.game.physics.arcade.overlap(_this.player, enemyGroup, function (player, enemy) {
+                        if (player.attackState) {
+                            enemy.damage(player.damagePoints);
+                        } else if (!_this.player.immortalState) {
+                            _this.player.makeDamage(enemy.damagePoints);
+                            _this.hud.setHealthState(_this.player.health);
+                        }
+                    });
+                }, null);
 
                 this.shooters.forEach(function (shooter) {
                     _this.game.physics.arcade.collide(_this.player, shooter.bullets, function (player, bullet) {
                         bullet.kill();
-
                         if (!_this.player.immortalState) {
-                            _this.player.makeDamage(bullet.damagePoint);
+                            _this.player.makeDamage(bullet.damagePoints);
                             _this.hud.setHealthState(_this.player.health);
                         }
                     });

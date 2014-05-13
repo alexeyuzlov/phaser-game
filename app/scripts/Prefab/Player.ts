@@ -9,7 +9,6 @@ module Sample.Prefab {
         maxSpeed:number = 300;
         superSpeedPower:number = 600;
 
-        damagePoint:number = 30;
         jumpPower:number = 300;
 
         immortalState:boolean = false;
@@ -20,6 +19,8 @@ module Sample.Prefab {
         superAttakState:boolean = false;
 
         direction:Direction = Direction.Right;
+
+        damagePoints:number = 50;
 
         healthPoints:number = 10000;
         manaPoints:number = 100;
@@ -43,6 +44,8 @@ module Sample.Prefab {
             this.body.drag.x = this.drag;
             this.body.maxVelocity.x = this.maxSpeed;
 
+            this.body.collideWorldBounds = true;
+
             this.alive = true;
             this.health = this.healthPoints;
 
@@ -65,7 +68,7 @@ module Sample.Prefab {
 
         jump() {
             if (this.game.input.keyboard.isDown(settings.keys.jump)
-                && this.body.blocked.down
+                && (this.body.blocked.down || this.body.touching.down)
                 && !this.isActiveJumpKey) {
                 this.isActiveJumpKey = true;
                 this.body.velocity.y = -this.jumpPower;
