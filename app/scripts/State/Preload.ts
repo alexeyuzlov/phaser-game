@@ -20,6 +20,7 @@ module Sample.State {
             this.load.image('bullet', 'assets/images/prefabs/bullet.png');
 
             this.load.image('hud', 'assets/images/prefabs/hud.png');
+            this.load.image('messageBox', 'assets/images/prefabs/messageBox.png');
         }
 
         create() {

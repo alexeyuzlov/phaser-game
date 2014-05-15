@@ -8,6 +8,7 @@
 /// <reference path='../../Prefab/Flier.ts'/>
 
 /// <reference path='../../Prefab/HUD.ts'/>
+/// <reference path='../../Prefab/MessageBox.ts'/>
 
 /// <reference path='../../Prefab/ExitDoor.ts'/>
 
@@ -34,6 +35,7 @@ module Sample.State {
         fliers:Phaser.Group;
 
         hud:Prefab.HUD;
+        messageBox:Prefab.MessageBox;
 
         create() {
             // PRE-SETTINGS
@@ -83,6 +85,8 @@ module Sample.State {
             this.hud = new Prefab.HUD(this.game, 0, 0);
             this.hud.setLevelState(this.currentLevel);
 
+            this.messageBox = new Prefab.MessageBox(this.game, 0, 400);
+
             // POST-SETTINGS
             this.game.camera.follow(this.player);
         }
@@ -130,7 +134,9 @@ module Sample.State {
             this.doCollide();
 
             if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-                this.startNextLevel();
+
+                //this.game.paused = true;
+                //this.startNextLevel();
             }
         }
 

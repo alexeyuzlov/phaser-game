@@ -53,6 +53,7 @@ var Sample;
                 this.load.image('bullet', 'assets/images/prefabs/bullet.png');
 
                 this.load.image('hud', 'assets/images/prefabs/hud.png');
+                this.load.image('messageBox', 'assets/images/prefabs/messageBox.png');
             };
 
             Preload.prototype.create = function () {
@@ -545,6 +546,35 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (Prefab) {
+        var MessageBox = (function (_super) {
+            __extends(MessageBox, _super);
+            function MessageBox(game, x, y) {
+                _super.call(this, game, x, y, 'messageBox');
+                this.contentText = "Hello world";
+                this.textStyle = {
+                    font: "20px Arial",
+                    fill: "#cdcdcd"
+                };
+
+                this.fixedToCamera = true;
+
+                this.contentState = this.game.add.text(this.x + 550, this.y + 8, this.contentText, this.textStyle);
+                this.addChild(this.contentState);
+
+                game.add.existing(this);
+            }
+            MessageBox.prototype.setContentState = function (content) {
+                this.contentState.text = content;
+            };
+            return MessageBox;
+        })(Phaser.Sprite);
+        Prefab.MessageBox = MessageBox;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
         var ExitDoor = (function (_super) {
             __extends(ExitDoor, _super);
             function ExitDoor(game, x, y) {
@@ -614,6 +644,8 @@ var Sample;
                 this.hud = new Sample.Prefab.HUD(this.game, 0, 0);
                 this.hud.setLevelState(this.currentLevel);
 
+                this.messageBox = new Sample.Prefab.MessageBox(this.game, 0, 400);
+
                 this.game.camera.follow(this.player);
             };
 
@@ -660,7 +692,6 @@ var Sample;
                 this.doCollide();
 
                 if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-                    this.startNextLevel();
                 }
             };
 
