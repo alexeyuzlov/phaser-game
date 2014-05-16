@@ -1,8 +1,8 @@
-/// <reference path='../../Levels/Level.ts'/>
+/// <reference path='../../Levels/AbstractZone.ts'/>
 
 module Sample.State {
 
-    export class Zone2 extends Level {
+    export class Zone2 extends AbstractZone {
         lightRadius:number = 100;
         shadowTexture:Phaser.BitmapData;
         lightSprite:Phaser.Image;

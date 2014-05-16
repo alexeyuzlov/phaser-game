@@ -11,9 +11,6 @@ module Sample.Prefab {
         currentLevelText: string = "Level: 1-1";
         currentLevelState: Phaser.Text;
 
-        scoreText: string = "Score: 0";
-        scoreState: Phaser.Text;
-
         textStyle = {
             font: "20px Arial",
             fill: "#ffffff"
@@ -24,17 +21,14 @@ module Sample.Prefab {
 
             this.fixedToCamera = true;
 
-            this.healthState = this.game.add.text(this.x + 10, this.y + 8, this.healthText, this.textStyle);
+            this.healthState = game.add.text(8, 8, this.healthText, this.textStyle);
             this.addChild(this.healthState);
 
-            this.manaState = this.game.add.text(this.x + 150, this.y + 8, this.manaText, this.textStyle);
+            this.manaState = game.add.text(150, 8, this.manaText, this.textStyle);
             this.addChild(this.manaState);
 
-            this.currentLevelState = this.game.add.text(this.x + 280, this.y + 8, this.currentLevelText, this.textStyle);
+            this.currentLevelState = game.add.text(280, 8, this.currentLevelText, this.textStyle);
             this.addChild(this.currentLevelState);
-
-            this.scoreState = this.game.add.text(this.x + 550, this.y + 8, this.scoreText, this.textStyle);
-            this.addChild(this.scoreState);
 
             game.add.existing(this);
         }
@@ -48,11 +42,7 @@ module Sample.Prefab {
         }
 
         setLevelState(level) {
-            this.currentLevelState.text = "Level: " + Sample.State.Level.GetLevelName(level); /* Sample.State.Level.GetLevelByName() */
-        }
-
-        setScoreState(score: number) {
-            this.scoreState.text = "Score: " + score.toString();
+            this.currentLevelState.text = "Level: " + Sample.State.AbstractZone.GetLevelName(level); /* Sample.State.Level.GetLevelByName() */
         }
     }
 }

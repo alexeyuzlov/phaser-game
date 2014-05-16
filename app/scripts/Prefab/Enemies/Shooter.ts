@@ -1,7 +1,8 @@
-/// <reference path='../Prefab/Bullet.ts'/>
+/// <reference path='AbstractEnemy.ts'/>
+/// <reference path='Bullet.ts'/>
 
 module Sample.Prefab {
-    export class Shooter extends Phaser.Sprite {
+    export class Shooter extends AbstractEnemy {
         gravity:number = 300;
 
         lastBulletShotAt: number = 0;
@@ -14,9 +15,7 @@ module Sample.Prefab {
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'shooter');
 
-            game.physics.arcade.enable(this);
             this.body.gravity.y = this.gravity;
-
             this.anchor.set(1, 0.5);
 
             this.bullets = this.game.add.group();
@@ -24,11 +23,7 @@ module Sample.Prefab {
                 var bullet = new Prefab.Bullet(game, 0, 0);
                 this.bullets.add(bullet);
             }
-
-            this.alive = true;
             this.health = 10;
-
-            game.add.existing(this);
         }
 
         update() {

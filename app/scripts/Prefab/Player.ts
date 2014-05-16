@@ -52,7 +52,7 @@ module Sample.Prefab {
             //this.smoothed = true;
 
             this.animations.add('stay', ['player-walk-1.png'], 10, true)
-            this.animations.add('walk', Phaser.Animation.generateFrameNames('player-walk-', 1, 4, '.png', 0), 10, true);
+            this.animations.add('walk', Phaser.Animation.generateFrameNames('player-walk-', 1, 4, '.png', 0), 30, true);
             this.animations.add('attack', Phaser.Animation.generateFrameNames('player-attack-', 1, 3, '.png', 0), 10, true);
             this.animations.add('sit', ['player-sit-1.png'], 10, true);
 
@@ -64,6 +64,20 @@ module Sample.Prefab {
             this.immortalStateAt = Date.now();
             this.immortalState = true;
             this.alpha = 0.5;
+
+            var textStyle = {
+                font: "20px Arial",
+                fill: "#ffffff",
+                stroke: "ff0000",
+                strokeThickness: 1
+            };
+
+            var text = this.game.add.text(this.x, this.y, damagePoint.toString(), textStyle);
+            var tween = this.game.add.tween(text).to({alpha: 0}, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
+
+            tween.onComplete.add(()=> {
+                text.destroy();
+            });
         }
 
         jump() {

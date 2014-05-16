@@ -1,14 +1,16 @@
 module Sample.Prefab {
 
     export class Ice extends Phaser.Sprite {
+        damagePoints: number = 50;
+
         target: Phaser.Sprite;
         distanceToTarget: number = Math.random() * 100 - 40; // from - 40 to 60 px to target
 
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'ice');
-
+            game.physics.arcade.enable(this);
             this.alive = true;
-
+            this.body.immovable = true;
             this.checkWorldBounds = true;
             this.outOfBoundsKill = true;
 

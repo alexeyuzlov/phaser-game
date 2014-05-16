@@ -131,7 +131,7 @@ var Sample;
                 this.health = this.healthPoints;
 
                 this.animations.add('stay', ['player-walk-1.png'], 10, true);
-                this.animations.add('walk', Phaser.Animation.generateFrameNames('player-walk-', 1, 4, '.png', 0), 10, true);
+                this.animations.add('walk', Phaser.Animation.generateFrameNames('player-walk-', 1, 4, '.png', 0), 30, true);
                 this.animations.add('attack', Phaser.Animation.generateFrameNames('player-attack-', 1, 3, '.png', 0), 10, true);
                 this.animations.add('sit', ['player-sit-1.png'], 10, true);
 
@@ -142,6 +142,20 @@ var Sample;
                 this.immortalStateAt = Date.now();
                 this.immortalState = true;
                 this.alpha = 0.5;
+
+                var textStyle = {
+                    font: "20px Arial",
+                    fill: "#ffffff",
+                    stroke: "ff0000",
+                    strokeThickness: 1
+                };
+
+                var text = this.game.add.text(this.x, this.y, damagePoint.toString(), textStyle);
+                var tween = this.game.add.tween(text).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
+
+                tween.onComplete.add(function () {
+                    text.destroy();
+                });
             };
 
             Player.prototype.jump = function () {
@@ -281,10 +295,11 @@ var Sample;
             __extends(Ice, _super);
             function Ice(game, x, y) {
                 _super.call(this, game, x, y, 'ice');
+                this.damagePoints = 50;
                 this.distanceToTarget = Math.random() * 100 - 40;
-
+                game.physics.arcade.enable(this);
                 this.alive = true;
-
+                this.body.immovable = true;
                 this.checkWorldBounds = true;
                 this.outOfBoundsKill = true;
 
@@ -315,6 +330,42 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (Prefab) {
+        var AbstractEnemy = (function (_super) {
+            __extends(AbstractEnemy, _super);
+            function AbstractEnemy(game, x, y, sprite) {
+                _super.call(this, game, x, y, sprite);
+
+                game.physics.arcade.enable(this);
+                this.alive = true;
+
+                game.add.existing(this);
+            }
+            AbstractEnemy.prototype.makeDamage = function (damagePoint) {
+                this.damage(damagePoint);
+
+                var textStyle = {
+                    font: "20px Arial",
+                    fill: "#ffffff",
+                    stroke: '#0000ff',
+                    strokeThickness: 1
+                };
+
+                var text = this.game.add.text(this.x, this.y, damagePoint.toString(), textStyle);
+                var tween = this.game.add.tween(text).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
+
+                tween.onComplete.add(function () {
+                    text.destroy();
+                });
+            };
+            return AbstractEnemy;
+        })(Phaser.Sprite);
+        Prefab.AbstractEnemy = AbstractEnemy;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
         var Runner = (function (_super) {
             __extends(Runner, _super);
             function Runner(game, x, y) {
@@ -324,13 +375,8 @@ var Sample;
                 this.direction = 1 /* Right */;
                 this.damagePoints = 10;
 
-                game.physics.arcade.enable(this);
                 this.body.gravity.y = this.gravity;
-
-                this.alive = true;
                 this.health = 10;
-
-                game.add.existing(this);
             }
             Runner.prototype.update = function () {
                 if (!this.inCamera)
@@ -356,7 +402,7 @@ var Sample;
                 }
             };
             return Runner;
-        })(Phaser.Sprite);
+        })(Prefab.AbstractEnemy);
         Prefab.Runner = Runner;
     })(Sample.Prefab || (Sample.Prefab = {}));
     var Prefab = Sample.Prefab;
@@ -399,9 +445,7 @@ var Sample;
                 this.shotDelay = 3000;
                 this.damagePoints = 10;
 
-                game.physics.arcade.enable(this);
                 this.body.gravity.y = this.gravity;
-
                 this.anchor.set(1, 0.5);
 
                 this.bullets = this.game.add.group();
@@ -409,11 +453,7 @@ var Sample;
                     var bullet = new Prefab.Bullet(game, 0, 0);
                     this.bullets.add(bullet);
                 }
-
-                this.alive = true;
                 this.health = 10;
-
-                game.add.existing(this);
             }
             Shooter.prototype.update = function () {
                 if (!this.inCamera)
@@ -436,7 +476,7 @@ var Sample;
                 bullet.body.velocity.x = -bullet.speed;
             };
             return Shooter;
-        })(Phaser.Sprite);
+        })(Prefab.AbstractEnemy);
         Prefab.Shooter = Shooter;
     })(Sample.Prefab || (Sample.Prefab = {}));
     var Prefab = Sample.Prefab;
@@ -452,13 +492,8 @@ var Sample;
                 this.damagePoints = 10;
                 this.speed = 150;
 
-                game.physics.arcade.enable(this);
                 this.anchor.set(0.5, 0.5);
-
-                this.alive = true;
                 this.health = 10;
-
-                game.add.existing(this);
             }
             Flier.prototype.setTarget = function (target) {
                 this.minDistance = target.width / 2;
@@ -485,7 +520,7 @@ var Sample;
                 }
             };
             return Flier;
-        })(Phaser.Sprite);
+        })(Prefab.AbstractEnemy);
         Prefab.Flier = Flier;
     })(Sample.Prefab || (Sample.Prefab = {}));
     var Prefab = Sample.Prefab;
@@ -500,7 +535,6 @@ var Sample;
                 this.healthText = "Health: 100";
                 this.manaText = "Mana: 100";
                 this.currentLevelText = "Level: 1-1";
-                this.scoreText = "Score: 0";
                 this.textStyle = {
                     font: "20px Arial",
                     fill: "#ffffff"
@@ -508,17 +542,14 @@ var Sample;
 
                 this.fixedToCamera = true;
 
-                this.healthState = this.game.add.text(this.x + 10, this.y + 8, this.healthText, this.textStyle);
+                this.healthState = game.add.text(8, 8, this.healthText, this.textStyle);
                 this.addChild(this.healthState);
 
-                this.manaState = this.game.add.text(this.x + 150, this.y + 8, this.manaText, this.textStyle);
+                this.manaState = game.add.text(150, 8, this.manaText, this.textStyle);
                 this.addChild(this.manaState);
 
-                this.currentLevelState = this.game.add.text(this.x + 280, this.y + 8, this.currentLevelText, this.textStyle);
+                this.currentLevelState = game.add.text(280, 8, this.currentLevelText, this.textStyle);
                 this.addChild(this.currentLevelState);
-
-                this.scoreState = this.game.add.text(this.x + 550, this.y + 8, this.scoreText, this.textStyle);
-                this.addChild(this.scoreState);
 
                 game.add.existing(this);
             }
@@ -531,44 +562,11 @@ var Sample;
             };
 
             HUD.prototype.setLevelState = function (level) {
-                this.currentLevelState.text = "Level: " + Sample.State.Level.GetLevelName(level);
-            };
-
-            HUD.prototype.setScoreState = function (score) {
-                this.scoreState.text = "Score: " + score.toString();
+                this.currentLevelState.text = "Level: " + Sample.State.AbstractZone.GetLevelName(level);
             };
             return HUD;
         })(Phaser.Sprite);
         Prefab.HUD = HUD;
-    })(Sample.Prefab || (Sample.Prefab = {}));
-    var Prefab = Sample.Prefab;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (Prefab) {
-        var MessageBox = (function (_super) {
-            __extends(MessageBox, _super);
-            function MessageBox(game, x, y) {
-                _super.call(this, game, x, y, 'messageBox');
-                this.contentText = "Hello world";
-                this.textStyle = {
-                    font: "20px Arial",
-                    fill: "#cdcdcd"
-                };
-
-                this.fixedToCamera = true;
-
-                this.contentState = this.game.add.text(this.x + 550, this.y + 8, this.contentText, this.textStyle);
-                this.addChild(this.contentState);
-
-                game.add.existing(this);
-            }
-            MessageBox.prototype.setContentState = function (content) {
-                this.contentState.text = content;
-            };
-            return MessageBox;
-        })(Phaser.Sprite);
-        Prefab.MessageBox = MessageBox;
     })(Sample.Prefab || (Sample.Prefab = {}));
     var Prefab = Sample.Prefab;
 })(Sample || (Sample = {}));
@@ -594,13 +592,13 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (State) {
-        var Level = (function (_super) {
-            __extends(Level, _super);
-            function Level() {
+        var AbstractZone = (function (_super) {
+            __extends(AbstractZone, _super);
+            function AbstractZone() {
                 _super.apply(this, arguments);
                 this.score = 0;
             }
-            Level.prototype.create = function () {
+            AbstractZone.prototype.create = function () {
                 var _this = this;
                 this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -644,12 +642,10 @@ var Sample;
                 this.hud = new Sample.Prefab.HUD(this.game, 0, 0);
                 this.hud.setLevelState(this.currentLevel);
 
-                this.messageBox = new Sample.Prefab.MessageBox(this.game, 0, 400);
-
                 this.game.camera.follow(this.player);
             };
 
-            Level.prototype.doCollide = function () {
+            AbstractZone.prototype.doCollide = function () {
                 var _this = this;
                 this.game.physics.arcade.collide(this.player, this.layer);
                 this.game.physics.arcade.collide(this.player, this.exitDoor, function (player, exitDoor) {
@@ -663,13 +659,20 @@ var Sample;
                     }
                 });
 
+                this.game.physics.arcade.collide(this.player, this.ice, function (player, ice) {
+                    if (!_this.player.immortalState) {
+                        _this.player.makeDamage(ice.damagePoints);
+                        _this.hud.setHealthState(_this.player.health);
+                    }
+                });
+
                 this.game.physics.arcade.collide(this.shooters, this.layer);
                 this.game.physics.arcade.collide(this.runners, this.layer);
 
                 this.allEnemies.forEach(function (enemyGroup) {
                     _this.game.physics.arcade.overlap(_this.player, enemyGroup, function (player, enemy) {
                         if (player.attackState) {
-                            enemy.damage(player.damagePoints);
+                            enemy.makeDamage(player.damagePoints);
                         } else if (!_this.player.immortalState) {
                             _this.player.makeDamage(enemy.damagePoints);
                             _this.hud.setHealthState(_this.player.health);
@@ -688,18 +691,19 @@ var Sample;
                 }, null);
             };
 
-            Level.prototype.update = function () {
+            AbstractZone.prototype.update = function () {
                 this.doCollide();
 
                 if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+                    this.startNextLevel();
                 }
             };
 
-            Level.prototype.startNextLevel = function () {
+            AbstractZone.prototype.startNextLevel = function () {
                 this.game.state.start(this.nextLevel.toString());
             };
 
-            Level.GetLevelName = function (level) {
+            AbstractZone.GetLevelName = function (level) {
                 switch (level) {
                     case 0 /* Zone1Level1 */:
                         return '1-1';
@@ -733,9 +737,9 @@ var Sample;
                         return 'X-X';
                 }
             };
-            return Level;
+            return AbstractZone;
         })(Phaser.State);
-        State.Level = Level;
+        State.AbstractZone = AbstractZone;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
 })(Sample || (Sample = {}));
@@ -759,7 +763,7 @@ var Sample;
                 _super.prototype.update.call(this);
             };
             return Zone1;
-        })(State.Level);
+        })(State.AbstractZone);
         State.Zone1 = Zone1;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
@@ -891,7 +895,7 @@ var Sample;
                 this.shadowTexture.dirty = true;
             };
             return Zone2;
-        })(State.Level);
+        })(State.AbstractZone);
         State.Zone2 = Zone2;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
@@ -1002,7 +1006,7 @@ var Sample;
                 _super.prototype.update.call(this);
             };
             return Zone3;
-        })(State.Level);
+        })(State.AbstractZone);
         State.Zone3 = Zone3;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
@@ -1111,7 +1115,7 @@ var Sample;
                 _super.prototype.update.call(this);
             };
             return Zone4;
-        })(State.Level);
+        })(State.AbstractZone);
         State.Zone4 = Zone4;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;

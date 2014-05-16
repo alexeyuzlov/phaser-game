@@ -1,6 +1,8 @@
+/// <reference path='AbstractEnemy.ts'/>
+
 module Sample.Prefab {
 
-    export class Flier extends Phaser.Sprite {
+    export class Flier extends AbstractEnemy {
         target: Phaser.Sprite;
         isActive: boolean = false;
 
@@ -11,13 +13,8 @@ module Sample.Prefab {
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'flier');
 
-            game.physics.arcade.enable(this);
             this.anchor.set(0.5, 0.5);
-
-            this.alive = true;
             this.health = 10;
-
-            game.add.existing(this);
         }
 
         setTarget(target: Phaser.Sprite) {

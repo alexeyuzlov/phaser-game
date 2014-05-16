@@ -3,18 +3,17 @@
 /// <reference path='../../Prefab/Barb.ts'/>
 /// <reference path='../../Prefab/Ice.ts'/>
 
-/// <reference path='../../Prefab/Runner.ts'/>
-/// <reference path='../../Prefab/Shooter.ts'/>
-/// <reference path='../../Prefab/Flier.ts'/>
+/// <reference path='../../Prefab/Enemies/Runner.ts'/>
+/// <reference path='../../Prefab/Enemies/Shooter.ts'/>
+/// <reference path='../../Prefab/Enemies/Flier.ts'/>
 
 /// <reference path='../../Prefab/HUD.ts'/>
-/// <reference path='../../Prefab/MessageBox.ts'/>
 
 /// <reference path='../../Prefab/ExitDoor.ts'/>
 
 module Sample.State {
 
-    export class Level extends Phaser.State {
+    export class AbstractZone extends Phaser.State {
         currentLevel:Levels;
         nextLevel:string;
 
@@ -35,7 +34,6 @@ module Sample.State {
         fliers:Phaser.Group;
 
         hud:Prefab.HUD;
-        messageBox:Prefab.MessageBox;
 
         create() {
             // PRE-SETTINGS
@@ -85,8 +83,6 @@ module Sample.State {
             this.hud = new Prefab.HUD(this.game, 0, 0);
             this.hud.setLevelState(this.currentLevel);
 
-            this.messageBox = new Prefab.MessageBox(this.game, 0, 400);
-
             // POST-SETTINGS
             this.game.camera.follow(this.player);
         }
@@ -104,6 +100,13 @@ module Sample.State {
                 }
             });
 
+            this.game.physics.arcade.collide(this.player, this.ice, (player, ice) => {
+                if (!this.player.immortalState) {
+                    this.player.makeDamage(ice.damagePoints);
+                    this.hud.setHealthState(this.player.health);
+                }
+            });
+
             this.game.physics.arcade.collide(this.shooters, this.layer);
             this.game.physics.arcade.collide(this.runners, this.layer);
 
@@ -111,7 +114,7 @@ module Sample.State {
             this.allEnemies.forEach((enemyGroup) => {
                 this.game.physics.arcade.overlap(this.player, enemyGroup, (player, enemy)=> {
                     if (player.attackState) {
-                        enemy.damage(player.damagePoints);
+                        enemy.makeDamage(player.damagePoints);
                     } else if (!this.player.immortalState) {
                         this.player.makeDamage(enemy.damagePoints);
                         this.hud.setHealthState(this.player.health);
@@ -134,9 +137,7 @@ module Sample.State {
             this.doCollide();
 
             if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-
-                //this.game.paused = true;
-                //this.startNextLevel();
+                this.startNextLevel();
             }
         }
 

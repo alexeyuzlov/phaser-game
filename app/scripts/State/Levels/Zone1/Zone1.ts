@@ -1,8 +1,8 @@
-/// <reference path='../../Levels/Level.ts'/>
+/// <reference path='../../Levels/AbstractZone.ts'/>
 
 module Sample.State {
 
-    export class Zone1 extends Level {
+    export class Zone1 extends AbstractZone {
 
         preload() {
             this.game.load.image('zone', 'assets/images/levels/zone1.png');
