@@ -31,11 +31,11 @@
 
 /// <reference path='Prefab/Player.ts'/>
 
-/// <reference path='Prefab/Barb.ts'/>
+/// <reference path='Prefab/Spike.ts'/>
 /// <reference path='Prefab/Ice.ts'/>
 /// <reference path='Prefab/Bullet.ts'/>
 /// <reference path='Prefab/HUD.ts'/>
-/// <reference path='Prefab/ExitDoor.ts'/>
+/// <reference path='Prefab/Exit.ts'/>
 
 /// <reference path='Prefab/Enemies/AbstractEnemy.ts'/>
 /// <reference path='Prefab/Enemies/Runner.ts'/>

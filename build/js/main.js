@@ -41,10 +41,12 @@ var Sample;
 
                 this.load.image('menu-background', 'assets/images/menu-background.png');
 
-                this.load.atlasXML('player', 'assets/images/prefabs/player/player.png', 'assets/images/prefabs/player/player.xml');
-                this.load.image('exitDoor', 'assets/images/prefabs/exitDoor.png');
+                this.load.image('ground', 'assets/images/ground.png');
+                this.load.image('exit', 'assets/images/prefabs/exit.png');
+                this.load.image('spike', 'assets/images/prefabs/spike.png');
 
-                this.load.image('barb', 'assets/images/prefabs/barb.png');
+                this.load.atlasXML('player', 'assets/images/prefabs/player/player.png', 'assets/images/prefabs/player/player.xml');
+
                 this.load.image('ice', 'assets/images/prefabs/ice.png');
 
                 this.load.image('runner', 'assets/images/prefabs/runner.png');
@@ -98,57 +100,56 @@ var Sample;
             }
             AbstractZone.prototype.create = function () {
                 var _this = this;
-                this.game.physics.startSystem(Phaser.Physics.ARCADE);
-
                 this.map = this.game.add.tilemap('map');
-                this.map.addTilesetImage('zone');
-                this.map.addTilesetImage('exitDoor');
-                this.map.setCollision([1]);
+                this.map.addTilesetImage('ground');
+                this.map.setCollisionBetween(1, 3, true);
 
-                this.layer = this.map.createLayer('main');
+                this.layer = this.map.createLayer('layer');
                 this.layer.resizeWorld();
 
                 this.player = new Sample.Prefab.Player(this, 220, this.game.world.height - 100);
 
+                this.hud = new Sample.Prefab.HUD(this, 0, 0);
+
                 var index;
 
-                index = this.map.getTilesetIndex('exitDoor');
+                this.exits = this.game.add.group();
+                index = this.map.getTilesetIndex('exit');
                 if (index) {
-                    this.exitDoors = this.game.add.group();
-                    this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'exitDoor', 0, true, false, this.exitDoors, Sample.Prefab.ExitDoor);
+                    this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'exit', 0, true, false, this.exits, Sample.Prefab.Exit);
                 }
 
-                index = this.map.getTilesetIndex('barb');
+                this.spikes = this.game.add.group();
+                index = this.map.getTilesetIndex('spike');
                 if (index) {
-                    this.barbs = this.game.add.group();
-                    this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'barb', 0, true, false, this.barbs, Sample.Prefab.Barb);
+                    this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'spike', 0, true, false, this.spikes, Sample.Prefab.Spike);
                 }
 
+                this.ice = this.game.add.group();
                 index = this.map.getTilesetIndex('ice');
                 if (index) {
-                    this.ice = this.game.add.group();
                     this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'ice', 0, true, false, this.ice, Sample.Prefab.Ice);
                     this.ice.forEach(function (iceOne) {
                         iceOne.setTarget(_this.player);
                     }, null);
                 }
 
+                this.shooters = this.game.add.group();
                 index = this.map.getTilesetIndex('shooter');
                 if (index) {
-                    this.shooters = this.game.add.group();
-                    this.map.createFromObjects('enemies', this.map.tilesets[index].firstgid, 'shooter', 0, true, false, this.shooters, Sample.Prefab.Shooter);
+                    this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'shooter', 0, true, false, this.shooters, Sample.Prefab.Shooter);
                 }
 
+                this.runners = this.game.add.group();
                 index = this.map.getTilesetIndex('runner');
                 if (index) {
-                    this.runners = this.game.add.group();
-                    this.map.createFromObjects('enemies', this.map.tilesets[index].firstgid, 'runner', 0, true, false, this.runners, Sample.Prefab.Runner);
+                    this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'runner', 0, true, false, this.runners, Sample.Prefab.Runner);
                 }
 
+                this.fliers = this.game.add.group();
                 index = this.map.getTilesetIndex('flier');
                 if (index) {
-                    this.fliers = this.game.add.group();
-                    this.map.createFromObjects('enemies', this.map.tilesets[index].firstgid, 'flier', 0, true, false, this.fliers, Sample.Prefab.Flier);
+                    this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'flier', 0, true, false, this.fliers, Sample.Prefab.Flier);
                     this.fliers.forEach(function (flier) {
                         flier.setTarget(_this.player);
                     }, null);
@@ -159,30 +160,27 @@ var Sample;
                 this.allEnemies.add(this.shooters);
                 this.allEnemies.add(this.fliers);
 
-                this.hud = new Sample.Prefab.HUD(this.game, 0, 0);
-                this.hud.setLevelState(this.currentLevel);
-
-                this.game.camera.follow(this.player);
+                this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_PLATFORMER);
             };
 
             AbstractZone.prototype.doCollide = function () {
                 var _this = this;
                 this.game.physics.arcade.collide(this.player, this.layer);
-                this.game.physics.arcade.collide(this.player, this.exitDoors, function (player, exitDoor) {
+                this.game.physics.arcade.collide(this.player, this.exits, function (player, exit) {
                     _this.startNextLevel();
                 });
 
-                this.game.physics.arcade.collide(this.player, this.barbs, function (player, barb) {
+                this.game.physics.arcade.collide(this.player, this.spikes, function (player, spike) {
                     if (!_this.player.immortalState) {
-                        _this.player.makeDamage(barb.damagePoints);
-                        _this.hud.setHealthState(_this.player.health);
+                        _this.player.makeDamage(spike.damagePoints);
+                        _this.hud.updateHealthState();
                     }
                 });
 
                 this.game.physics.arcade.overlap(this.player, this.ice, function (player, ice) {
                     if (!_this.player.immortalState) {
                         _this.player.makeDamage(ice.damagePoints);
-                        _this.hud.setHealthState(_this.player.health);
+                        _this.hud.updateHealthState();
                     }
                 });
 
@@ -195,7 +193,7 @@ var Sample;
                             enemy.makeDamage(player.damagePoints);
                         } else if (!_this.player.immortalState) {
                             _this.player.makeDamage(enemy.damagePoints);
-                            _this.hud.setHealthState(_this.player.health);
+                            _this.hud.updateHealthState();
                         }
                     });
                 }, null);
@@ -205,7 +203,7 @@ var Sample;
                         bullet.kill();
                         if (!_this.player.immortalState) {
                             _this.player.makeDamage(bullet.damagePoints);
-                            _this.hud.setHealthState(_this.player.health);
+                            _this.hud.updateHealthState();
                         }
                     });
                 }, null);
@@ -275,11 +273,12 @@ var Sample;
                 _super.apply(this, arguments);
             }
             Zone1.prototype.preload = function () {
-                this.game.load.image('zone', 'assets/images/levels/zone1.png');
+                _super.prototype.preload.call(this);
             };
 
             Zone1.prototype.create = function () {
                 _super.prototype.create.call(this);
+                this.game.stage.backgroundColor = "#D7F5FF";
             };
 
             Zone1.prototype.update = function () {
@@ -385,26 +384,28 @@ var Sample;
                 this.lightRadius = 100;
             }
             Zone2.prototype.preload = function () {
-                this.game.load.image('zone', 'assets/images/levels/zone2.png');
+                _super.prototype.preload.call(this);
             };
 
             Zone2.prototype.create = function () {
                 _super.prototype.create.call(this);
-
-                this.shadowTexture = this.game.add.bitmapData(this.game.width, this.game.height);
+                this.game.stage.backgroundColor = "#330169";
+                console.log(this.map.widthInPixels);
+                this.shadowTexture = this.game.add.bitmapData(this.map.widthInPixels, this.map.heightInPixels);
 
                 this.lightSprite = this.game.add.image(0, 0, this.shadowTexture);
                 this.lightSprite.blendMode = PIXI.blendModes.MULTIPLY;
-                this.lightSprite.fixedToCamera = true;
             };
 
             Zone2.prototype.update = function () {
                 _super.prototype.update.call(this);
+
+                this.shadowUpdate();
             };
 
             Zone2.prototype.shadowUpdate = function () {
-                this.shadowTexture.context.fillStyle = '#000000';
-                this.shadowTexture.context.fillRect(0, 0, this.game.width, this.game.height);
+                this.shadowTexture.context.fillStyle = '#444444';
+                this.shadowTexture.context.fillRect(0, 0, this.map.widthInPixels, this.map.heightInPixels);
 
                 var gradient = this.shadowTexture.context.createRadialGradient(this.player.body.x, this.player.body.y, this.lightRadius * 0.75, this.player.body.x, this.player.body.y, this.lightRadius);
                 gradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
@@ -516,7 +517,7 @@ var Sample;
                 _super.apply(this, arguments);
             }
             Zone3.prototype.preload = function () {
-                this.game.load.image('zone', 'assets/images/levels/zone3.png');
+                _super.prototype.preload.call(this);
             };
 
             Zone3.prototype.create = function () {
@@ -627,7 +628,7 @@ var Sample;
                 _super.apply(this, arguments);
             }
             Zone4.prototype.preload = function () {
-                this.game.load.image('zone', 'assets/images/levels/zone4.png');
+                _super.prototype.preload.call(this);
             };
 
             Zone4.prototype.create = function () {
@@ -766,7 +767,6 @@ var Sample;
                 this.superAttakState = false;
                 this.direction = 1 /* Right */;
                 this.damagePoints = 50;
-                this.healthPoints = 10000;
                 this.manaPoints = 100;
                 this.immortalStateAt = Date.now();
                 this.attackStateAt = Date.now();
@@ -785,7 +785,7 @@ var Sample;
                 this.body.collideWorldBounds = true;
 
                 this.alive = true;
-                this.health = this.healthPoints;
+                this.health = 1000;
 
                 this.animations.add('stay', ['player-walk-1.png'], 10, true);
                 this.animations.add('walk', Phaser.Animation.generateFrameNames('player-walk-', 1, 4, '.png', 0), 30, true);
@@ -927,10 +927,10 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (Prefab) {
-        var Barb = (function (_super) {
-            __extends(Barb, _super);
-            function Barb(game, x, y) {
-                _super.call(this, game, x, y, 'barb');
+        var Spike = (function (_super) {
+            __extends(Spike, _super);
+            function Spike(game, x, y) {
+                _super.call(this, game, x, y, 'spike');
                 this.damagePoints = 50;
 
                 game.physics.arcade.enable(this);
@@ -939,9 +939,9 @@ var Sample;
 
                 game.add.existing(this);
             }
-            return Barb;
+            return Spike;
         })(Phaser.Sprite);
-        Prefab.Barb = Barb;
+        Prefab.Spike = Spike;
     })(Sample.Prefab || (Sample.Prefab = {}));
     var Prefab = Sample.Prefab;
 })(Sample || (Sample = {}));
@@ -1013,11 +1013,9 @@ var Sample;
     (function (Prefab) {
         var HUD = (function (_super) {
             __extends(HUD, _super);
-            function HUD(game, x, y) {
-                _super.call(this, game, x, y, 'hud');
-                this.healthText = "Health: 100";
-                this.manaText = "Mana: 100";
-                this.currentLevelText = "Level: 1-1";
+            function HUD(level, x, y) {
+                _super.call(this, level.game, x, y, 'hud');
+                this.level = level;
                 this.textStyle = {
                     font: "20px Arial",
                     fill: "#ffffff"
@@ -1025,27 +1023,30 @@ var Sample;
 
                 this.fixedToCamera = true;
 
-                this.healthState = game.add.text(8, 8, this.healthText, this.textStyle);
+                this.healthState = level.game.add.text(8, 8, "", this.textStyle);
+                this.updateHealthState();
                 this.addChild(this.healthState);
 
-                this.manaState = game.add.text(150, 8, this.manaText, this.textStyle);
+                this.manaState = level.game.add.text(150, 8, "", this.textStyle);
+                this.updateManaState();
                 this.addChild(this.manaState);
 
-                this.currentLevelState = game.add.text(280, 8, this.currentLevelText, this.textStyle);
+                this.currentLevelState = level.game.add.text(280, 8, "", this.textStyle);
+                this.updateLevelState();
                 this.addChild(this.currentLevelState);
 
-                game.add.existing(this);
+                level.game.add.existing(this);
             }
-            HUD.prototype.setHealthState = function (health) {
-                this.healthState.text = "Health: " + health.toString();
+            HUD.prototype.updateHealthState = function () {
+                this.healthState.text = "Health: " + this.level.player.health.toString();
             };
 
-            HUD.prototype.setManaState = function (mana) {
-                this.manaState.text = "Mana: " + mana.toString();
+            HUD.prototype.updateManaState = function () {
+                this.manaState.text = "Mana: " + this.level.player.manaPoints.toString();
             };
 
-            HUD.prototype.setLevelState = function (level) {
-                this.currentLevelState.text = "Level: " + Sample.State.AbstractZone.GetLevelName(level);
+            HUD.prototype.updateLevelState = function () {
+                this.currentLevelState.text = "Level: " + Sample.State.AbstractZone.GetLevelName(this.level.currentLevel);
             };
             return HUD;
         })(Phaser.Sprite);
@@ -1056,19 +1057,19 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (Prefab) {
-        var ExitDoor = (function (_super) {
-            __extends(ExitDoor, _super);
-            function ExitDoor(game, x, y) {
-                _super.call(this, game, x, y, 'exitDoor');
+        var Exit = (function (_super) {
+            __extends(Exit, _super);
+            function Exit(game, x, y) {
+                _super.call(this, game, x, y, 'exit');
 
                 game.physics.arcade.enable(this);
                 this.body.immovable = true;
 
                 game.add.existing(this);
             }
-            return ExitDoor;
+            return Exit;
         })(Phaser.Sprite);
-        Prefab.ExitDoor = ExitDoor;
+        Prefab.Exit = Exit;
     })(Sample.Prefab || (Sample.Prefab = {}));
     var Prefab = Sample.Prefab;
 })(Sample || (Sample = {}));

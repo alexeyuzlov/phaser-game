@@ -8,28 +8,29 @@ module Sample.State {
         lightSprite:Phaser.Image;
 
         preload() {
-            this.game.load.image('zone', 'assets/images/levels/zone2.png');
+            super.preload();
         }
 
         create() {
             super.create();
-
-            this.shadowTexture = this.game.add.bitmapData(this.game.width, this.game.height);
+            this.game.stage.backgroundColor = "#330169";
+            console.log(this.map.widthInPixels);
+            this.shadowTexture = this.game.add.bitmapData(this.map.widthInPixels, this.map.heightInPixels);
 
             this.lightSprite = this.game.add.image(0, 0, this.shadowTexture);
             this.lightSprite.blendMode = PIXI.blendModes.MULTIPLY;
-            this.lightSprite.fixedToCamera = true;
+            //this.lightSprite.fixedToCamera = true;
         }
 
         update() {
             super.update();
 
-            //this.shadowUpdate();
+            this.shadowUpdate();
         }
 
         shadowUpdate() {
-            this.shadowTexture.context.fillStyle = '#000000';
-            this.shadowTexture.context.fillRect(0, 0, this.game.width, this.game.height);
+            this.shadowTexture.context.fillStyle = '#444444';
+            this.shadowTexture.context.fillRect(0, 0, this.map.widthInPixels, this.map.heightInPixels);
 
             var gradient = this.shadowTexture.context.createRadialGradient(
                 this.player.body.x, this.player.body.y, this.lightRadius * 0.75,
@@ -43,7 +44,6 @@ module Sample.State {
                 this.lightRadius, 0, Math.PI * 2);
             this.shadowTexture.context.fill();
 
-            // This just tells the engine it should update the texture cache
             this.shadowTexture.dirty = true;
         }
     }

@@ -5,7 +5,7 @@ module Sample.State {
     export class Zone4 extends AbstractZone {
 
         preload() {
-            this.game.load.image('zone', 'assets/images/levels/zone4.png');
+            super.preload();
         }
 
         create() {

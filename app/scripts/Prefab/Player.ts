@@ -21,8 +21,6 @@ module Sample.Prefab {
         direction:Direction = Direction.Right;
 
         damagePoints:number = 50;
-
-        healthPoints:number = 10000;
         manaPoints:number = 100;
 
         immortalStateAt:number = Date.now();
@@ -47,7 +45,7 @@ module Sample.Prefab {
             this.body.collideWorldBounds = true;
 
             this.alive = true;
-            this.health = this.healthPoints;
+            this.health = 1000;
 
             //this.smoothed = true;
 

@@ -1,9 +1,9 @@
 module Sample.Prefab {
 
-    export class ExitDoor extends Phaser.Sprite {
+    export class Exit extends Phaser.Sprite {
 
         constructor(game:Phaser.Game, x:number, y:number) {
-            super(game, x, y, 'exitDoor');
+            super(game, x, y, 'exit');
 
             game.physics.arcade.enable(this);
             this.body.immovable = true;

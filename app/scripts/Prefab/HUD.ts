@@ -1,14 +1,8 @@
 module Sample.Prefab {
 
     export class HUD extends Phaser.Sprite {
-
-        healthText: string = "Health: 100";
         healthState: Phaser.Text;
-
-        manaText: string = "Mana: 100";
         manaState: Phaser.Text;
-
-        currentLevelText: string = "Level: 1-1";
         currentLevelState: Phaser.Text;
 
         textStyle = {
@@ -16,33 +10,36 @@ module Sample.Prefab {
             fill: "#ffffff"
         };
 
-        constructor(game:Phaser.Game, x:number, y:number) {
-            super(game, x, y, 'hud');
+        constructor(public level:State.AbstractZone, x:number, y:number) {
+            super(level.game, x, y, 'hud');
 
             this.fixedToCamera = true;
 
-            this.healthState = game.add.text(8, 8, this.healthText, this.textStyle);
+            this.healthState = level.game.add.text(8, 8, "", this.textStyle);
+            this.updateHealthState();
             this.addChild(this.healthState);
 
-            this.manaState = game.add.text(150, 8, this.manaText, this.textStyle);
+            this.manaState = level.game.add.text(150, 8, "", this.textStyle);
+            this.updateManaState();
             this.addChild(this.manaState);
 
-            this.currentLevelState = game.add.text(280, 8, this.currentLevelText, this.textStyle);
+            this.currentLevelState = level.game.add.text(280, 8, "", this.textStyle);
+            this.updateLevelState();
             this.addChild(this.currentLevelState);
 
-            game.add.existing(this);
+            level.game.add.existing(this);
         }
 
-        setHealthState(health: number) {
-            this.healthState.text = "Health: " + health.toString();
+        updateHealthState() {
+            this.healthState.text = "Health: " + this.level.player.health.toString();
         }
 
-        setManaState(mana: number) {
-            this.manaState.text = "Mana: " + mana.toString();
+        updateManaState() {
+            this.manaState.text = "Mana: " + this.level.player.manaPoints.toString();
         }
 
-        setLevelState(level) {
-            this.currentLevelState.text = "Level: " + Sample.State.AbstractZone.GetLevelName(level); /* Sample.State.Level.GetLevelByName() */
+        updateLevelState() {
+            this.currentLevelState.text = "Level: " + Sample.State.AbstractZone.GetLevelName(this.level.currentLevel);
         }
     }
 }

@@ -10,70 +10,70 @@ module Sample.State {
         player:Prefab.Player;
         hud:Prefab.HUD;
 
-        barbs:Phaser.Group;
+        spikes:Phaser.Group;
         ice:Phaser.Group;
         allEnemies:Phaser.Group;
         shooters:Phaser.Group;
         runners:Phaser.Group;
         fliers:Phaser.Group;
-        exitDoors:Phaser.Group;
+        exits:Phaser.Group;
 
         create() {
-            // PRE-SETTINGS
-            this.game.physics.startSystem(Phaser.Physics.ARCADE);
-
             // MAP AND LAYERS
             this.map = this.game.add.tilemap('map');
-            this.map.addTilesetImage('zone');
-            this.map.addTilesetImage('exitDoor');
-            this.map.setCollision([1]);
+            this.map.addTilesetImage('ground');
+            this.map.setCollisionBetween(1, 3, true);
 
-            this.layer = this.map.createLayer('main');
+            this.layer = this.map.createLayer('layer');
             this.layer.resizeWorld();
 
             // PREFABS SINGLE
             this.player = new Prefab.Player(this, 220, this.game.world.height - 100);
 
+            // HUD MANAGER
+            this.hud = new Prefab.HUD(this, 0, 0);
+
             // PREFABS MULTIPLE
             var index:number;
 
-            index = this.map.getTilesetIndex('exitDoor');
+            this.exits = this.game.add.group();
+            index = this.map.getTilesetIndex('exit');
             if (index) {
-                this.exitDoors = this.game.add.group();
-                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'exitDoor', 0, true, false, this.exitDoors, Prefab.ExitDoor);
+                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'exit', 0, true, false, this.exits, Prefab.Exit);
             }
 
-            index = this.map.getTilesetIndex('barb');
+            this.spikes = this.game.add.group();
+            index = this.map.getTilesetIndex('spike');
             if (index) {
-                this.barbs = this.game.add.group();
-                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'barb', 0, true, false, this.barbs, Prefab.Barb);
+
+                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'spike', 0, true, false, this.spikes, Prefab.Spike);
             }
 
+            this.ice = this.game.add.group();
             index = this.map.getTilesetIndex('ice');
             if (index) {
-                this.ice = this.game.add.group();
                 this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'ice', 0, true, false, this.ice, Prefab.Ice);
                 this.ice.forEach((iceOne) => {
                     iceOne.setTarget(this.player);
                 }, null);
             }
 
+            this.shooters = this.game.add.group();
             index = this.map.getTilesetIndex('shooter');
             if (index) {
-                this.shooters = this.game.add.group();
-                this.map.createFromObjects('enemies', this.map.tilesets[index].firstgid, 'shooter', 0, true, false, this.shooters, Prefab.Shooter);
+                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'shooter', 0, true, false, this.shooters, Prefab.Shooter);
             }
 
+            this.runners = this.game.add.group();
             index = this.map.getTilesetIndex('runner');
             if (index) {
-                this.runners = this.game.add.group();
-                this.map.createFromObjects('enemies', this.map.tilesets[index].firstgid, 'runner', 0, true, false, this.runners, Prefab.Runner);
+                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'runner', 0, true, false, this.runners, Prefab.Runner);
             }
 
+            this.fliers = this.game.add.group();
             index = this.map.getTilesetIndex('flier');
             if (index) {
-                this.fliers = this.game.add.group();
-                this.map.createFromObjects('enemies', this.map.tilesets[index].firstgid, 'flier', 0, true, false, this.fliers, Prefab.Flier);
+                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'flier', 0, true, false, this.fliers, Prefab.Flier);
                 this.fliers.forEach((flier) => {
                     flier.setTarget(this.player);
                 }, null);
@@ -84,31 +84,27 @@ module Sample.State {
             this.allEnemies.add(this.shooters);
             this.allEnemies.add(this.fliers);
 
-            // HUD MANAGER
-            this.hud = new Prefab.HUD(this.game, 0, 0);
-            this.hud.setLevelState(this.currentLevel);
-
             // POST-SETTINGS
-            this.game.camera.follow(this.player);
+            this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_PLATFORMER);
         }
 
         private doCollide() {
             this.game.physics.arcade.collide(this.player, this.layer);
-            this.game.physics.arcade.collide(this.player, this.exitDoors, (player, exitDoor) => {
+            this.game.physics.arcade.collide(this.player, this.exits, (player, exit) => {
                 this.startNextLevel();
             });
 
-            this.game.physics.arcade.collide(this.player, this.barbs, (player, barb) => {
+            this.game.physics.arcade.collide(this.player, this.spikes, (player, spike) => {
                 if (!this.player.immortalState) {
-                    this.player.makeDamage(barb.damagePoints);
-                    this.hud.setHealthState(this.player.health);
+                    this.player.makeDamage(spike.damagePoints);
+                    this.hud.updateHealthState();
                 }
             });
 
             this.game.physics.arcade.overlap(this.player, this.ice, (player, ice) => {
                 if (!this.player.immortalState) {
                     this.player.makeDamage(ice.damagePoints);
-                    this.hud.setHealthState(this.player.health);
+                    this.hud.updateHealthState();
                 }
             });
 
@@ -121,7 +117,7 @@ module Sample.State {
                         enemy.makeDamage(player.damagePoints);
                     } else if (!this.player.immortalState) {
                         this.player.makeDamage(enemy.damagePoints);
-                        this.hud.setHealthState(this.player.health);
+                        this.hud.updateHealthState();
                     }
                 });
             }, null);
@@ -131,7 +127,7 @@ module Sample.State {
                     bullet.kill();
                     if (!this.player.immortalState) {
                         this.player.makeDamage(bullet.damagePoints);
-                        this.hud.setHealthState(this.player.health);
+                        this.hud.updateHealthState();
                     }
                 });
             }, null);

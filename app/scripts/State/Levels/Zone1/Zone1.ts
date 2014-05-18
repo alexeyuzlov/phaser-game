@@ -3,11 +3,12 @@ module Sample.State {
     export class Zone1 extends AbstractZone {
 
         preload() {
-            this.game.load.image('zone', 'assets/images/levels/zone1.png');
+            super.preload();
         }
 
         create() {
             super.create();
+            this.game.stage.backgroundColor = "#D7F5FF";
         }
 
         update() {
