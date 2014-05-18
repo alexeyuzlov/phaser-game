@@ -90,513 +90,11 @@ var Sample;
 })(Sample || (Sample = {}));
 var Sample;
 (function (Sample) {
-    (function (Prefab) {
-        var Player = (function (_super) {
-            __extends(Player, _super);
-            function Player(game, x, y) {
-                _super.call(this, game, x, y, 'player');
-                this.gravity = 300;
-                this.acceleration = 1000;
-                this.drag = 1000;
-                this.maxSpeed = 300;
-                this.superSpeedPower = 600;
-                this.jumpPower = 300;
-                this.immortalState = false;
-                this.attackState = false;
-                this.moveState = false;
-                this.sitState = false;
-                this.superSpeedState = false;
-                this.superAttakState = false;
-                this.direction = 1 /* Right */;
-                this.damagePoints = 50;
-                this.healthPoints = 10000;
-                this.manaPoints = 100;
-                this.immortalStateAt = Date.now();
-                this.attackStateAt = Date.now();
-                this.immortalDuration = 3000;
-                this.attackDuration = 300;
-                this.isActiveJumpKey = false;
-                this.isAttackKeyPressed = false;
-
-                game.physics.arcade.enable(this);
-                this.body.gravity.y = this.gravity;
-                this.anchor.set(0.5, 1);
-
-                this.body.drag.x = this.drag;
-                this.body.maxVelocity.x = this.maxSpeed;
-
-                this.body.collideWorldBounds = true;
-
-                this.alive = true;
-                this.health = this.healthPoints;
-
-                this.animations.add('stay', ['player-walk-1.png'], 10, true);
-                this.animations.add('walk', Phaser.Animation.generateFrameNames('player-walk-', 1, 4, '.png', 0), 30, true);
-                this.animations.add('attack', Phaser.Animation.generateFrameNames('player-attack-', 1, 3, '.png', 0), 10, true);
-                this.animations.add('sit', ['player-sit-1.png'], 10, true);
-
-                game.add.existing(this);
-            }
-            Player.prototype.makeDamage = function (damagePoint) {
-                this.damage(damagePoint);
-                this.immortalStateAt = Date.now();
-                this.immortalState = true;
-                this.alpha = 0.5;
-
-                var textStyle = {
-                    font: "20px Arial",
-                    fill: "#ffffff",
-                    stroke: "ff0000",
-                    strokeThickness: 1
-                };
-
-                var text = this.game.add.text(this.x, this.y, damagePoint.toString(), textStyle);
-                var tween = this.game.add.tween(text).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
-
-                tween.onComplete.add(function () {
-                    text.destroy();
-                });
-            };
-
-            Player.prototype.jump = function () {
-                if (this.game.input.keyboard.isDown(Sample.settings.keys.jump) && (this.body.blocked.down || this.body.touching.down) && !this.isActiveJumpKey) {
-                    this.isActiveJumpKey = true;
-                    this.body.velocity.y = -this.jumpPower;
-                }
-
-                if (!this.game.input.keyboard.isDown(Sample.settings.keys.jump)) {
-                    this.isActiveJumpKey = false;
-                }
-            };
-
-            Player.prototype.move = function () {
-                if (this.game.input.keyboard.isDown(Sample.settings.keys.moveRight)) {
-                    this.moveState = true;
-                    this.body.acceleration.x = this.acceleration;
-                    this.direction = 1 /* Right */;
-                    this.scale.x = 1;
-                } else if (this.game.input.keyboard.isDown(Sample.settings.keys.moveLeft)) {
-                    this.moveState = true;
-                    this.body.acceleration.x = -this.acceleration;
-                    this.direction = 0 /* Left */;
-                    this.scale.x = -1;
-                } else {
-                    this.moveState = false;
-                    this.body.acceleration.x = 0;
-                }
-            };
-
-            Player.prototype.attack = function () {
-                if (this.game.input.keyboard.isDown(Sample.settings.keys.attack) && !this.attackState && !this.isAttackKeyPressed) {
-                    this.isAttackKeyPressed = true;
-                    this.attackState = true;
-                    this.attackStateAt = Date.now();
-                }
-
-                if (!this.game.input.keyboard.isDown(Sample.settings.keys.attack)) {
-                    this.isAttackKeyPressed = false;
-                }
-
-                if ((Date.now() - this.attackStateAt) > this.attackDuration) {
-                    this.attackState = false;
-                }
-            };
-
-            Player.prototype.superSpeed = function () {
-                if (this.game.input.keyboard.isDown(Sample.settings.keys.superSpeed) && this.body.blocked.down && !this.attackState) {
-                    this.superSpeedState = true;
-                }
-
-                if (!this.game.input.keyboard.isDown(Sample.settings.keys.superSpeed)) {
-                    this.superSpeedState = false;
-                }
-
-                if (this.superSpeedState) {
-                    this.body.maxVelocity.x = this.superSpeedPower;
-                } else {
-                    this.body.maxVelocity.x = this.maxSpeed;
-                }
-            };
-
-            Player.prototype.superAttack = function () {
-            };
-
-            Player.prototype.sit = function () {
-                if (this.game.input.keyboard.isDown(Sample.settings.keys.sit)) {
-                    this.sitState = true;
-                }
-
-                if (!this.game.input.keyboard.isDown(Sample.settings.keys.sit)) {
-                    this.sitState = false;
-                }
-            };
-
-            Player.prototype.state = function () {
-                if (this.immortalState && (Date.now() - this.immortalStateAt) > this.immortalDuration) {
-                    this.alpha = 1;
-                    this.immortalState = false;
-                }
-
-                if (this.attackState) {
-                    this.animations.play('attack');
-                } else if (this.moveState) {
-                    this.animations.play('walk');
-                } else if (this.sitState) {
-                    this.animations.play('sit');
-                } else {
-                    this.animations.play('stay');
-                }
-
-                this.body.width = this.animations.currentFrame.width;
-                this.body.height = this.animations.currentFrame.height;
-            };
-
-            Player.prototype.update = function () {
-                this.move();
-                this.jump();
-                this.attack();
-                this.sit();
-                this.superSpeed();
-                this.superAttack();
-
-                this.state();
-            };
-            return Player;
-        })(Phaser.Sprite);
-        Prefab.Player = Player;
-    })(Sample.Prefab || (Sample.Prefab = {}));
-    var Prefab = Sample.Prefab;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (Prefab) {
-        var Barb = (function (_super) {
-            __extends(Barb, _super);
-            function Barb(game, x, y) {
-                _super.call(this, game, x, y, 'barb');
-                this.damagePoints = 50;
-
-                game.physics.arcade.enable(this);
-
-                this.body.immovable = true;
-
-                game.add.existing(this);
-            }
-            return Barb;
-        })(Phaser.Sprite);
-        Prefab.Barb = Barb;
-    })(Sample.Prefab || (Sample.Prefab = {}));
-    var Prefab = Sample.Prefab;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (Prefab) {
-        var Ice = (function (_super) {
-            __extends(Ice, _super);
-            function Ice(game, x, y) {
-                _super.call(this, game, x, y, 'ice');
-                this.damagePoints = 50;
-                this.distanceToTarget = Math.random() * 100 - 40;
-                game.physics.arcade.enable(this);
-                this.alive = true;
-                this.body.immovable = true;
-                this.checkWorldBounds = true;
-                this.outOfBoundsKill = true;
-
-                game.physics.arcade.enable(this);
-                game.add.existing(this);
-            }
-            Ice.prototype.setTarget = function (target) {
-                this.target = target;
-            };
-
-            Ice.prototype.update = function () {
-                if (!this.inCamera)
-                    return;
-                if (!this.alive)
-                    return;
-
-                if (Math.abs(this.target.x - this.body.x) < this.distanceToTarget && this.target.y > this.body.y) {
-                    this.body.gravity.y = 100;
-                    this.body.acceleration.y = 1000;
-                }
-            };
-            return Ice;
-        })(Phaser.Sprite);
-        Prefab.Ice = Ice;
-    })(Sample.Prefab || (Sample.Prefab = {}));
-    var Prefab = Sample.Prefab;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (Prefab) {
-        var AbstractEnemy = (function (_super) {
-            __extends(AbstractEnemy, _super);
-            function AbstractEnemy(game, x, y, sprite) {
-                _super.call(this, game, x, y, sprite);
-
-                game.physics.arcade.enable(this);
-                this.alive = true;
-
-                game.add.existing(this);
-            }
-            AbstractEnemy.prototype.makeDamage = function (damagePoint) {
-                this.damage(damagePoint);
-
-                var textStyle = {
-                    font: "20px Arial",
-                    fill: "#ffffff",
-                    stroke: '#0000ff',
-                    strokeThickness: 1
-                };
-
-                var text = this.game.add.text(this.x, this.y, damagePoint.toString(), textStyle);
-                var tween = this.game.add.tween(text).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
-
-                tween.onComplete.add(function () {
-                    text.destroy();
-                });
-            };
-            return AbstractEnemy;
-        })(Phaser.Sprite);
-        Prefab.AbstractEnemy = AbstractEnemy;
-    })(Sample.Prefab || (Sample.Prefab = {}));
-    var Prefab = Sample.Prefab;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (Prefab) {
-        var Runner = (function (_super) {
-            __extends(Runner, _super);
-            function Runner(game, x, y) {
-                _super.call(this, game, x, y, 'runner');
-                this.gravity = 300;
-                this.velocity = 100;
-                this.direction = 1 /* Right */;
-                this.damagePoints = 10;
-
-                this.body.gravity.y = this.gravity;
-                this.health = 10;
-            }
-            Runner.prototype.update = function () {
-                if (!this.inCamera)
-                    return;
-                if (!this.alive)
-                    return;
-
-                if (this.body.blocked.left) {
-                    this.direction = 1 /* Right */;
-                } else if (this.body.blocked.right) {
-                    this.direction = 0 /* Left */;
-                }
-
-                switch (this.direction) {
-                    case 0 /* Left */:
-                        this.body.velocity.x = -this.velocity;
-                        break;
-                    case 1 /* Right */:
-                        this.body.velocity.x = this.velocity;
-                        break;
-                    default:
-                        this.body.velocity.x = 0;
-                }
-            };
-            return Runner;
-        })(Prefab.AbstractEnemy);
-        Prefab.Runner = Runner;
-    })(Sample.Prefab || (Sample.Prefab = {}));
-    var Prefab = Sample.Prefab;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (Prefab) {
-        var Bullet = (function (_super) {
-            __extends(Bullet, _super);
-            function Bullet(game, x, y) {
-                _super.call(this, game, x, y, 'bullet');
-                this.speed = 300;
-                this.damagePoints = 30;
-
-                game.physics.arcade.enable(this);
-                this.anchor.set(0.5, 0.5);
-                this.kill();
-
-                this.checkWorldBounds = true;
-                this.outOfBoundsKill = true;
-
-                game.add.existing(this);
-            }
-            return Bullet;
-        })(Phaser.Sprite);
-        Prefab.Bullet = Bullet;
-    })(Sample.Prefab || (Sample.Prefab = {}));
-    var Prefab = Sample.Prefab;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (Prefab) {
-        var Shooter = (function (_super) {
-            __extends(Shooter, _super);
-            function Shooter(game, x, y) {
-                _super.call(this, game, x, y, 'shooter');
-                this.gravity = 300;
-                this.lastBulletShotAt = 0;
-                this.countBullets = 1;
-                this.shotDelay = 3000;
-                this.damagePoints = 10;
-
-                this.body.gravity.y = this.gravity;
-                this.anchor.set(1, 0.5);
-
-                this.bullets = this.game.add.group();
-                for (var i = 0; i < this.countBullets; i++) {
-                    var bullet = new Prefab.Bullet(game, 0, 0);
-                    this.bullets.add(bullet);
-                }
-                this.health = 10;
-            }
-            Shooter.prototype.update = function () {
-                if (!this.inCamera)
-                    return;
-                if (!this.alive)
-                    return;
-
-                if (this.game.time.now - this.lastBulletShotAt < this.shotDelay)
-                    return;
-                this.lastBulletShotAt = this.game.time.now;
-
-                var bullet = this.bullets.getFirstDead();
-
-                if (bullet === null || bullet === undefined)
-                    return;
-
-                bullet.revive();
-                bullet.reset(this.x, this.y);
-
-                bullet.body.velocity.x = -bullet.speed;
-            };
-            return Shooter;
-        })(Prefab.AbstractEnemy);
-        Prefab.Shooter = Shooter;
-    })(Sample.Prefab || (Sample.Prefab = {}));
-    var Prefab = Sample.Prefab;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (Prefab) {
-        var Flier = (function (_super) {
-            __extends(Flier, _super);
-            function Flier(game, x, y) {
-                _super.call(this, game, x, y, 'flier');
-                this.isActive = false;
-                this.damagePoints = 10;
-                this.speed = 150;
-
-                this.anchor.set(0.5, 0.5);
-                this.health = 10;
-            }
-            Flier.prototype.setTarget = function (target) {
-                this.minDistance = target.width / 2;
-
-                this.target = target;
-                this.isActive = true;
-            };
-
-            Flier.prototype.update = function () {
-                if (!this.inCamera)
-                    return;
-                if (!this.isActive)
-                    return;
-
-                var distance = Phaser.Math.distance(this.x, this.y, this.target.x, this.target.y);
-
-                if (distance > this.minDistance) {
-                    var rotation = Phaser.Math.angleBetween(this.x, this.y, this.target.x, this.target.y);
-
-                    this.body.velocity.x = Math.cos(rotation) * this.speed;
-                    this.body.velocity.y = Math.sin(rotation) * this.speed;
-                } else {
-                    this.body.velocity.setTo(0, 0);
-                }
-            };
-            return Flier;
-        })(Prefab.AbstractEnemy);
-        Prefab.Flier = Flier;
-    })(Sample.Prefab || (Sample.Prefab = {}));
-    var Prefab = Sample.Prefab;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (Prefab) {
-        var HUD = (function (_super) {
-            __extends(HUD, _super);
-            function HUD(game, x, y) {
-                _super.call(this, game, x, y, 'hud');
-                this.healthText = "Health: 100";
-                this.manaText = "Mana: 100";
-                this.currentLevelText = "Level: 1-1";
-                this.textStyle = {
-                    font: "20px Arial",
-                    fill: "#ffffff"
-                };
-
-                this.fixedToCamera = true;
-
-                this.healthState = game.add.text(8, 8, this.healthText, this.textStyle);
-                this.addChild(this.healthState);
-
-                this.manaState = game.add.text(150, 8, this.manaText, this.textStyle);
-                this.addChild(this.manaState);
-
-                this.currentLevelState = game.add.text(280, 8, this.currentLevelText, this.textStyle);
-                this.addChild(this.currentLevelState);
-
-                game.add.existing(this);
-            }
-            HUD.prototype.setHealthState = function (health) {
-                this.healthState.text = "Health: " + health.toString();
-            };
-
-            HUD.prototype.setManaState = function (mana) {
-                this.manaState.text = "Mana: " + mana.toString();
-            };
-
-            HUD.prototype.setLevelState = function (level) {
-                this.currentLevelState.text = "Level: " + Sample.State.AbstractZone.GetLevelName(level);
-            };
-            return HUD;
-        })(Phaser.Sprite);
-        Prefab.HUD = HUD;
-    })(Sample.Prefab || (Sample.Prefab = {}));
-    var Prefab = Sample.Prefab;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (Prefab) {
-        var ExitDoor = (function (_super) {
-            __extends(ExitDoor, _super);
-            function ExitDoor(game, x, y) {
-                _super.call(this, game, x, y, 'exitDoor');
-
-                game.physics.arcade.enable(this);
-                this.body.immovable = true;
-
-                game.add.existing(this);
-            }
-            return ExitDoor;
-        })(Phaser.Sprite);
-        Prefab.ExitDoor = ExitDoor;
-    })(Sample.Prefab || (Sample.Prefab = {}));
-    var Prefab = Sample.Prefab;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
     (function (State) {
         var AbstractZone = (function (_super) {
             __extends(AbstractZone, _super);
             function AbstractZone() {
                 _super.apply(this, arguments);
-                this.score = 0;
             }
             AbstractZone.prototype.create = function () {
                 var _this = this;
@@ -604,35 +102,57 @@ var Sample;
 
                 this.map = this.game.add.tilemap('map');
                 this.map.addTilesetImage('zone');
-                this.map.setCollision(1);
+                this.map.addTilesetImage('exitDoor');
+                this.map.setCollision([1]);
 
                 this.layer = this.map.createLayer('main');
                 this.layer.resizeWorld();
 
-                this.exitDoor = new Sample.Prefab.ExitDoor(this.game, 10, this.game.world.height - 64 - 200);
+                this.player = new Sample.Prefab.Player(this, 220, this.game.world.height - 100);
 
-                this.player = new Sample.Prefab.Player(this.game, 220, this.game.world.height - 100);
+                var index;
 
-                this.barbs = this.game.add.group();
-                this.map.createFromObjects('objects', 6, 'barb', 0, true, false, this.barbs, Sample.Prefab.Barb);
+                index = this.map.getTilesetIndex('exitDoor');
+                if (index) {
+                    this.exitDoors = this.game.add.group();
+                    this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'exitDoor', 0, true, false, this.exitDoors, Sample.Prefab.ExitDoor);
+                }
 
-                this.ice = this.game.add.group();
-                this.map.createFromObjects('objects', 8, 'ice', 0, true, false, this.ice, Sample.Prefab.Ice);
-                this.ice.forEach(function (iceOne) {
-                    iceOne.setTarget(_this.player);
-                }, null);
+                index = this.map.getTilesetIndex('barb');
+                if (index) {
+                    this.barbs = this.game.add.group();
+                    this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'barb', 0, true, false, this.barbs, Sample.Prefab.Barb);
+                }
 
-                this.shooters = this.game.add.group();
-                this.map.createFromObjects('enemies', 3, 'shooter', 0, true, false, this.shooters, Sample.Prefab.Shooter);
+                index = this.map.getTilesetIndex('ice');
+                if (index) {
+                    this.ice = this.game.add.group();
+                    this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'ice', 0, true, false, this.ice, Sample.Prefab.Ice);
+                    this.ice.forEach(function (iceOne) {
+                        iceOne.setTarget(_this.player);
+                    }, null);
+                }
 
-                this.runners = this.game.add.group();
-                this.map.createFromObjects('enemies', 4, 'runner', 0, true, false, this.runners, Sample.Prefab.Runner);
+                index = this.map.getTilesetIndex('shooter');
+                if (index) {
+                    this.shooters = this.game.add.group();
+                    this.map.createFromObjects('enemies', this.map.tilesets[index].firstgid, 'shooter', 0, true, false, this.shooters, Sample.Prefab.Shooter);
+                }
 
-                this.fliers = this.game.add.group();
-                this.map.createFromObjects('enemies', 5, 'flier', 0, true, false, this.fliers, Sample.Prefab.Flier);
-                this.fliers.forEach(function (flier) {
-                    flier.setTarget(_this.player);
-                }, null);
+                index = this.map.getTilesetIndex('runner');
+                if (index) {
+                    this.runners = this.game.add.group();
+                    this.map.createFromObjects('enemies', this.map.tilesets[index].firstgid, 'runner', 0, true, false, this.runners, Sample.Prefab.Runner);
+                }
+
+                index = this.map.getTilesetIndex('flier');
+                if (index) {
+                    this.fliers = this.game.add.group();
+                    this.map.createFromObjects('enemies', this.map.tilesets[index].firstgid, 'flier', 0, true, false, this.fliers, Sample.Prefab.Flier);
+                    this.fliers.forEach(function (flier) {
+                        flier.setTarget(_this.player);
+                    }, null);
+                }
 
                 this.allEnemies = this.game.add.group();
                 this.allEnemies.add(this.runners);
@@ -648,7 +168,7 @@ var Sample;
             AbstractZone.prototype.doCollide = function () {
                 var _this = this;
                 this.game.physics.arcade.collide(this.player, this.layer);
-                this.game.physics.arcade.collide(this.player, this.exitDoor, function (player, exitDoor) {
+                this.game.physics.arcade.collide(this.player, this.exitDoors, function (player, exitDoor) {
                     _this.startNextLevel();
                 });
 
@@ -659,7 +179,7 @@ var Sample;
                     }
                 });
 
-                this.game.physics.arcade.collide(this.player, this.ice, function (player, ice) {
+                this.game.physics.arcade.overlap(this.player, this.ice, function (player, ice) {
                     if (!_this.player.immortalState) {
                         _this.player.makeDamage(ice.damagePoints);
                         _this.hud.setHealthState(_this.player.health);
@@ -689,6 +209,9 @@ var Sample;
                         }
                     });
                 }, null);
+            };
+
+            AbstractZone.prototype.render = function () {
             };
 
             AbstractZone.prototype.update = function () {
@@ -1220,6 +743,507 @@ var Sample;
         State.GameOver = GameOver;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
+        var Player = (function (_super) {
+            __extends(Player, _super);
+            function Player(level, x, y) {
+                _super.call(this, level.game, x, y, 'player');
+                this.level = level;
+                this.gravity = 300;
+                this.acceleration = 1000;
+                this.drag = 1000;
+                this.maxSpeed = 300;
+                this.superSpeedPower = 600;
+                this.jumpPower = 300;
+                this.immortalState = false;
+                this.attackState = false;
+                this.moveState = false;
+                this.sitState = false;
+                this.superSpeedState = false;
+                this.superAttakState = false;
+                this.direction = 1 /* Right */;
+                this.damagePoints = 50;
+                this.healthPoints = 10000;
+                this.manaPoints = 100;
+                this.immortalStateAt = Date.now();
+                this.attackStateAt = Date.now();
+                this.immortalDuration = 3000;
+                this.attackDuration = 300;
+                this.isActiveJumpKey = false;
+                this.isAttackKeyPressed = false;
+
+                this.level.game.physics.arcade.enable(this);
+                this.body.gravity.y = this.gravity;
+                this.anchor.set(0.5, 1);
+
+                this.body.drag.x = this.drag;
+                this.body.maxVelocity.x = this.maxSpeed;
+
+                this.body.collideWorldBounds = true;
+
+                this.alive = true;
+                this.health = this.healthPoints;
+
+                this.animations.add('stay', ['player-walk-1.png'], 10, true);
+                this.animations.add('walk', Phaser.Animation.generateFrameNames('player-walk-', 1, 4, '.png', 0), 30, true);
+                this.animations.add('attack', Phaser.Animation.generateFrameNames('player-attack-', 1, 3, '.png', 0), 10, true);
+                this.animations.add('sit', ['player-sit-1.png'], 10, true);
+
+                this.level.game.add.existing(this);
+            }
+            Player.prototype.makeDamage = function (damagePoint) {
+                this.damage(damagePoint);
+                this.immortalStateAt = Date.now();
+                this.immortalState = true;
+                this.alpha = 0.5;
+
+                var textStyle = {
+                    font: "20px Arial",
+                    fill: "#ffffff",
+                    stroke: "ff0000",
+                    strokeThickness: 1
+                };
+
+                var text = this.game.add.text(this.x, this.y, damagePoint.toString(), textStyle);
+                var tween = this.game.add.tween(text).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
+
+                tween.onComplete.add(function () {
+                    text.destroy();
+                });
+            };
+
+            Player.prototype.jump = function () {
+                if (this.game.input.keyboard.isDown(Sample.settings.keys.jump) && (this.body.blocked.down || this.body.touching.down) && !this.isActiveJumpKey) {
+                    this.isActiveJumpKey = true;
+                    this.body.velocity.y = -this.jumpPower;
+                }
+
+                if (!this.game.input.keyboard.isDown(Sample.settings.keys.jump)) {
+                    this.isActiveJumpKey = false;
+                }
+            };
+
+            Player.prototype.move = function () {
+                if (this.game.input.keyboard.isDown(Sample.settings.keys.moveRight)) {
+                    this.moveState = true;
+                    this.body.acceleration.x = this.acceleration;
+                    this.direction = 1 /* Right */;
+                    this.scale.x = 1;
+                } else if (this.game.input.keyboard.isDown(Sample.settings.keys.moveLeft)) {
+                    this.moveState = true;
+                    this.body.acceleration.x = -this.acceleration;
+                    this.direction = 0 /* Left */;
+                    this.scale.x = -1;
+                } else {
+                    this.moveState = false;
+                    this.body.acceleration.x = 0;
+                }
+            };
+
+            Player.prototype.attack = function () {
+                if (this.game.input.keyboard.isDown(Sample.settings.keys.attack) && !this.attackState && !this.isAttackKeyPressed) {
+                    this.isAttackKeyPressed = true;
+                    this.attackState = true;
+                    this.attackStateAt = Date.now();
+                }
+
+                if (!this.game.input.keyboard.isDown(Sample.settings.keys.attack)) {
+                    this.isAttackKeyPressed = false;
+                }
+
+                if ((Date.now() - this.attackStateAt) > this.attackDuration) {
+                    this.attackState = false;
+                }
+            };
+
+            Player.prototype.superSpeed = function () {
+                if (this.game.input.keyboard.isDown(Sample.settings.keys.superSpeed) && this.body.blocked.down && !this.attackState) {
+                    this.superSpeedState = true;
+                }
+
+                if (!this.game.input.keyboard.isDown(Sample.settings.keys.superSpeed)) {
+                    this.superSpeedState = false;
+                }
+
+                if (this.superSpeedState) {
+                    this.body.maxVelocity.x = this.superSpeedPower;
+                } else {
+                    this.body.maxVelocity.x = this.maxSpeed;
+                }
+            };
+
+            Player.prototype.superAttack = function () {
+            };
+
+            Player.prototype.sit = function () {
+                if (this.game.input.keyboard.isDown(Sample.settings.keys.sit)) {
+                    this.sitState = true;
+                }
+
+                if (!this.game.input.keyboard.isDown(Sample.settings.keys.sit)) {
+                    this.sitState = false;
+                }
+            };
+
+            Player.prototype.state = function () {
+                if (this.immortalState && (Date.now() - this.immortalStateAt) > this.immortalDuration) {
+                    this.alpha = 1;
+                    this.immortalState = false;
+                }
+
+                if (this.attackState) {
+                    this.animations.play('attack');
+                } else if (this.moveState) {
+                    this.animations.play('walk');
+                } else if (this.sitState) {
+                    this.animations.play('sit');
+                } else {
+                    this.animations.play('stay');
+                }
+
+                this.body.width = this.animations.currentFrame.width;
+                this.body.height = this.animations.currentFrame.height;
+            };
+
+            Player.prototype.update = function () {
+                this.move();
+                this.jump();
+                this.attack();
+                this.sit();
+                this.superSpeed();
+                this.superAttack();
+
+                this.state();
+            };
+            return Player;
+        })(Phaser.Sprite);
+        Prefab.Player = Player;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
+        var Barb = (function (_super) {
+            __extends(Barb, _super);
+            function Barb(game, x, y) {
+                _super.call(this, game, x, y, 'barb');
+                this.damagePoints = 50;
+
+                game.physics.arcade.enable(this);
+
+                this.body.immovable = true;
+
+                game.add.existing(this);
+            }
+            return Barb;
+        })(Phaser.Sprite);
+        Prefab.Barb = Barb;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
+        var Ice = (function (_super) {
+            __extends(Ice, _super);
+            function Ice(game, x, y) {
+                _super.call(this, game, x, y, 'ice');
+                this.damagePoints = 50;
+                this.distanceToTarget = Math.random() * 100 - 40;
+                game.physics.arcade.enable(this);
+                this.alive = true;
+                this.checkWorldBounds = true;
+                this.outOfBoundsKill = true;
+
+                game.physics.arcade.enable(this);
+                game.add.existing(this);
+            }
+            Ice.prototype.setTarget = function (target) {
+                this.target = target;
+            };
+
+            Ice.prototype.update = function () {
+                if (!this.inCamera)
+                    return;
+                if (!this.alive)
+                    return;
+
+                if (Math.abs(this.target.x - this.body.x) < this.distanceToTarget && this.target.y > this.body.y) {
+                    this.body.gravity.y = 100;
+                    this.body.acceleration.y = 1000;
+                }
+            };
+            return Ice;
+        })(Phaser.Sprite);
+        Prefab.Ice = Ice;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
+        var Bullet = (function (_super) {
+            __extends(Bullet, _super);
+            function Bullet(game, x, y) {
+                _super.call(this, game, x, y, 'bullet');
+                this.speed = 300;
+                this.damagePoints = 30;
+
+                game.physics.arcade.enable(this);
+                this.anchor.set(0.5, 0.5);
+                this.kill();
+
+                this.checkWorldBounds = true;
+                this.outOfBoundsKill = true;
+
+                game.add.existing(this);
+            }
+            return Bullet;
+        })(Phaser.Sprite);
+        Prefab.Bullet = Bullet;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
+        var HUD = (function (_super) {
+            __extends(HUD, _super);
+            function HUD(game, x, y) {
+                _super.call(this, game, x, y, 'hud');
+                this.healthText = "Health: 100";
+                this.manaText = "Mana: 100";
+                this.currentLevelText = "Level: 1-1";
+                this.textStyle = {
+                    font: "20px Arial",
+                    fill: "#ffffff"
+                };
+
+                this.fixedToCamera = true;
+
+                this.healthState = game.add.text(8, 8, this.healthText, this.textStyle);
+                this.addChild(this.healthState);
+
+                this.manaState = game.add.text(150, 8, this.manaText, this.textStyle);
+                this.addChild(this.manaState);
+
+                this.currentLevelState = game.add.text(280, 8, this.currentLevelText, this.textStyle);
+                this.addChild(this.currentLevelState);
+
+                game.add.existing(this);
+            }
+            HUD.prototype.setHealthState = function (health) {
+                this.healthState.text = "Health: " + health.toString();
+            };
+
+            HUD.prototype.setManaState = function (mana) {
+                this.manaState.text = "Mana: " + mana.toString();
+            };
+
+            HUD.prototype.setLevelState = function (level) {
+                this.currentLevelState.text = "Level: " + Sample.State.AbstractZone.GetLevelName(level);
+            };
+            return HUD;
+        })(Phaser.Sprite);
+        Prefab.HUD = HUD;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
+        var ExitDoor = (function (_super) {
+            __extends(ExitDoor, _super);
+            function ExitDoor(game, x, y) {
+                _super.call(this, game, x, y, 'exitDoor');
+
+                game.physics.arcade.enable(this);
+                this.body.immovable = true;
+
+                game.add.existing(this);
+            }
+            return ExitDoor;
+        })(Phaser.Sprite);
+        Prefab.ExitDoor = ExitDoor;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
+        var AbstractEnemy = (function (_super) {
+            __extends(AbstractEnemy, _super);
+            function AbstractEnemy(game, x, y, sprite) {
+                _super.call(this, game, x, y, sprite);
+
+                game.physics.arcade.enable(this);
+                this.alive = true;
+                this.anchor.set(0, 0.5);
+
+                game.add.existing(this);
+            }
+            AbstractEnemy.prototype.makeDamage = function (damagePoint) {
+                this.damage(damagePoint);
+
+                var textStyle = {
+                    font: "20px Arial",
+                    fill: "#ffffff",
+                    stroke: '#0000ff',
+                    strokeThickness: 1
+                };
+
+                var text = this.game.add.text(this.x, this.y, damagePoint.toString(), textStyle);
+                var tween = this.game.add.tween(text).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
+
+                tween.onComplete.add(function () {
+                    text.destroy();
+                });
+            };
+            return AbstractEnemy;
+        })(Phaser.Sprite);
+        Prefab.AbstractEnemy = AbstractEnemy;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
+        var Runner = (function (_super) {
+            __extends(Runner, _super);
+            function Runner(game, x, y) {
+                _super.call(this, game, x, y, 'runner');
+                this.gravity = 300;
+                this.velocity = 100;
+                this.direction = 1 /* Right */;
+                this.damagePoints = 10;
+
+                this.body.gravity.y = this.gravity;
+                this.health = 10;
+            }
+            Runner.prototype.update = function () {
+                if (!this.inCamera)
+                    return;
+                if (!this.alive)
+                    return;
+
+                if (this.body.blocked.left) {
+                    this.direction = 1 /* Right */;
+                } else if (this.body.blocked.right) {
+                    this.direction = 0 /* Left */;
+                }
+
+                switch (this.direction) {
+                    case 0 /* Left */:
+                        this.body.velocity.x = -this.velocity;
+                        break;
+                    case 1 /* Right */:
+                        this.body.velocity.x = this.velocity;
+                        break;
+                    default:
+                        this.body.velocity.x = 0;
+                }
+            };
+            return Runner;
+        })(Prefab.AbstractEnemy);
+        Prefab.Runner = Runner;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
+        var Flier = (function (_super) {
+            __extends(Flier, _super);
+            function Flier(game, x, y) {
+                _super.call(this, game, x, y, 'flier');
+                this.isActive = false;
+                this.damagePoints = 10;
+                this.speed = 150;
+
+                this.anchor.set(0.5, 0.5);
+                this.health = 10;
+            }
+            Flier.prototype.setTarget = function (target) {
+                this.minDistance = target.width / 2;
+
+                this.target = target;
+                this.isActive = true;
+            };
+
+            Flier.prototype.update = function () {
+                if (!this.inCamera)
+                    return;
+                if (!this.isActive)
+                    return;
+
+                var distance = Phaser.Math.distance(this.x, this.y, this.target.x, this.target.y);
+
+                if (distance > this.minDistance) {
+                    var rotation = Phaser.Math.angleBetween(this.x, this.y, this.target.x, this.target.y);
+
+                    this.body.velocity.x = Math.cos(rotation) * this.speed;
+                    this.body.velocity.y = Math.sin(rotation) * this.speed;
+                } else {
+                    this.body.velocity.setTo(0, 0);
+                }
+            };
+            return Flier;
+        })(Prefab.AbstractEnemy);
+        Prefab.Flier = Flier;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
+        var Shooter = (function (_super) {
+            __extends(Shooter, _super);
+            function Shooter(game, x, y) {
+                _super.call(this, game, x, y, 'shooter');
+                this.gravity = 300;
+                this.lastBulletShotAt = 0;
+                this.countBullets = 1;
+                this.shotDelay = 3000;
+                this.damagePoints = 10;
+
+                this.body.gravity.y = this.gravity;
+
+                this.bullets = this.game.add.group();
+                for (var i = 0; i < this.countBullets; i++) {
+                    var bullet = new Prefab.Bullet(game, 0, 0);
+                    this.bullets.add(bullet);
+                }
+                this.health = 10;
+            }
+            Shooter.prototype.update = function () {
+                if (!this.inCamera)
+                    return;
+                if (!this.alive)
+                    return;
+
+                if (this.game.time.now - this.lastBulletShotAt < this.shotDelay)
+                    return;
+                this.lastBulletShotAt = this.game.time.now;
+
+                var bullet = this.bullets.getFirstDead();
+
+                if (bullet === null || bullet === undefined)
+                    return;
+
+                bullet.revive();
+                bullet.reset(this.x, this.y);
+
+                bullet.body.velocity.x = -bullet.speed;
+            };
+            return Shooter;
+        })(Prefab.AbstractEnemy);
+        Prefab.Shooter = Shooter;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
 })(Sample || (Sample = {}));
 var Sample;
 (function (Sample) {

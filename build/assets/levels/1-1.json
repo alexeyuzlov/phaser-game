@@ -54,7 +54,7 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":672,
+                 "x":680,
                  "y":384
                 }, 
                 {
@@ -209,7 +209,7 @@
                  "y":288
                 }, 
                 {
-                 "gid":8,
+                 "gid":7,
                  "height":0,
                  "name":"",
                  "properties":
@@ -221,6 +221,20 @@
                  "width":0,
                  "x":840,
                  "y":240
+                }, 
+                {
+                 "gid":8,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":192,
+                 "y":256
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -333,7 +347,7 @@
          "tilewidth":16
         }, 
         {
-         "firstgid":8,
+         "firstgid":7,
          "image":"ice.png",
          "imageheight":16,
          "imagewidth":16,
@@ -346,6 +360,21 @@
          "spacing":0,
          "tileheight":16,
          "tilewidth":16
+        }, 
+        {
+         "firstgid":8,
+         "image":"exitDoor.png",
+         "imageheight":96,
+         "imagewidth":48,
+         "margin":0,
+         "name":"exitDoor",
+         "properties":
+            {
+
+            },
+         "spacing":0,
+         "tileheight":96,
+         "tilewidth":48
         }],
  "tilewidth":32,
  "version":1,

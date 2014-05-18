@@ -5,23 +5,42 @@
 
 /// <reference path='State/Menu.ts'/>
 
+/// <reference path='State/Levels/AbstractZone.ts'/>
+
+/// <reference path='State/Levels/Zone1/Zone1.ts'/>
 /// <reference path='State/Levels/Zone1/Level1.ts'/>
 /// <reference path='State/Levels/Zone1/Level2.ts'/>
 /// <reference path='State/Levels/Zone1/Level3.ts'/>
 
+/// <reference path='State/Levels/Zone2/Zone2.ts'/>
 /// <reference path='State/Levels/Zone2/Level1.ts'/>
 /// <reference path='State/Levels/Zone2/Level2.ts'/>
 /// <reference path='State/Levels/Zone2/Level3.ts'/>
 
+/// <reference path='State/Levels/Zone3/Zone3.ts'/>
 /// <reference path='State/Levels/Zone3/Level1.ts'/>
 /// <reference path='State/Levels/Zone3/Level2.ts'/>
 /// <reference path='State/Levels/Zone3/Level3.ts'/>
 
+/// <reference path='State/Levels/Zone4/Zone4.ts'/>
 /// <reference path='State/Levels/Zone4/Level1.ts'/>
 /// <reference path='State/Levels/Zone4/Level2.ts'/>
 /// <reference path='State/Levels/Zone4/Level3.ts'/>
 
 /// <reference path='State/GameOver.ts'/>
+
+/// <reference path='Prefab/Player.ts'/>
+
+/// <reference path='Prefab/Barb.ts'/>
+/// <reference path='Prefab/Ice.ts'/>
+/// <reference path='Prefab/Bullet.ts'/>
+/// <reference path='Prefab/HUD.ts'/>
+/// <reference path='Prefab/ExitDoor.ts'/>
+
+/// <reference path='Prefab/Enemies/AbstractEnemy.ts'/>
+/// <reference path='Prefab/Enemies/Runner.ts'/>
+/// <reference path='Prefab/Enemies/Flier.ts'/>
+/// <reference path='Prefab/Enemies/Shooter.ts'/>
 
 module Sample {
 

@@ -6,6 +6,7 @@ module Sample.Prefab {
 
             game.physics.arcade.enable(this);
             this.alive = true;
+            this.anchor.set(0, 0.5);
 
             game.add.existing(this);
         }

@@ -10,7 +10,6 @@ module Sample.Prefab {
             super(game, x, y, 'ice');
             game.physics.arcade.enable(this);
             this.alive = true;
-            this.body.immovable = true;
             this.checkWorldBounds = true;
             this.outOfBoundsKill = true;
 

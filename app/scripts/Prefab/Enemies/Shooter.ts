@@ -1,6 +1,3 @@
-/// <reference path='AbstractEnemy.ts'/>
-/// <reference path='Bullet.ts'/>
-
 module Sample.Prefab {
     export class Shooter extends AbstractEnemy {
         gravity:number = 300;
@@ -16,7 +13,6 @@ module Sample.Prefab {
             super(game, x, y, 'shooter');
 
             this.body.gravity.y = this.gravity;
-            this.anchor.set(1, 0.5);
 
             this.bullets = this.game.add.group();
             for(var i = 0; i < this.countBullets; i++) {

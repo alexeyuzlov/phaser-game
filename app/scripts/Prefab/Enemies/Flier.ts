@@ -1,5 +1,3 @@
-/// <reference path='AbstractEnemy.ts'/>
-
 module Sample.Prefab {
 
     export class Flier extends AbstractEnemy {

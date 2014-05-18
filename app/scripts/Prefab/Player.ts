@@ -1,6 +1,6 @@
 module Sample.Prefab {
 
-    export class Player extends Phaser.Sprite implements IDirection {
+    export class Player extends Phaser.Sprite {
         gravity:number = 300;
 
         acceleration:number = 1000;
@@ -34,10 +34,10 @@ module Sample.Prefab {
         isActiveJumpKey:boolean = false;
         isAttackKeyPressed:boolean = false;
 
-        constructor(game:Phaser.Game, x:number, y:number) {
-            super(game, x, y, 'player');
+        constructor(public level:State.AbstractZone, x:number, y:number) {
+            super(level.game, x, y, 'player');
 
-            game.physics.arcade.enable(this);
+            this.level.game.physics.arcade.enable(this);
             this.body.gravity.y = this.gravity;
             this.anchor.set(0.5, 1);
 
@@ -56,7 +56,7 @@ module Sample.Prefab {
             this.animations.add('attack', Phaser.Animation.generateFrameNames('player-attack-', 1, 3, '.png', 0), 10, true);
             this.animations.add('sit', ['player-sit-1.png'], 10, true);
 
-            game.add.existing(this);
+            this.level.game.add.existing(this);
         }
 
         makeDamage(damagePoint) {

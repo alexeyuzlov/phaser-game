@@ -1,5 +1,3 @@
-/// <reference path='../../Levels/AbstractZone.ts'/>
-
 module Sample.State {
 
     export class Zone1 extends AbstractZone {
