@@ -47,7 +47,7 @@ var Sample;
 
                 this.load.atlasXML('player', 'assets/images/prefabs/player/player.png', 'assets/images/prefabs/player/player.xml');
 
-                this.load.image('ice', 'assets/images/prefabs/ice.png');
+                this.load.image('iceSpike', 'assets/images/prefabs/iceSpike.png');
 
                 this.load.image('runner', 'assets/images/prefabs/runner.png');
                 this.load.image('flier', 'assets/images/prefabs/flier.png');
@@ -125,11 +125,11 @@ var Sample;
                     this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'spike', 0, true, false, this.spikes, Sample.Prefab.Spike);
                 }
 
-                this.ice = this.game.add.group();
-                index = this.map.getTilesetIndex('ice');
+                this.iceSpikes = this.game.add.group();
+                index = this.map.getTilesetIndex('iceSpike');
                 if (index) {
-                    this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'ice', 0, true, false, this.ice, Sample.Prefab.Ice);
-                    this.ice.forEach(function (iceOne) {
+                    this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'iceSpike', 0, true, false, this.iceSpikes, Sample.Prefab.IceSpike);
+                    this.iceSpikes.forEach(function (iceOne) {
                         iceOne.setTarget(_this.player);
                     }, null);
                 }
@@ -177,7 +177,7 @@ var Sample;
                     }
                 });
 
-                this.game.physics.arcade.overlap(this.player, this.ice, function (player, ice) {
+                this.game.physics.arcade.overlap(this.player, this.iceSpikes, function (player, ice) {
                     if (!_this.player.immortalState) {
                         _this.player.makeDamage(ice.damagePoints);
                         _this.hud.updateHealthState();
@@ -948,25 +948,20 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (Prefab) {
-        var Ice = (function (_super) {
-            __extends(Ice, _super);
-            function Ice(game, x, y) {
-                _super.call(this, game, x, y, 'ice');
+        var IceSpike = (function (_super) {
+            __extends(IceSpike, _super);
+            function IceSpike(game, x, y) {
+                _super.call(this, game, x, y, 'iceSpike');
                 this.damagePoints = 50;
                 this.distanceToTarget = Math.random() * 100 - 40;
                 game.physics.arcade.enable(this);
                 this.alive = true;
                 this.checkWorldBounds = true;
-                this.outOfBoundsKill = true;
 
                 game.physics.arcade.enable(this);
                 game.add.existing(this);
             }
-            Ice.prototype.setTarget = function (target) {
-                this.target = target;
-            };
-
-            Ice.prototype.update = function () {
+            IceSpike.prototype.update = function () {
                 if (!this.inCamera)
                     return;
                 if (!this.alive)
@@ -977,9 +972,9 @@ var Sample;
                     this.body.acceleration.y = 1000;
                 }
             };
-            return Ice;
+            return IceSpike;
         })(Phaser.Sprite);
-        Prefab.Ice = Ice;
+        Prefab.IceSpike = IceSpike;
     })(Sample.Prefab || (Sample.Prefab = {}));
     var Prefab = Sample.Prefab;
 })(Sample || (Sample = {}));

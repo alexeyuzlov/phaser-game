@@ -32,7 +32,7 @@
 /// <reference path='Prefab/Player.ts'/>
 
 /// <reference path='Prefab/Spike.ts'/>
-/// <reference path='Prefab/Ice.ts'/>
+/// <reference path='Prefab/IceSpike.ts'/>
 /// <reference path='Prefab/Bullet.ts'/>
 /// <reference path='Prefab/HUD.ts'/>
 /// <reference path='Prefab/Exit.ts'/>

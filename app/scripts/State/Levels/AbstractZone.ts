@@ -11,7 +11,7 @@ module Sample.State {
         hud:Prefab.HUD;
 
         spikes:Phaser.Group;
-        ice:Phaser.Group;
+        iceSpikes:Phaser.Group;
         allEnemies:Phaser.Group;
         shooters:Phaser.Group;
         runners:Phaser.Group;
@@ -49,11 +49,11 @@ module Sample.State {
                 this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'spike', 0, true, false, this.spikes, Prefab.Spike);
             }
 
-            this.ice = this.game.add.group();
-            index = this.map.getTilesetIndex('ice');
+            this.iceSpikes = this.game.add.group();
+            index = this.map.getTilesetIndex('iceSpike');
             if (index) {
-                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'ice', 0, true, false, this.ice, Prefab.Ice);
-                this.ice.forEach((iceOne) => {
+                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'iceSpike', 0, true, false, this.iceSpikes, Prefab.IceSpike);
+                this.iceSpikes.forEach((iceOne) => {
                     iceOne.setTarget(this.player);
                 }, null);
             }
@@ -101,7 +101,7 @@ module Sample.State {
                 }
             });
 
-            this.game.physics.arcade.overlap(this.player, this.ice, (player, ice) => {
+            this.game.physics.arcade.overlap(this.player, this.iceSpikes, (player, ice) => {
                 if (!this.player.immortalState) {
                     this.player.makeDamage(ice.damagePoints);
                     this.hud.updateHealthState();
