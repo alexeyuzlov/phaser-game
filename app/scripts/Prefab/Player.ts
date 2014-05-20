@@ -1,15 +1,15 @@
 module Sample.Prefab {
 
     export class Player extends Phaser.Sprite {
-        gravity:number = 300;
+        gravity:number = 700;
 
         acceleration:number = 1000;
         drag:number = 1000;
 
-        maxSpeed:number = 300;
+        maxSpeed:number = 270;
         superSpeedPower:number = 600;
 
-        jumpPower:number = 300;
+        jumpPower:number = 400;
 
         immortalState:boolean = false;
         attackState:boolean = false;
@@ -50,7 +50,7 @@ module Sample.Prefab {
             //this.smoothed = true;
 
             this.animations.add('stay', ['player-walk-1.png'], 10, true)
-            this.animations.add('walk', Phaser.Animation.generateFrameNames('player-walk-', 1, 4, '.png', 0), 30, true);
+            this.animations.add('walk', Phaser.Animation.generateFrameNames('player-walk-', 1, 4, '.png', 0), 15, true);
             this.animations.add('attack', Phaser.Animation.generateFrameNames('player-attack-', 1, 3, '.png', 0), 10, true);
             this.animations.add('sit', ['player-sit-1.png'], 10, true);
 

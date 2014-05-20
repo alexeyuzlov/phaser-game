@@ -129,8 +129,8 @@ var Sample;
                 index = this.map.getTilesetIndex('iceSpike');
                 if (index) {
                     this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'iceSpike', 0, true, false, this.iceSpikes, Sample.Prefab.IceSpike);
-                    this.iceSpikes.forEach(function (iceOne) {
-                        iceOne.setTarget(_this.player);
+                    this.iceSpikes.forEach(function (ice) {
+                        ice.target = _this.player;
                     }, null);
                 }
 
@@ -753,12 +753,12 @@ var Sample;
             function Player(level, x, y) {
                 _super.call(this, level.game, x, y, 'player');
                 this.level = level;
-                this.gravity = 300;
+                this.gravity = 700;
                 this.acceleration = 1000;
                 this.drag = 1000;
-                this.maxSpeed = 300;
+                this.maxSpeed = 270;
                 this.superSpeedPower = 600;
-                this.jumpPower = 300;
+                this.jumpPower = 400;
                 this.immortalState = false;
                 this.attackState = false;
                 this.moveState = false;
@@ -788,7 +788,7 @@ var Sample;
                 this.health = 1000;
 
                 this.animations.add('stay', ['player-walk-1.png'], 10, true);
-                this.animations.add('walk', Phaser.Animation.generateFrameNames('player-walk-', 1, 4, '.png', 0), 30, true);
+                this.animations.add('walk', Phaser.Animation.generateFrameNames('player-walk-', 1, 4, '.png', 0), 15, true);
                 this.animations.add('attack', Phaser.Animation.generateFrameNames('player-attack-', 1, 3, '.png', 0), 10, true);
                 this.animations.add('sit', ['player-sit-1.png'], 10, true);
 
@@ -970,6 +970,10 @@ var Sample;
                 if (Math.abs(this.target.x - this.body.x) < this.distanceToTarget && this.target.y > this.body.y) {
                     this.body.gravity.y = 100;
                     this.body.acceleration.y = 1000;
+                }
+
+                if (this.y > this.game.world.height) {
+                    this.kill();
                 }
             };
             return IceSpike;

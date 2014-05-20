@@ -11,7 +11,6 @@ module Sample.Prefab {
             game.physics.arcade.enable(this);
             this.alive = true;
             this.checkWorldBounds = true;
-            //this.outOfBoundsKill = true;
 
             game.physics.arcade.enable(this);
             game.add.existing(this);
@@ -24,6 +23,10 @@ module Sample.Prefab {
             if (Math.abs(this.target.x - this.body.x) < this.distanceToTarget && this.target.y > this.body.y) {
                 this.body.gravity.y = 100;
                 this.body.acceleration.y = 1000;
+            }
+
+            if (this.y > this.game.world.height) {
+                this.kill();
             }
         }
     }

@@ -45,7 +45,6 @@ module Sample.State {
             this.spikes = this.game.add.group();
             index = this.map.getTilesetIndex('spike');
             if (index) {
-
                 this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'spike', 0, true, false, this.spikes, Prefab.Spike);
             }
 
@@ -53,8 +52,8 @@ module Sample.State {
             index = this.map.getTilesetIndex('iceSpike');
             if (index) {
                 this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'iceSpike', 0, true, false, this.iceSpikes, Prefab.IceSpike);
-                this.iceSpikes.forEach((iceOne) => {
-                    iceOne.setTarget(this.player);
+                this.iceSpikes.forEach((ice) => {
+                    ice.target = this.player;
                 }, null);
             }
 
