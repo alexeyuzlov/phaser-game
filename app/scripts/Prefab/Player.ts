@@ -1,15 +1,15 @@
 module Sample.Prefab {
 
     export class Player extends Phaser.Sprite {
-        gravity:number = 700;
+        gravity:number = 500;
 
-        acceleration:number = 1000;
-        drag:number = 1000;
+        acceleration:number = 500;
+        drag:number = 500;
 
         maxSpeed:number = 270;
-        superSpeedPower:number = 600;
+        superSpeedPower:number = 390;
 
-        jumpPower:number = 400;
+        jumpPower:number = 350;
 
         immortalState:boolean = false;
         attackState:boolean = false;
@@ -17,6 +17,7 @@ module Sample.Prefab {
         sitState:boolean = false;
         superSpeedState:boolean = false;
         superAttakState:boolean = false;
+        viewAroundState:boolean = false;
 
         direction:Direction = Direction.Right;
 
@@ -43,11 +44,8 @@ module Sample.Prefab {
             this.body.maxVelocity.x = this.maxSpeed;
 
             this.body.collideWorldBounds = true;
-
             this.alive = true;
             this.health = 1000;
-
-            //this.smoothed = true;
 
             this.animations.add('stay', ['player-walk-1.png'], 10, true)
             this.animations.add('walk', Phaser.Animation.generateFrameNames('player-walk-', 1, 4, '.png', 0), 15, true);
@@ -67,7 +65,7 @@ module Sample.Prefab {
                 font: "20px Arial",
                 fill: "#ffffff",
                 stroke: "ff0000",
-                strokeThickness: 1
+                strokeThickness: 2
             };
 
             var text = this.game.add.text(this.x, this.y, damagePoint.toString(), textStyle);
@@ -147,13 +145,7 @@ module Sample.Prefab {
         }
 
         sit() {
-            if (this.game.input.keyboard.isDown(settings.keys.sit)) {
-                this.sitState = true;
-            }
-
-            if (!this.game.input.keyboard.isDown(settings.keys.sit)) {
-                this.sitState = false;
-            }
+            this.sitState = this.game.input.keyboard.isDown(settings.keys.sit);
         }
 
         state() {

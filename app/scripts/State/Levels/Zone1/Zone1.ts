@@ -8,6 +8,7 @@ module Sample.State {
 
         create() {
             super.create();
+
             this.game.stage.backgroundColor = "#D7F5FF";
         }
 

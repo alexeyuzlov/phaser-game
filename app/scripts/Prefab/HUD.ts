@@ -41,5 +41,9 @@ module Sample.Prefab {
         updateLevelState() {
             this.currentLevelState.text = "Level: " + Sample.State.AbstractZone.GetLevelName(this.level.currentLevel);
         }
+
+        update() {
+            this.bringToTop();
+        }
     }
 }

@@ -14,17 +14,14 @@ module Sample.State {
         create() {
             super.create();
             this.game.stage.backgroundColor = "#330169";
-            console.log(this.map.widthInPixels);
             this.shadowTexture = this.game.add.bitmapData(this.map.widthInPixels, this.map.heightInPixels);
 
             this.lightSprite = this.game.add.image(0, 0, this.shadowTexture);
             this.lightSprite.blendMode = PIXI.blendModes.MULTIPLY;
-            //this.lightSprite.fixedToCamera = true;
         }
 
         update() {
             super.update();
-
             this.shadowUpdate();
         }
 

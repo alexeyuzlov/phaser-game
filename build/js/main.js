@@ -278,6 +278,7 @@ var Sample;
 
             Zone1.prototype.create = function () {
                 _super.prototype.create.call(this);
+
                 this.game.stage.backgroundColor = "#D7F5FF";
             };
 
@@ -331,10 +332,32 @@ var Sample;
             Zone1Level2.prototype.preload = function () {
                 _super.prototype.preload.call(this);
                 this.game.load.tilemap('map', 'assets/levels/1-2.json', null, Phaser.Tilemap.TILED_JSON);
+                this.game.load.spritesheet('rain', 'assets/images/rain.png', 8, 8);
+            };
+
+            Zone1Level2.prototype.rainCreate = function () {
+                var emitter = this.game.add.emitter(this.game.world.centerX, 0, 1000);
+
+                emitter.width = this.game.world.width + this.game.world.width * 0.2;
+                emitter.angle = 20;
+
+                emitter.makeParticles('rain');
+
+                emitter.minParticleScale = 0.2;
+                emitter.maxParticleScale = 0.7;
+
+                emitter.setYSpeed(100, 700);
+                emitter.setXSpeed(-5, 5);
+
+                emitter.minRotation = 0;
+                emitter.maxRotation = 0;
+
+                emitter.start(false, 3000, 5, 0);
             };
 
             Zone1Level2.prototype.create = function () {
                 _super.prototype.create.call(this);
+                this.rainCreate();
             };
 
             Zone1Level2.prototype.update = function () {
@@ -359,10 +382,34 @@ var Sample;
             Zone1Level3.prototype.preload = function () {
                 _super.prototype.preload.call(this);
                 this.game.load.tilemap('map', 'assets/levels/1-3.json', null, Phaser.Tilemap.TILED_JSON);
+                this.game.load.spritesheet('snowflake', 'assets/images/snowflake.png', 16, 16);
+            };
+
+            Zone1Level3.prototype.createSnowFlakes = function () {
+                var emitter = this.game.add.emitter(this.game.world.centerX, 0, 500);
+
+                emitter.width = this.game.world.width;
+
+                emitter.makeParticles('snowflake');
+
+                emitter.minParticleScale = 0.2;
+                emitter.maxParticleScale = 1.5;
+                emitter.gravity = 5;
+
+                emitter.setYSpeed(5, 10);
+                emitter.setXSpeed(-15, 15);
+
+                emitter.minRotation = 0;
+                emitter.maxRotation = 0;
+
+                emitter.start(false, 20000, 200, 0);
             };
 
             Zone1Level3.prototype.create = function () {
                 _super.prototype.create.call(this);
+                this.game.stage.backgroundColor = "#333333";
+
+                this.createSnowFlakes();
             };
 
             Zone1Level3.prototype.update = function () {
@@ -390,7 +437,6 @@ var Sample;
             Zone2.prototype.create = function () {
                 _super.prototype.create.call(this);
                 this.game.stage.backgroundColor = "#330169";
-                console.log(this.map.widthInPixels);
                 this.shadowTexture = this.game.add.bitmapData(this.map.widthInPixels, this.map.heightInPixels);
 
                 this.lightSprite = this.game.add.image(0, 0, this.shadowTexture);
@@ -399,7 +445,6 @@ var Sample;
 
             Zone2.prototype.update = function () {
                 _super.prototype.update.call(this);
-
                 this.shadowUpdate();
             };
 
@@ -753,18 +798,19 @@ var Sample;
             function Player(level, x, y) {
                 _super.call(this, level.game, x, y, 'player');
                 this.level = level;
-                this.gravity = 700;
-                this.acceleration = 1000;
-                this.drag = 1000;
+                this.gravity = 500;
+                this.acceleration = 500;
+                this.drag = 500;
                 this.maxSpeed = 270;
-                this.superSpeedPower = 600;
-                this.jumpPower = 400;
+                this.superSpeedPower = 390;
+                this.jumpPower = 350;
                 this.immortalState = false;
                 this.attackState = false;
                 this.moveState = false;
                 this.sitState = false;
                 this.superSpeedState = false;
                 this.superAttakState = false;
+                this.viewAroundState = false;
                 this.direction = 1 /* Right */;
                 this.damagePoints = 50;
                 this.manaPoints = 100;
@@ -783,7 +829,6 @@ var Sample;
                 this.body.maxVelocity.x = this.maxSpeed;
 
                 this.body.collideWorldBounds = true;
-
                 this.alive = true;
                 this.health = 1000;
 
@@ -804,7 +849,7 @@ var Sample;
                     font: "20px Arial",
                     fill: "#ffffff",
                     stroke: "ff0000",
-                    strokeThickness: 1
+                    strokeThickness: 2
                 };
 
                 var text = this.game.add.text(this.x, this.y, damagePoint.toString(), textStyle);
@@ -879,13 +924,7 @@ var Sample;
             };
 
             Player.prototype.sit = function () {
-                if (this.game.input.keyboard.isDown(Sample.settings.keys.sit)) {
-                    this.sitState = true;
-                }
-
-                if (!this.game.input.keyboard.isDown(Sample.settings.keys.sit)) {
-                    this.sitState = false;
-                }
+                this.sitState = this.game.input.keyboard.isDown(Sample.settings.keys.sit);
             };
 
             Player.prototype.state = function () {
@@ -1046,6 +1085,10 @@ var Sample;
 
             HUD.prototype.updateLevelState = function () {
                 this.currentLevelState.text = "Level: " + Sample.State.AbstractZone.GetLevelName(this.level.currentLevel);
+            };
+
+            HUD.prototype.update = function () {
+                this.bringToTop();
             };
             return HUD;
         })(Phaser.Sprite);
