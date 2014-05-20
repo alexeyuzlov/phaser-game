@@ -19,10 +19,12 @@ module Sample.State {
         exits:Phaser.Group;
 
         create() {
+            this.game.stage.backgroundColor = "#000000";
+
             // MAP AND LAYERS
             this.map = this.game.add.tilemap('map');
             this.map.addTilesetImage('ground');
-            this.map.setCollisionBetween(1, 3, true);
+            this.map.setCollisionBetween(1, 5);
 
             this.layer = this.map.createLayer('layer');
             this.layer.resizeWorld();
@@ -84,7 +86,7 @@ module Sample.State {
             this.allEnemies.add(this.fliers);
 
             // POST-SETTINGS
-            this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_PLATFORMER);
+            this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_TOPDOWN_TIGHT);
         }
 
         private doCollide() {

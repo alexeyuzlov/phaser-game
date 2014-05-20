@@ -9,6 +9,7 @@ module Sample.State {
             this.load.image('menu-background', 'assets/images/menu-background.png');
 
             this.load.image('ground', 'assets/images/ground.png');
+
             this.load.image('exit', 'assets/images/prefabs/exit.png');
             this.load.image('spike', 'assets/images/prefabs/spike.png');
 
