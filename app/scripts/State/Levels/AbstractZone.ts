@@ -9,6 +9,7 @@ module Sample.State {
 
         player:Prefab.Player;
         hud:Prefab.HUD;
+        blackScreen: Prefab.BlackScreen;
 
         spikes:Phaser.Group;
         iceSpikes:Phaser.Group;
@@ -31,9 +32,6 @@ module Sample.State {
 
             // PREFABS SINGLE
             this.player = new Prefab.Player(this, 220, this.game.world.height - 100);
-
-            // HUD MANAGER
-            this.hud = new Prefab.HUD(this, 0, 0);
 
             // PREFABS MULTIPLE
             var index:number;
@@ -63,6 +61,9 @@ module Sample.State {
             index = this.map.getTilesetIndex('shooter');
             if (index) {
                 this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'shooter', 0, true, false, this.shooters, Prefab.Shooter);
+                this.shooters.forEach((shooter) => {
+                    shooter.setTarget(this.player);
+                }, null);
             }
 
             this.runners = this.game.add.group();
@@ -87,6 +88,14 @@ module Sample.State {
 
             // POST-SETTINGS
             this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_TOPDOWN_TIGHT);
+
+            this.blackScreen = new Prefab.BlackScreen(this);
+            this.blackScreen.setText(AbstractZone.GetLevelName(this.currentLevel));
+            this.game.add.tween(this.blackScreen)
+                .to({ alpha: 0 }, 3000, Phaser.Easing.Linear.None, true)
+                .onComplete.add(()=> {
+                    this.hud = new Prefab.HUD(this, 0, 0);
+                });
         }
 
         private doCollide() {
@@ -142,7 +151,12 @@ module Sample.State {
             this.doCollide();
 
             if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-                this.startNextLevel();
+                this.blackScreen.setText("");
+                this.game.add.tween(this.blackScreen)
+                    .to({ alpha: 1 }, 3000, Phaser.Easing.Linear.None, true)
+                    .onComplete.add(()=> {
+                        this.startNextLevel();
+                    });
             }
         }
 

@@ -30,11 +30,12 @@
 /// <reference path='State/GameOver.ts'/>
 
 /// <reference path='Prefab/Player.ts'/>
+/// <reference path='Prefab/HUD.ts'/>
+/// <reference path='Prefab/BlackScreen.ts'/>
 
 /// <reference path='Prefab/Spike.ts'/>
 /// <reference path='Prefab/IceSpike.ts'/>
 /// <reference path='Prefab/Bullet.ts'/>
-/// <reference path='Prefab/HUD.ts'/>
 /// <reference path='Prefab/Exit.ts'/>
 
 /// <reference path='Prefab/Enemies/AbstractEnemy.ts'/>
@@ -46,6 +47,16 @@ module Sample {
 
     class SettingsClass  {
         keys: any;
+        font = {
+            whiteBig: {
+                font: "20px Arial",
+                fill: "#ffffff"
+            },
+            blackBig: {
+                font: "20px Arial",
+                fill: "#000000"
+            }
+        };
 
         constructor() {
             this.keys = {

@@ -2,6 +2,8 @@ module Sample.Prefab {
     export class Shooter extends AbstractEnemy {
         gravity:number = 300;
 
+        target: Phaser.Sprite;
+
         lastBulletShotAt: number = 0;
         bullets: Phaser.Group;
         countBullets: number = 1;
@@ -22,6 +24,10 @@ module Sample.Prefab {
             this.health = 10;
         }
 
+        setTarget(target: Phaser.Sprite) {
+            this.target = target;
+        }
+
         update() {
             if (!this.inCamera) return;
             if (!this.alive) return;
@@ -36,7 +42,11 @@ module Sample.Prefab {
             bullet.revive();
             bullet.reset(this.x, this.y);
 
-            bullet.body.velocity.x = -bullet.speed;
+            if (this.x > this.target.x) {
+                bullet.body.velocity.x = -bullet.speed;
+            } else {
+                bullet.body.velocity.x = bullet.speed;
+            }
         }
     }
 }
