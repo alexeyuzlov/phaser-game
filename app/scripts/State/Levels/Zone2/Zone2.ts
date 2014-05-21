@@ -8,7 +8,6 @@ module Sample.State {
         lightSprite:Phaser.Image;
 
         preload() {
-            super.preload();
         }
 
         create() {

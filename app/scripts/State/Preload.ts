@@ -26,7 +26,7 @@ module Sample.State {
         }
 
         create() {
-            this.game.state.start(Levels.Zone1Level1.toString());
+            this.game.state.start(settings.storage.getCurrentLevel());
         }
     }
 }

@@ -7,7 +7,6 @@ module Sample.State {
         preload() {
             super.preload();
             this.game.load.tilemap('map', 'assets/levels/1-3.json', null, Phaser.Tilemap.TILED_JSON);
-            this.game.load.spritesheet('snowflake', 'assets/images/snowflake.png', 16, 16);
         }
 
         create() {

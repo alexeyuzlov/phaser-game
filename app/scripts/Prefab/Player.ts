@@ -22,7 +22,7 @@ module Sample.Prefab {
         direction:Direction = Direction.Right;
 
         damagePoints:number = 50;
-        manaPoints:number = 100;
+        manaPoints:number = settings.storage.getManaPoints();
 
         immortalStateAt:number = Date.now();
         attackStateAt:number = Date.now();
@@ -45,7 +45,8 @@ module Sample.Prefab {
 
             this.body.collideWorldBounds = true;
             this.alive = true;
-            this.health = 1000;
+
+            this.health = +settings.storage.getHealthPoints();
 
             this.animations.add('stay', ['player-walk-1.png'], 10, true)
             this.animations.add('walk', Phaser.Animation.generateFrameNames('player-walk-', 1, 4, '.png', 0), 15, true);

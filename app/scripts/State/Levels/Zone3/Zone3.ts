@@ -6,6 +6,7 @@ module Sample.State {
 
         preload() {
             super.preload();
+            this.game.load.spritesheet('snowflake', 'assets/images/snowflake.png', 16, 16);
         }
 
         createSnowFlakes() {

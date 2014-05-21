@@ -59,7 +59,7 @@ var Sample;
             };
 
             Preload.prototype.create = function () {
-                this.game.state.start(0 /* Zone1Level1 */.toString());
+                this.game.state.start(Sample.settings.storage.getCurrentLevel());
             };
             return Preload;
         })(Phaser.State);
@@ -98,8 +98,12 @@ var Sample;
             function AbstractZone() {
                 _super.apply(this, arguments);
             }
+            AbstractZone.prototype.preload = function () {
+            };
+
             AbstractZone.prototype.create = function () {
                 var _this = this;
+                Sample.settings.storage.setCurrentLevel(this.currentLevel.toString());
                 this.game.stage.backgroundColor = "#000000";
 
                 this.map = this.game.add.tilemap('map');
@@ -110,6 +114,8 @@ var Sample;
                 this.layer.resizeWorld();
 
                 this.player = new Sample.Prefab.Player(this, 220, this.game.world.height - 100);
+                this.hud = new Sample.Prefab.HUD(this, 0, 0);
+                this.hud.alpha = 0;
 
                 var index;
 
@@ -168,7 +174,7 @@ var Sample;
                 this.blackScreen = new Sample.Prefab.BlackScreen(this);
                 this.blackScreen.setText(AbstractZone.GetLevelName(this.currentLevel));
                 this.game.add.tween(this.blackScreen).to({ alpha: 0 }, 3000, Phaser.Easing.Linear.None, true).onComplete.add(function () {
-                    _this.hud = new Sample.Prefab.HUD(_this, 0, 0);
+                    _this.hud.alpha = 1;
                 });
             };
 
@@ -234,6 +240,8 @@ var Sample;
             };
 
             AbstractZone.prototype.startNextLevel = function () {
+                Sample.settings.storage.setHealthPoints(this.player.health.toString());
+                Sample.settings.storage.setManaPoints(this.player.manaPoints.toString());
                 this.game.state.start(this.nextLevel.toString());
             };
 
@@ -287,6 +295,7 @@ var Sample;
             }
             Zone1.prototype.preload = function () {
                 _super.prototype.preload.call(this);
+                this.game.load.spritesheet('rain', 'assets/images/rain.png', 8, 8);
             };
 
             Zone1.prototype.create = function () {
@@ -364,7 +373,6 @@ var Sample;
             Zone1Level2.prototype.preload = function () {
                 _super.prototype.preload.call(this);
                 this.game.load.tilemap('map', 'assets/levels/1-2.json', null, Phaser.Tilemap.TILED_JSON);
-                this.game.load.spritesheet('rain', 'assets/images/rain.png', 8, 8);
             };
 
             Zone1Level2.prototype.create = function () {
@@ -394,7 +402,6 @@ var Sample;
             Zone1Level3.prototype.preload = function () {
                 _super.prototype.preload.call(this);
                 this.game.load.tilemap('map', 'assets/levels/1-3.json', null, Phaser.Tilemap.TILED_JSON);
-                this.game.load.spritesheet('snowflake', 'assets/images/snowflake.png', 16, 16);
             };
 
             Zone1Level3.prototype.create = function () {
@@ -421,7 +428,6 @@ var Sample;
                 this.lightRadius = 100;
             }
             Zone2.prototype.preload = function () {
-                _super.prototype.preload.call(this);
             };
 
             Zone2.prototype.create = function () {
@@ -553,6 +559,7 @@ var Sample;
             }
             Zone3.prototype.preload = function () {
                 _super.prototype.preload.call(this);
+                this.game.load.spritesheet('snowflake', 'assets/images/snowflake.png', 16, 16);
             };
 
             Zone3.prototype.createSnowFlakes = function () {
@@ -824,7 +831,7 @@ var Sample;
                 this.viewAroundState = false;
                 this.direction = 1 /* Right */;
                 this.damagePoints = 50;
-                this.manaPoints = 100;
+                this.manaPoints = Sample.settings.storage.getManaPoints();
                 this.immortalStateAt = Date.now();
                 this.attackStateAt = Date.now();
                 this.immortalDuration = 3000;
@@ -841,7 +848,8 @@ var Sample;
 
                 this.body.collideWorldBounds = true;
                 this.alive = true;
-                this.health = 1000;
+
+                this.health = +Sample.settings.storage.getHealthPoints();
 
                 this.animations.add('stay', ['player-walk-1.png'], 10, true);
                 this.animations.add('walk', Phaser.Animation.generateFrameNames('player-walk-', 1, 4, '.png', 0), 15, true);
@@ -1328,8 +1336,68 @@ var Sample;
 })(Sample || (Sample = {}));
 var Sample;
 (function (Sample) {
+    var Init = (function () {
+        function Init() {
+        }
+        Init.HealthPoints = 1000;
+        Init.ManaPoints = 500;
+        Init.CurrentLevel = 0 /* Zone1Level1 */.toString();
+        return Init;
+    })();
+
+    var Storage = (function () {
+        function Storage() {
+        }
+        Storage.prototype.getCurrentLevel = function () {
+            var currentLevel = localStorage.getItem('currentLevel');
+            if (currentLevel) {
+                return currentLevel;
+            } else {
+                currentLevel = Init.CurrentLevel.toString();
+                this.setCurrentLevel(currentLevel);
+                return currentLevel;
+            }
+        };
+
+        Storage.prototype.setCurrentLevel = function (currentLevel) {
+            localStorage.setItem('currentLevel', currentLevel);
+        };
+
+        Storage.prototype.getHealthPoints = function () {
+            var healthPoints = localStorage.getItem('healthPoints');
+            if (healthPoints) {
+                return healthPoints;
+            } else {
+                healthPoints = Init.HealthPoints.toString();
+                this.setHealthPoints(healthPoints);
+                return healthPoints;
+            }
+        };
+
+        Storage.prototype.setHealthPoints = function (healthPoints) {
+            localStorage.setItem('healthPoints', healthPoints);
+        };
+
+        Storage.prototype.getManaPoints = function () {
+            var manaPoints = localStorage.getItem('manaPoints');
+            if (manaPoints) {
+                return manaPoints;
+            } else {
+                manaPoints = Init.ManaPoints.toString();
+                this.setManaPoints(manaPoints);
+                return manaPoints;
+            }
+        };
+
+        Storage.prototype.setManaPoints = function (manaPoints) {
+            localStorage.setItem('manaPoints', manaPoints);
+        };
+        return Storage;
+    })();
+
     var SettingsClass = (function () {
         function SettingsClass() {
+            this.storage = new Storage();
             this.font = {
                 whiteBig: {
                     font: "20px Arial",
@@ -1415,6 +1483,14 @@ var Sample;
 })(Sample || (Sample = {}));
 
 window.onload = function () {
-    var game = new Sample.Game();
+    (function () {
+        try  {
+            return 'localStorage' in window && window['localStorage'] !== null;
+        } catch (e) {
+            return false;
+        }
+    })();
+
+    new Sample.Game();
 };
 //# sourceMappingURL=main.js.map

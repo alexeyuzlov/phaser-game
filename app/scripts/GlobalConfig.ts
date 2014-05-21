@@ -45,8 +45,70 @@
 
 module Sample {
 
-    class SettingsClass  {
-        keys: any;
+    class Init {
+        static HealthPoints = 1000;
+        static ManaPoints = 500;
+        static CurrentLevel = Levels.Zone1Level1.toString();
+    }
+
+    class Storage {
+        private healthPoints:string;
+        private manaPoints:string;
+        private currentLevel:string;
+
+        constructor() {
+        }
+
+        getCurrentLevel():string {
+            var currentLevel = localStorage.getItem('currentLevel');
+            if (currentLevel) {
+                return currentLevel;
+            } else {
+                currentLevel = Init.CurrentLevel.toString();
+                this.setCurrentLevel(currentLevel)
+                return currentLevel;
+            }
+        }
+
+        setCurrentLevel(currentLevel:string) {
+            localStorage.setItem('currentLevel', currentLevel);
+        }
+
+        getHealthPoints():string {
+            var healthPoints = localStorage.getItem('healthPoints');
+            if (healthPoints) {
+                return healthPoints;
+            } else {
+                healthPoints = Init.HealthPoints.toString();
+                this.setHealthPoints(healthPoints);
+                return healthPoints;
+            }
+        }
+
+        setHealthPoints(healthPoints:string) {
+            localStorage.setItem('healthPoints', healthPoints);
+        }
+
+        getManaPoints():string {
+            var manaPoints = localStorage.getItem('manaPoints');
+            if (manaPoints) {
+                return manaPoints;
+            } else {
+                manaPoints = Init.ManaPoints.toString();
+                this.setManaPoints(manaPoints);
+                return manaPoints;
+            }
+        }
+
+        setManaPoints(manaPoints:string) {
+            localStorage.setItem('manaPoints', manaPoints);
+        }
+    }
+
+    class SettingsClass {
+        storage = new Storage();
+
+        keys:any;
         font = {
             whiteBig: {
                 font: "20px Arial",
@@ -72,7 +134,7 @@ module Sample {
         }
     }
 
-    export var settings: any = new SettingsClass();
+    export var settings:any = new SettingsClass();
 
     export enum Levels {
         Zone1Level1, Zone1Level2, Zone1Level3,

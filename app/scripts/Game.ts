@@ -33,5 +33,15 @@ module Sample {
 }
 
 window.onload = () => {
-    var game = new Sample.Game();
+    /* Check localStorage */
+    (() => {
+        try {
+            return 'localStorage' in window && window['localStorage'] !== null;
+        } catch (e) {
+            return false;
+        }
+    })();
+
+    /* Start instance game */
+    new Sample.Game();
 };

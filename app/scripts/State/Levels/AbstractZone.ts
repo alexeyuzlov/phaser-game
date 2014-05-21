@@ -19,7 +19,12 @@ module Sample.State {
         fliers:Phaser.Group;
         exits:Phaser.Group;
 
+        preload() {
+            // All in preload file
+        }
+
         create() {
+            settings.storage.setCurrentLevel(this.currentLevel.toString());
             this.game.stage.backgroundColor = "#000000";
 
             // MAP AND LAYERS
@@ -32,6 +37,8 @@ module Sample.State {
 
             // PREFABS SINGLE
             this.player = new Prefab.Player(this, 220, this.game.world.height - 100);
+            this.hud = new Prefab.HUD(this, 0, 0);
+            this.hud.alpha = 0;
 
             // PREFABS MULTIPLE
             var index:number;
@@ -94,7 +101,7 @@ module Sample.State {
             this.game.add.tween(this.blackScreen)
                 .to({ alpha: 0 }, 3000, Phaser.Easing.Linear.None, true)
                 .onComplete.add(()=> {
-                    this.hud = new Prefab.HUD(this, 0, 0);
+                    this.hud.alpha = 1;
                 });
         }
 
@@ -161,6 +168,8 @@ module Sample.State {
         }
 
         startNextLevel() {
+            settings.storage.setHealthPoints(this.player.health.toString());
+            settings.storage.setManaPoints(this.player.manaPoints.toString());
             this.game.state.start(this.nextLevel.toString());
         }
 
