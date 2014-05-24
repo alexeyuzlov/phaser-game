@@ -22,12 +22,13 @@ module Sample.Prefab {
         direction:Direction = Direction.Right;
 
         damagePoints:number = 50;
-        manaPoints:number = settings.storage.getManaPoints();
+        manaPoints:number = +settings.storage.getManaPoints();
 
         immortalStateAt:number = Date.now();
         attackStateAt:number = Date.now();
 
         immortalDuration:number = 3000;
+        immortalDefaultDuration:number = 3000;
         attackDuration:number = 300;
 
         isActiveJumpKey:boolean = false;
@@ -56,25 +57,38 @@ module Sample.Prefab {
             this.level.game.add.existing(this);
         }
 
-        makeDamage(damagePoint) {
-            this.damage(damagePoint);
+        getHP(healthPoints:number) {
+            this.health += +healthPoints;
+            this.level.hud.updateHealthState();
+            this.write(healthPoints.toString() + 'HP', settings.font.whiteWithBlue);
+        }
+
+        getMP(manaPoints:number) {
+            this.manaPoints += +manaPoints;
+            this.level.hud.updateManaState();
+            this.write(manaPoints.toString() + 'MP', settings.font.whiteWithRed);
+        }
+
+        immortal(duration) {
+            this.immortalDuration = duration;
             this.immortalStateAt = Date.now();
             this.immortalState = true;
             this.alpha = 0.5;
+        }
 
-            var textStyle = {
-                font: "20px Arial",
-                fill: "#ffffff",
-                stroke: "ff0000",
-                strokeThickness: 2
-            };
-
-            var text = this.game.add.text(this.x, this.y, damagePoint.toString(), textStyle);
-            var tween = this.game.add.tween(text).to({alpha: 0}, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
+        write(text, style) {
+            var textSprite = this.game.add.text(this.x, this.y, text, style);
+            var tween = this.game.add.tween(textSprite).to({alpha: 0}, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
 
             tween.onComplete.add(()=> {
-                text.destroy();
+                textSprite.destroy();
             });
+        }
+
+        makeDamage(damagePoint) {
+            this.damage(damagePoint);
+            this.immortal(this.immortalDefaultDuration);
+            this.write(damagePoint.toString(), settings.font.whiteWithRed);
         }
 
         jump() {
@@ -126,15 +140,17 @@ module Sample.Prefab {
         }
 
         superSpeed() {
-            if (this.game.input.keyboard.isDown(settings.keys.superSpeed) && this.body.blocked.down && !this.attackState) {
+            if (this.manaPoints >= 0 && this.game.input.keyboard.isDown(settings.keys.superSpeed) && this.body.blocked.down && !this.attackState) {
                 this.superSpeedState = true;
             }
 
-            if (!this.game.input.keyboard.isDown(settings.keys.superSpeed)) {
+            if (this.manaPoints <= 0 || !this.game.input.keyboard.isDown(settings.keys.superSpeed)) {
                 this.superSpeedState = false;
             }
 
             if (this.superSpeedState) {
+                this.manaPoints--;
+                this.level.hud.updateManaState();
                 this.body.maxVelocity.x = this.superSpeedPower;
             } else {
                 this.body.maxVelocity.x = this.maxSpeed;
@@ -143,10 +159,18 @@ module Sample.Prefab {
 
         superAttack() {
             // distance attack
+            //if (this.manaPoints <= 0) return;
         }
 
+        // ! wrong !
         sit() {
-            this.sitState = this.game.input.keyboard.isDown(settings.keys.sit);
+            if (this.game.input.keyboard.isDown(settings.keys.sit)) {
+                this.sitState = true;
+            }
+
+            if (!this.body.touching.up && !this.game.input.keyboard.isDown(settings.keys.sit)) {
+                this.sitState = false;
+            }
         }
 
         state() {

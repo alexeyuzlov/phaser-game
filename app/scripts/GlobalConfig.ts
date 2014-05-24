@@ -33,14 +33,25 @@
 /// <reference path='Prefab/HUD.ts'/>
 /// <reference path='Prefab/BlackScreen.ts'/>
 
+/// <reference path='Prefab/Transparent.ts'/>
+
 /// <reference path='Prefab/Spike.ts'/>
 /// <reference path='Prefab/IceSpike.ts'/>
-/// <reference path='Prefab/Bullet.ts'/>
 /// <reference path='Prefab/Exit.ts'/>
+
+/// <reference path='Prefab/Platforms/Platform.ts'/>
+/// <reference path='Prefab/Platforms/PlatformHorizontal.ts'/>
+/// <reference path='Prefab/Platforms/PlatformVertical.ts'/>
+
+/// <reference path='Prefab/Bottles/Bottle.ts'/>
+/// <reference path='Prefab/Bottles/BottleHP.ts'/>
+/// <reference path='Prefab/Bottles/BottleMP.ts'/>
+/// <reference path='Prefab/Bottles/BottleSuper.ts'/>
 
 /// <reference path='Prefab/Enemies/AbstractEnemy.ts'/>
 /// <reference path='Prefab/Enemies/Runner.ts'/>
 /// <reference path='Prefab/Enemies/Flier.ts'/>
+/// <reference path='Prefab/Enemies/Bullet.ts'/>
 /// <reference path='Prefab/Enemies/Shooter.ts'/>
 
 module Sample {
@@ -110,6 +121,24 @@ module Sample {
 
         keys:any;
         font = {
+            whiteWithRed: {
+                font: "20px Arial",
+                fill: "#ffffff",
+                stroke: "ff0000",
+                strokeThickness: 2
+            },
+            whiteWithBlue: {
+                font: "20px Arial",
+                fill: "#ffffff",
+                stroke: "0000ff",
+                strokeThickness: 2
+            },
+            whiteWithGreen: {
+                font: "20px Arial",
+                fill: "#ffffff",
+                stroke: "00ff00",
+                strokeThickness: 2
+            },
             whiteBig: {
                 font: "20px Arial",
                 fill: "#ffffff"
@@ -146,6 +175,8 @@ module Sample {
     export enum Direction {
         Left,
         Right,
+        Up,
+        Down
     }
 
     export interface IDirection extends Phaser.Sprite {

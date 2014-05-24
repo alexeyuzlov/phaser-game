@@ -9,18 +9,30 @@ module Sample.State {
 
         player:Prefab.Player;
         hud:Prefab.HUD;
-        blackScreen: Prefab.BlackScreen;
+        blackScreen:Prefab.BlackScreen;
 
+        transparents:Phaser.Group;
         spikes:Phaser.Group;
         iceSpikes:Phaser.Group;
+        exits:Phaser.Group;
+
+        allPlatforms:Phaser.Group;
+        platformsHorizontal:Phaser.Group;
+        platformsVertical:Phaser.Group;
+
         allEnemies:Phaser.Group;
         shooters:Phaser.Group;
         runners:Phaser.Group;
         fliers:Phaser.Group;
-        exits:Phaser.Group;
+
+        allBottles:Phaser.Group;
+        bottlesHP:Phaser.Group;
+        bottlesMP:Phaser.Group;
+        bottlesSuper:Phaser.Group;
 
         preload() {
             // All in preload file
+            // Don't delete this function
         }
 
         create() {
@@ -40,8 +52,30 @@ module Sample.State {
             this.hud = new Prefab.HUD(this, 0, 0);
             this.hud.alpha = 0;
 
+            this.getPrefabsFromMap();
+
+            // POST-SETTINGS
+            this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_TOPDOWN_TIGHT);
+
+            this.blackScreen = new Prefab.BlackScreen(this);
+            this.blackScreen.setText(AbstractZone.GetLevelName(this.currentLevel));
+            this.game.add.tween(this.blackScreen)
+                .to({ alpha: 0 }, 3000, Phaser.Easing.Linear.None, true)
+                .onComplete.add(()=> {
+                    this.hud.alpha = 1;
+                });
+        }
+
+        private getPrefabsFromMap() {
+
             // PREFABS MULTIPLE
             var index:number;
+
+            this.transparents = this.game.add.group();
+            index = this.map.getTilesetIndex('transparent');
+            if (index) {
+                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'transparent', 0, true, false, this.transparents, Prefab.Transparent);
+            }
 
             this.exits = this.game.add.group();
             index = this.map.getTilesetIndex('exit');
@@ -63,6 +97,14 @@ module Sample.State {
                     ice.target = this.player;
                 }, null);
             }
+
+            this.getBottlesPrefabsFromMap();
+            this.getEnemiesPrefabsFromMap();
+            this.getPlatformsPrefabsFromMap();
+        }
+
+        private getEnemiesPrefabsFromMap() {
+            var index:number;
 
             this.shooters = this.game.add.group();
             index = this.map.getTilesetIndex('shooter');
@@ -92,21 +134,58 @@ module Sample.State {
             this.allEnemies.add(this.runners);
             this.allEnemies.add(this.shooters);
             this.allEnemies.add(this.fliers);
+        }
 
-            // POST-SETTINGS
-            this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_TOPDOWN_TIGHT);
+        private getPlatformsPrefabsFromMap() {
+            var index:number;
 
-            this.blackScreen = new Prefab.BlackScreen(this);
-            this.blackScreen.setText(AbstractZone.GetLevelName(this.currentLevel));
-            this.game.add.tween(this.blackScreen)
-                .to({ alpha: 0 }, 3000, Phaser.Easing.Linear.None, true)
-                .onComplete.add(()=> {
-                    this.hud.alpha = 1;
-                });
+            this.platformsHorizontal = this.game.add.group();
+            index = this.map.getTilesetIndex('platform-h');
+            if (index) {
+                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'platform-h', 0, true, false, this.platformsHorizontal, Prefab.PlatformHorizontal);
+            }
+
+            this.platformsVertical = this.game.add.group();
+            index = this.map.getTilesetIndex('platform-v');
+            if (index) {
+                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'platform-v', 0, true, false, this.platformsVertical, Prefab.PlatformVertical);
+            }
+
+            this.allPlatforms = this.game.add.group();
+            this.allPlatforms.add(this.platformsHorizontal);
+            this.allPlatforms.add(this.platformsVertical);
+        }
+
+        private getBottlesPrefabsFromMap() {
+            var index:number;
+
+            this.bottlesHP = this.game.add.group();
+            index = this.map.getTilesetIndex('bottle-hp');
+            if (index) {
+                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'bottle-hp', 0, true, false, this.bottlesHP, Prefab.BottleHP);
+            }
+
+            this.bottlesMP = this.game.add.group();
+            index = this.map.getTilesetIndex('bottle-mp');
+            if (index) {
+                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'bottle-mp', 0, true, false, this.bottlesMP, Prefab.BottleMP);
+            }
+
+            this.bottlesSuper = this.game.add.group();
+            index = this.map.getTilesetIndex('bottle-super');
+            if (index) {
+                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'bottle-super', 0, true, false, this.bottlesSuper, Prefab.BottleSuper);
+            }
+
+            this.allBottles = this.game.add.group();
+            this.allBottles.add(this.bottlesHP);
+            this.allBottles.add(this.bottlesMP);
+            this.allBottles.add(this.bottlesSuper);
         }
 
         private doCollide() {
             this.game.physics.arcade.collide(this.player, this.layer);
+
             this.game.physics.arcade.collide(this.player, this.exits, (player, exit) => {
                 this.startNextLevel();
             });
@@ -128,8 +207,8 @@ module Sample.State {
             this.game.physics.arcade.collide(this.shooters, this.layer);
             this.game.physics.arcade.collide(this.runners, this.layer);
 
-            this.allEnemies.forEach((enemyGroup) => {
-                this.game.physics.arcade.overlap(this.player, enemyGroup, (player, enemy)=> {
+            this.allEnemies.forEach((enemiesGroup) => {
+                this.game.physics.arcade.overlap(this.player, enemiesGroup, (player, enemy)=> {
                     if (player.attackState) {
                         enemy.makeDamage(player.damagePoints);
                     } else if (!this.player.immortalState) {
@@ -146,6 +225,20 @@ module Sample.State {
                         this.player.makeDamage(bullet.damagePoints);
                         this.hud.updateHealthState();
                     }
+                });
+            }, null);
+
+            this.allPlatforms.forEach((platformsGroup) => {
+                this.game.physics.arcade.collide(this.player, platformsGroup);
+                this.game.physics.arcade.overlap(platformsGroup, this.transparents, (platform, transparent) => {
+                    platform.toggleDirection();
+                });
+            }, null);
+
+            this.allBottles.forEach((bottlesGroup) => {
+                this.game.physics.arcade.overlap(this.player, bottlesGroup, (player, bottle) => {
+                    bottle.makeAction(player);
+                    bottle.kill();
                 });
             }, null);
         }

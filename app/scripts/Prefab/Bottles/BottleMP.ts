@@ -1,0 +1,17 @@
+module Sample.Prefab {
+
+    export class BottleMP extends Bottle {
+        amount: number = 50;
+
+        constructor(game:Phaser.Game, x:number, y:number) {
+            super(game, x, y, 'bottle-mp');
+            game.physics.arcade.enable(this);
+
+            game.add.existing(this);
+        }
+
+        makeAction(player: Prefab.Player) {
+            player.getMP(this.amount);
+        }
+    }
+}
