@@ -1,15 +1,17 @@
 module Sample.State {
     export class Menu extends Phaser.State {
-        background:Phaser.Sprite;
+        preload() {
+
+        }
 
         create() {
-            this.background = this.add.sprite(80, 0, 'menu-background');
+            this.game.stage.backgroundColor = '#000000';
         }
 
         update() {
-            if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-                this.game.state.start(Levels.Zone1Level1.toString());
-            }
+            //if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+                this.game.state.start(settings.storage.getCurrentLevel());
+            //}
         }
     }
 }

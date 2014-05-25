@@ -1,8 +1,8 @@
 module Sample.State {
 
     export class Zone1Level2 extends Zone1 {
-        currentLevel:Levels = Levels.Zone1Level2;
-        nextLevel:string = Levels.Zone1Level3.toString();
+        currentLevel: string = Levels[Levels.Zone1Level2];
+        nextLevel:string = Levels[Levels.Zone1Level3];
 
         preload() {
             super.preload();

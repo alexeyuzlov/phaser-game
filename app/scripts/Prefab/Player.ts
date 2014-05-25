@@ -27,9 +27,9 @@ module Sample.Prefab {
         immortalStateAt:number = Date.now();
         attackStateAt:number = Date.now();
 
-        immortalDuration:number = 3000;
-        immortalDefaultDuration:number = 3000;
-        attackDuration:number = 300;
+        immortalDuration:number = Phaser.Timer.SECOND * 3;
+        immortalDefaultDuration:number = Phaser.Timer.SECOND * 3;
+        attackDuration:number = Phaser.Timer.SECOND / 3;
 
         isActiveJumpKey:boolean = false;
         isAttackKeyPressed:boolean = false;
@@ -53,6 +53,10 @@ module Sample.Prefab {
             this.animations.add('walk', Phaser.Animation.generateFrameNames('player-walk-', 1, 4, '.png', 0), 15, true);
             this.animations.add('attack', Phaser.Animation.generateFrameNames('player-attack-', 1, 3, '.png', 0), 10, true);
             this.animations.add('sit', ['player-sit-1.png'], 10, true);
+
+            this.events.onKilled.add(()=> {
+                this.level.gameOver();
+            });
 
             this.level.game.add.existing(this);
         }
@@ -78,7 +82,7 @@ module Sample.Prefab {
 
         write(text, style) {
             var textSprite = this.game.add.text(this.x, this.y, text, style);
-            var tween = this.game.add.tween(textSprite).to({alpha: 0}, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
+            var tween = this.game.add.tween(textSprite).to({alpha: 0}, Phaser.Timer.SECOND, Phaser.Easing.Linear.None, true, 0, 0, false);
 
             tween.onComplete.add(()=> {
                 textSprite.destroy();
@@ -87,8 +91,8 @@ module Sample.Prefab {
 
         makeDamage(damagePoint) {
             this.damage(damagePoint);
-            this.immortal(this.immortalDefaultDuration);
             this.write(damagePoint.toString(), settings.font.whiteWithRed);
+            this.immortal(this.immortalDefaultDuration);
         }
 
         jump() {

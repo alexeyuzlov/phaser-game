@@ -6,23 +6,28 @@
 /// <reference path='State/Menu.ts'/>
 
 /// <reference path='State/Levels/AbstractZone.ts'/>
+/// <reference path='State/Levels/AbstractStory.ts'/>
 
 /// <reference path='State/Levels/Zone1/Zone1.ts'/>
+/// <reference path='State/Levels/Zone1/Story1.ts'/>
 /// <reference path='State/Levels/Zone1/Level1.ts'/>
 /// <reference path='State/Levels/Zone1/Level2.ts'/>
 /// <reference path='State/Levels/Zone1/Level3.ts'/>
 
 /// <reference path='State/Levels/Zone2/Zone2.ts'/>
+/// <reference path='State/Levels/Zone2/Story2.ts'/>
 /// <reference path='State/Levels/Zone2/Level1.ts'/>
 /// <reference path='State/Levels/Zone2/Level2.ts'/>
 /// <reference path='State/Levels/Zone2/Level3.ts'/>
 
 /// <reference path='State/Levels/Zone3/Zone3.ts'/>
+/// <reference path='State/Levels/Zone3/Story3.ts'/>
 /// <reference path='State/Levels/Zone3/Level1.ts'/>
 /// <reference path='State/Levels/Zone3/Level2.ts'/>
 /// <reference path='State/Levels/Zone3/Level3.ts'/>
 
 /// <reference path='State/Levels/Zone4/Zone4.ts'/>
+/// <reference path='State/Levels/Zone4/Story4.ts'/>
 /// <reference path='State/Levels/Zone4/Level1.ts'/>
 /// <reference path='State/Levels/Zone4/Level2.ts'/>
 /// <reference path='State/Levels/Zone4/Level3.ts'/>
@@ -32,6 +37,7 @@
 /// <reference path='Prefab/Player.ts'/>
 /// <reference path='Prefab/HUD.ts'/>
 /// <reference path='Prefab/BlackScreen.ts'/>
+/// <reference path='Prefab/PreloadBar.ts'/>
 
 /// <reference path='Prefab/Transparent.ts'/>
 
@@ -56,10 +62,32 @@
 
 module Sample {
 
+    export enum Stories {
+        Story1, Story2, Story3, Story4
+    }
+
+    export enum Levels {
+        Zone1Level1, Zone1Level2, Zone1Level3,
+        Zone2Level1, Zone2Level2, Zone2Level3,
+        Zone3Level1, Zone3Level2, Zone3Level3,
+        Zone4Level1, Zone4Level2, Zone4Level3,
+    }
+
+    export enum Direction {
+        Left,
+        Right,
+        Up,
+        Down
+    }
+
+    export interface IDirection extends Phaser.Sprite {
+        direction: Direction;
+    }
+
     class Init {
-        static HealthPoints = 1000;
+        static HealthPoints = 10;
         static ManaPoints = 500;
-        static CurrentLevel = Levels.Zone1Level1.toString();
+        static FirstState: string = Stories[Stories.Story1];
     }
 
     class Storage {
@@ -75,9 +103,8 @@ module Sample {
             if (currentLevel) {
                 return currentLevel;
             } else {
-                currentLevel = Init.CurrentLevel.toString();
-                this.setCurrentLevel(currentLevel)
-                return currentLevel;
+                this.setCurrentLevel(Init.FirstState);
+                return Init.FirstState;
             }
         }
 
@@ -164,22 +191,4 @@ module Sample {
     }
 
     export var settings:any = new SettingsClass();
-
-    export enum Levels {
-        Zone1Level1, Zone1Level2, Zone1Level3,
-        Zone2Level1, Zone2Level2, Zone2Level3,
-        Zone3Level1, Zone3Level2, Zone3Level3,
-        Zone4Level1, Zone4Level2, Zone4Level3,
-    }
-
-    export enum Direction {
-        Left,
-        Right,
-        Up,
-        Down
-    }
-
-    export interface IDirection extends Phaser.Sprite {
-        direction: Direction;
-    }
 }

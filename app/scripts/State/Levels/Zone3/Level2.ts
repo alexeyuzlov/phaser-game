@@ -1,10 +1,8 @@
-/// <reference path='Zone3.ts'/>
-
 module Sample.State {
 
     export class Zone3Level2 extends Zone3 {
-        currentLevel: Levels = Levels.Zone3Level2;
-        nextLevel: string = Levels.Zone3Level3.toString();
+        currentLevel: string = Levels[Levels.Zone3Level2];
+        nextLevel:string = Levels[Levels.Zone3Level3];
 
         preload() {
             super.preload();

@@ -1,9 +1,15 @@
 module Sample.State {
-    export class GameOver extends Phaser.State {
-        content: string[] = [' ', 'You win!', 'You win!!!'];
+
+    export class AbstractStory extends Phaser.State {
+        nextLevel:string;
+
+        content: string[];
         text;
         index = 0;
         line = '';
+
+        preload() {
+        }
 
         create() {
             this.game.stage.backgroundColor = '#000000';
@@ -19,7 +25,7 @@ module Sample.State {
                 this.line = '';
                 this.game.time.events.repeat(80, this.content[this.index].length + 1, this.updateLine, this);
             } else {
-                // FINAL HERE
+                this.game.state.start(this.nextLevel);
             }
         }
 

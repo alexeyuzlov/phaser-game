@@ -1,15 +1,12 @@
 module Sample.State {
     export class Preload extends Phaser.State {
-        private preloadBar:Phaser.Sprite;
-
         preload() {
-            this.preloadBar = this.add.sprite(0, 148, 'preload-bar');
-            this.load.setPreloadSprite(this.preloadBar);
-
-            this.load.image('menu-background', 'assets/images/menu-background.png');
+            var preloadBar = new Prefab.PreloadBar(this.game, this.game.world.width - 10, this.game.world.height - 10);
+            this.load.setPreloadSprite(preloadBar);
 
             this.load.atlasXML('player', 'assets/images/prefabs/player/player.png', 'assets/images/prefabs/player/player.xml');
 
+            this.load.image('hud', 'assets/images/prefabs/hud.png');
             this.load.image('ground', 'assets/images/ground.png');
 
             this.load.image('platform-h', 'assets/images/prefabs/platform-h.png');
@@ -29,12 +26,10 @@ module Sample.State {
             this.load.image('flier', 'assets/images/prefabs/enemies/flier.png');
             this.load.image('shooter', 'assets/images/prefabs/enemies/shooter.png');
             this.load.image('bullet', 'assets/images/prefabs/enemies/bullet.png');
-
-            this.load.image('hud', 'assets/images/prefabs/hud.png');
         }
 
         create() {
-            this.game.state.start(settings.storage.getCurrentLevel());
+            this.game.state.start('menu');
         }
     }
 }

@@ -1,7 +1,7 @@
 module Sample.State {
 
     export class AbstractZone extends Phaser.State {
-        currentLevel:Levels;
+        currentLevel:string;
         nextLevel:string;
 
         map:Phaser.Tilemap;
@@ -58,9 +58,9 @@ module Sample.State {
             this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_TOPDOWN_TIGHT);
 
             this.blackScreen = new Prefab.BlackScreen(this);
-            this.blackScreen.setText(AbstractZone.GetLevelName(this.currentLevel));
+            this.blackScreen.setText(this.currentLevel);
             this.game.add.tween(this.blackScreen)
-                .to({ alpha: 0 }, 3000, Phaser.Easing.Linear.None, true)
+                .to({ alpha: 0 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.None, true)
                 .onComplete.add(()=> {
                     this.hud.alpha = 1;
                 });
@@ -253,52 +253,26 @@ module Sample.State {
             if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
                 this.blackScreen.setText("");
                 this.game.add.tween(this.blackScreen)
-                    .to({ alpha: 1 }, 3000, Phaser.Easing.Linear.None, true)
+                    .to({ alpha: 1 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.None, true)
                     .onComplete.add(()=> {
                         this.startNextLevel();
                     });
             }
         }
 
+        gameOver() {
+            this.blackScreen.setText("Game Over. Reload Level.");
+            this.game.add.tween(this.blackScreen)
+                .to({ alpha: 1 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.None, true)
+                .onComplete.add(()=> {
+                    this.game.state.start(this.currentLevel);
+                });
+        }
+
         startNextLevel() {
             settings.storage.setHealthPoints(this.player.health.toString());
             settings.storage.setManaPoints(this.player.manaPoints.toString());
-            this.game.state.start(this.nextLevel.toString());
-        }
-
-        static GetLevelName(level:Levels) {
-            switch (level) {
-                case Levels.Zone1Level1:
-                    return '1-1';
-                case Levels.Zone1Level2:
-                    return '1-2';
-                case Levels.Zone1Level3:
-                    return '1-3';
-
-                case Levels.Zone2Level1:
-                    return '2-1';
-                case Levels.Zone2Level2:
-                    return '2-2';
-                case Levels.Zone2Level3:
-                    return '2-3';
-
-                case Levels.Zone3Level1:
-                    return '3-1';
-                case Levels.Zone3Level2:
-                    return '3-2';
-                case Levels.Zone3Level3:
-                    return '3-3';
-
-                case Levels.Zone4Level1:
-                    return '4-1';
-                case Levels.Zone4Level2:
-                    return '4-2';
-                case Levels.Zone4Level3:
-                    return '4-3';
-
-                default:
-                    return 'X-X';
-            }
+            this.game.state.start(this.nextLevel);
         }
     }
 }

@@ -1,5 +1,3 @@
-/// <reference path='../../Levels/AbstractZone.ts'/>
-
 module Sample.State {
 
     export class Zone2 extends AbstractZone {
@@ -8,6 +6,7 @@ module Sample.State {
         lightSprite:Phaser.Image;
 
         preload() {
+            super.preload();
         }
 
         create() {

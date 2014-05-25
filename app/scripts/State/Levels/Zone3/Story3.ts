@@ -1,6 +1,8 @@
 module Sample.State {
 
-    export class Zone4 extends AbstractZone {
+    export class Story3 extends AbstractStory {
+        nextLevel: string = Levels[Levels.Zone3Level1];
+        content = [' ', 'Story Zone3'];
 
         preload() {
             super.preload();

@@ -13,12 +13,11 @@ var Sample;
                 _super.apply(this, arguments);
             }
             Boot.prototype.preload = function () {
-                this.load.image('preload-bar', 'assets/images/preload-bar.png');
+                this.load.image('preload-bar', 'assets/images/prefabs/preload-bar.png');
             };
 
             Boot.prototype.create = function () {
-                this.game.stage.backgroundColor = 0xFFFFFF;
-
+                this.game.stage.backgroundColor = '#000000';
                 this.game.state.start('preload');
             };
             return Boot;
@@ -36,13 +35,12 @@ var Sample;
                 _super.apply(this, arguments);
             }
             Preload.prototype.preload = function () {
-                this.preloadBar = this.add.sprite(0, 148, 'preload-bar');
-                this.load.setPreloadSprite(this.preloadBar);
-
-                this.load.image('menu-background', 'assets/images/menu-background.png');
+                var preloadBar = new Sample.Prefab.PreloadBar(this.game, this.game.world.width - 10, this.game.world.height - 10);
+                this.load.setPreloadSprite(preloadBar);
 
                 this.load.atlasXML('player', 'assets/images/prefabs/player/player.png', 'assets/images/prefabs/player/player.xml');
 
+                this.load.image('hud', 'assets/images/prefabs/hud.png');
                 this.load.image('ground', 'assets/images/ground.png');
 
                 this.load.image('platform-h', 'assets/images/prefabs/platform-h.png');
@@ -61,12 +59,10 @@ var Sample;
                 this.load.image('flier', 'assets/images/prefabs/enemies/flier.png');
                 this.load.image('shooter', 'assets/images/prefabs/enemies/shooter.png');
                 this.load.image('bullet', 'assets/images/prefabs/enemies/bullet.png');
-
-                this.load.image('hud', 'assets/images/prefabs/hud.png');
             };
 
             Preload.prototype.create = function () {
-                this.game.state.start(Sample.settings.storage.getCurrentLevel());
+                this.game.state.start('menu');
             };
             return Preload;
         })(Phaser.State);
@@ -82,14 +78,15 @@ var Sample;
             function Menu() {
                 _super.apply(this, arguments);
             }
+            Menu.prototype.preload = function () {
+            };
+
             Menu.prototype.create = function () {
-                this.background = this.add.sprite(80, 0, 'menu-background');
+                this.game.stage.backgroundColor = '#000000';
             };
 
             Menu.prototype.update = function () {
-                if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-                    this.game.state.start(0 /* Zone1Level1 */.toString());
-                }
+                this.game.state.start(Sample.settings.storage.getCurrentLevel());
             };
             return Menu;
         })(Phaser.State);
@@ -129,8 +126,8 @@ var Sample;
                 this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_TOPDOWN_TIGHT);
 
                 this.blackScreen = new Sample.Prefab.BlackScreen(this);
-                this.blackScreen.setText(AbstractZone.GetLevelName(this.currentLevel));
-                this.game.add.tween(this.blackScreen).to({ alpha: 0 }, 3000, Phaser.Easing.Linear.None, true).onComplete.add(function () {
+                this.blackScreen.setText(this.currentLevel);
+                this.game.add.tween(this.blackScreen).to({ alpha: 0 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.None, true).onComplete.add(function () {
                     _this.hud.alpha = 1;
                 });
             };
@@ -322,55 +319,73 @@ var Sample;
 
                 if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
                     this.blackScreen.setText("");
-                    this.game.add.tween(this.blackScreen).to({ alpha: 1 }, 3000, Phaser.Easing.Linear.None, true).onComplete.add(function () {
+                    this.game.add.tween(this.blackScreen).to({ alpha: 1 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.None, true).onComplete.add(function () {
                         _this.startNextLevel();
                     });
                 }
             };
 
+            AbstractZone.prototype.gameOver = function () {
+                var _this = this;
+                this.blackScreen.setText("Game Over. Reload Level.");
+                this.game.add.tween(this.blackScreen).to({ alpha: 1 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.None, true).onComplete.add(function () {
+                    _this.game.state.start(_this.currentLevel);
+                });
+            };
+
             AbstractZone.prototype.startNextLevel = function () {
                 Sample.settings.storage.setHealthPoints(this.player.health.toString());
                 Sample.settings.storage.setManaPoints(this.player.manaPoints.toString());
-                this.game.state.start(this.nextLevel.toString());
-            };
-
-            AbstractZone.GetLevelName = function (level) {
-                switch (level) {
-                    case 0 /* Zone1Level1 */:
-                        return '1-1';
-                    case 1 /* Zone1Level2 */:
-                        return '1-2';
-                    case 2 /* Zone1Level3 */:
-                        return '1-3';
-
-                    case 3 /* Zone2Level1 */:
-                        return '2-1';
-                    case 4 /* Zone2Level2 */:
-                        return '2-2';
-                    case 5 /* Zone2Level3 */:
-                        return '2-3';
-
-                    case 6 /* Zone3Level1 */:
-                        return '3-1';
-                    case 7 /* Zone3Level2 */:
-                        return '3-2';
-                    case 8 /* Zone3Level3 */:
-                        return '3-3';
-
-                    case 9 /* Zone4Level1 */:
-                        return '4-1';
-                    case 10 /* Zone4Level2 */:
-                        return '4-2';
-                    case 11 /* Zone4Level3 */:
-                        return '4-3';
-
-                    default:
-                        return 'X-X';
-                }
+                this.game.state.start(this.nextLevel);
             };
             return AbstractZone;
         })(Phaser.State);
         State.AbstractZone = AbstractZone;
+    })(Sample.State || (Sample.State = {}));
+    var State = Sample.State;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (State) {
+        var AbstractStory = (function (_super) {
+            __extends(AbstractStory, _super);
+            function AbstractStory() {
+                _super.apply(this, arguments);
+                this.index = 0;
+                this.line = '';
+            }
+            AbstractStory.prototype.preload = function () {
+            };
+
+            AbstractStory.prototype.create = function () {
+                this.game.stage.backgroundColor = '#000000';
+
+                this.text = this.game.add.text(10, 10, '', Sample.settings.font.whiteBig);
+                this.nextLine();
+            };
+
+            AbstractStory.prototype.nextLine = function () {
+                this.index++;
+
+                if (this.index < this.content.length) {
+                    this.line = '';
+                    this.game.time.events.repeat(80, this.content[this.index].length + 1, this.updateLine, this);
+                } else {
+                    this.game.state.start(this.nextLevel);
+                }
+            };
+
+            AbstractStory.prototype.updateLine = function () {
+                if (this.line.length < this.content[this.index].length) {
+                    this.line = this.content[this.index].substr(0, this.line.length + 1);
+                    this.text.setText(this.line);
+                } else {
+                    this.game.time.events.add(Phaser.Timer.SECOND * 2, this.nextLine, this);
+                }
+            };
+            return AbstractStory;
+        })(Phaser.State);
+        State.AbstractStory = AbstractStory;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
 })(Sample || (Sample = {}));
@@ -424,12 +439,39 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (State) {
+        var Story1 = (function (_super) {
+            __extends(Story1, _super);
+            function Story1() {
+                _super.apply(this, arguments);
+                this.nextLevel = Sample.Levels[0 /* Zone1Level1 */];
+                this.content = [' ', 'Story Zone1'];
+            }
+            Story1.prototype.preload = function () {
+                _super.prototype.preload.call(this);
+            };
+
+            Story1.prototype.create = function () {
+                _super.prototype.create.call(this);
+            };
+
+            Story1.prototype.update = function () {
+                _super.prototype.update.call(this);
+            };
+            return Story1;
+        })(State.AbstractStory);
+        State.Story1 = Story1;
+    })(Sample.State || (Sample.State = {}));
+    var State = Sample.State;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (State) {
         var Zone1Level1 = (function (_super) {
             __extends(Zone1Level1, _super);
             function Zone1Level1() {
                 _super.apply(this, arguments);
-                this.currentLevel = 0 /* Zone1Level1 */;
-                this.nextLevel = 1 /* Zone1Level2 */.toString();
+                this.currentLevel = Sample.Levels[0 /* Zone1Level1 */];
+                this.nextLevel = Sample.Levels[1 /* Zone1Level2 */];
             }
             Zone1Level1.prototype.preload = function () {
                 _super.prototype.preload.call(this);
@@ -456,8 +498,8 @@ var Sample;
             __extends(Zone1Level2, _super);
             function Zone1Level2() {
                 _super.apply(this, arguments);
-                this.currentLevel = 1 /* Zone1Level2 */;
-                this.nextLevel = 2 /* Zone1Level3 */.toString();
+                this.currentLevel = Sample.Levels[1 /* Zone1Level2 */];
+                this.nextLevel = Sample.Levels[2 /* Zone1Level3 */];
             }
             Zone1Level2.prototype.preload = function () {
                 _super.prototype.preload.call(this);
@@ -485,8 +527,8 @@ var Sample;
             __extends(Zone1Level3, _super);
             function Zone1Level3() {
                 _super.apply(this, arguments);
-                this.currentLevel = 2 /* Zone1Level3 */;
-                this.nextLevel = 3 /* Zone2Level1 */.toString();
+                this.currentLevel = Sample.Levels[2 /* Zone1Level3 */];
+                this.nextLevel = Sample.Stories[1 /* Story2 */];
             }
             Zone1Level3.prototype.preload = function () {
                 _super.prototype.preload.call(this);
@@ -517,6 +559,7 @@ var Sample;
                 this.lightRadius = 100;
             }
             Zone2.prototype.preload = function () {
+                _super.prototype.preload.call(this);
             };
 
             Zone2.prototype.create = function () {
@@ -557,12 +600,39 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (State) {
+        var Story2 = (function (_super) {
+            __extends(Story2, _super);
+            function Story2() {
+                _super.apply(this, arguments);
+                this.nextLevel = Sample.Levels[3 /* Zone2Level1 */];
+                this.content = [' ', 'Story Zone2'];
+            }
+            Story2.prototype.preload = function () {
+                _super.prototype.preload.call(this);
+            };
+
+            Story2.prototype.create = function () {
+                _super.prototype.create.call(this);
+            };
+
+            Story2.prototype.update = function () {
+                _super.prototype.update.call(this);
+            };
+            return Story2;
+        })(State.AbstractStory);
+        State.Story2 = Story2;
+    })(Sample.State || (Sample.State = {}));
+    var State = Sample.State;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (State) {
         var Zone2Level1 = (function (_super) {
             __extends(Zone2Level1, _super);
             function Zone2Level1() {
                 _super.apply(this, arguments);
-                this.currentLevel = 3 /* Zone2Level1 */;
-                this.nextLevel = 4 /* Zone2Level2 */.toString();
+                this.currentLevel = Sample.Levels[3 /* Zone2Level1 */];
+                this.nextLevel = Sample.Levels[4 /* Zone2Level2 */];
             }
             Zone2Level1.prototype.preload = function () {
                 _super.prototype.preload.call(this);
@@ -589,8 +659,8 @@ var Sample;
             __extends(Zone2Level2, _super);
             function Zone2Level2() {
                 _super.apply(this, arguments);
-                this.currentLevel = 4 /* Zone2Level2 */;
-                this.nextLevel = 5 /* Zone2Level3 */.toString();
+                this.currentLevel = Sample.Levels[4 /* Zone2Level2 */];
+                this.nextLevel = Sample.Levels[5 /* Zone2Level3 */];
             }
             Zone2Level2.prototype.preload = function () {
                 _super.prototype.preload.call(this);
@@ -617,8 +687,8 @@ var Sample;
             __extends(Zone2Level3, _super);
             function Zone2Level3() {
                 _super.apply(this, arguments);
-                this.currentLevel = 5 /* Zone2Level3 */;
-                this.nextLevel = 6 /* Zone3Level1 */.toString();
+                this.currentLevel = Sample.Levels[5 /* Zone2Level3 */];
+                this.nextLevel = Sample.Stories[2 /* Story3 */];
             }
             Zone2Level3.prototype.preload = function () {
                 _super.prototype.preload.call(this);
@@ -690,12 +760,39 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (State) {
+        var Story3 = (function (_super) {
+            __extends(Story3, _super);
+            function Story3() {
+                _super.apply(this, arguments);
+                this.nextLevel = Sample.Levels[6 /* Zone3Level1 */];
+                this.content = [' ', 'Story Zone3'];
+            }
+            Story3.prototype.preload = function () {
+                _super.prototype.preload.call(this);
+            };
+
+            Story3.prototype.create = function () {
+                _super.prototype.create.call(this);
+            };
+
+            Story3.prototype.update = function () {
+                _super.prototype.update.call(this);
+            };
+            return Story3;
+        })(State.AbstractStory);
+        State.Story3 = Story3;
+    })(Sample.State || (Sample.State = {}));
+    var State = Sample.State;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (State) {
         var Zone3Level1 = (function (_super) {
             __extends(Zone3Level1, _super);
             function Zone3Level1() {
                 _super.apply(this, arguments);
-                this.currentLevel = 6 /* Zone3Level1 */;
-                this.nextLevel = 7 /* Zone3Level2 */.toString();
+                this.currentLevel = Sample.Levels[6 /* Zone3Level1 */];
+                this.nextLevel = Sample.Levels[7 /* Zone3Level2 */];
             }
             Zone3Level1.prototype.preload = function () {
                 _super.prototype.preload.call(this);
@@ -722,8 +819,8 @@ var Sample;
             __extends(Zone3Level2, _super);
             function Zone3Level2() {
                 _super.apply(this, arguments);
-                this.currentLevel = 7 /* Zone3Level2 */;
-                this.nextLevel = 8 /* Zone3Level3 */.toString();
+                this.currentLevel = Sample.Levels[7 /* Zone3Level2 */];
+                this.nextLevel = Sample.Levels[8 /* Zone3Level3 */];
             }
             Zone3Level2.prototype.preload = function () {
                 _super.prototype.preload.call(this);
@@ -750,8 +847,8 @@ var Sample;
             __extends(Zone3Level3, _super);
             function Zone3Level3() {
                 _super.apply(this, arguments);
-                this.currentLevel = 8 /* Zone3Level3 */;
-                this.nextLevel = 9 /* Zone4Level1 */.toString();
+                this.currentLevel = Sample.Levels[8 /* Zone3Level3 */];
+                this.nextLevel = Sample.Stories[3 /* Story4 */];
             }
             Zone3Level3.prototype.preload = function () {
                 _super.prototype.preload.call(this);
@@ -799,12 +896,39 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (State) {
+        var Story4 = (function (_super) {
+            __extends(Story4, _super);
+            function Story4() {
+                _super.apply(this, arguments);
+                this.nextLevel = Sample.Levels[9 /* Zone4Level1 */];
+                this.content = [' ', 'Story Zone4'];
+            }
+            Story4.prototype.preload = function () {
+                _super.prototype.preload.call(this);
+            };
+
+            Story4.prototype.create = function () {
+                _super.prototype.create.call(this);
+            };
+
+            Story4.prototype.update = function () {
+                _super.prototype.update.call(this);
+            };
+            return Story4;
+        })(State.AbstractStory);
+        State.Story4 = Story4;
+    })(Sample.State || (Sample.State = {}));
+    var State = Sample.State;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (State) {
         var Zone4Level1 = (function (_super) {
             __extends(Zone4Level1, _super);
             function Zone4Level1() {
                 _super.apply(this, arguments);
-                this.currentLevel = 9 /* Zone4Level1 */;
-                this.nextLevel = 10 /* Zone4Level2 */.toString();
+                this.currentLevel = Sample.Levels[9 /* Zone4Level1 */];
+                this.nextLevel = Sample.Levels[10 /* Zone4Level2 */];
             }
             Zone4Level1.prototype.preload = function () {
                 _super.prototype.preload.call(this);
@@ -831,8 +955,8 @@ var Sample;
             __extends(Zone4Level2, _super);
             function Zone4Level2() {
                 _super.apply(this, arguments);
-                this.currentLevel = 10 /* Zone4Level2 */;
-                this.nextLevel = 11 /* Zone4Level3 */.toString();
+                this.currentLevel = Sample.Levels[10 /* Zone4Level2 */];
+                this.nextLevel = Sample.Levels[11 /* Zone4Level3 */];
             }
             Zone4Level2.prototype.preload = function () {
                 _super.prototype.preload.call(this);
@@ -859,7 +983,7 @@ var Sample;
             __extends(Zone4Level3, _super);
             function Zone4Level3() {
                 _super.apply(this, arguments);
-                this.currentLevel = 11 /* Zone4Level3 */;
+                this.currentLevel = Sample.Levels[11 /* Zone4Level3 */];
                 this.nextLevel = 'gameOver';
             }
             Zone4Level3.prototype.preload = function () {
@@ -887,9 +1011,34 @@ var Sample;
             __extends(GameOver, _super);
             function GameOver() {
                 _super.apply(this, arguments);
+                this.content = [' ', 'You win!', 'You win!!!'];
+                this.index = 0;
+                this.line = '';
             }
             GameOver.prototype.create = function () {
-                this.background = this.add.sprite(80, 0, 'menu-background');
+                this.game.stage.backgroundColor = '#000000';
+
+                this.text = this.game.add.text(10, 10, '', Sample.settings.font.whiteBig);
+                this.nextLine();
+            };
+
+            GameOver.prototype.nextLine = function () {
+                this.index++;
+
+                if (this.index < this.content.length) {
+                    this.line = '';
+                    this.game.time.events.repeat(80, this.content[this.index].length + 1, this.updateLine, this);
+                } else {
+                }
+            };
+
+            GameOver.prototype.updateLine = function () {
+                if (this.line.length < this.content[this.index].length) {
+                    this.line = this.content[this.index].substr(0, this.line.length + 1);
+                    this.text.setText(this.line);
+                } else {
+                    this.game.time.events.add(Phaser.Timer.SECOND * 2, this.nextLine, this);
+                }
             };
             return GameOver;
         })(Phaser.State);
@@ -903,6 +1052,7 @@ var Sample;
         var Player = (function (_super) {
             __extends(Player, _super);
             function Player(level, x, y) {
+                var _this = this;
                 _super.call(this, level.game, x, y, 'player');
                 this.level = level;
                 this.gravity = 500;
@@ -923,9 +1073,9 @@ var Sample;
                 this.manaPoints = +Sample.settings.storage.getManaPoints();
                 this.immortalStateAt = Date.now();
                 this.attackStateAt = Date.now();
-                this.immortalDuration = 3000;
-                this.immortalDefaultDuration = 3000;
-                this.attackDuration = 300;
+                this.immortalDuration = Phaser.Timer.SECOND * 3;
+                this.immortalDefaultDuration = Phaser.Timer.SECOND * 3;
+                this.attackDuration = Phaser.Timer.SECOND / 3;
                 this.isActiveJumpKey = false;
                 this.isAttackKeyPressed = false;
 
@@ -945,6 +1095,10 @@ var Sample;
                 this.animations.add('walk', Phaser.Animation.generateFrameNames('player-walk-', 1, 4, '.png', 0), 15, true);
                 this.animations.add('attack', Phaser.Animation.generateFrameNames('player-attack-', 1, 3, '.png', 0), 10, true);
                 this.animations.add('sit', ['player-sit-1.png'], 10, true);
+
+                this.events.onKilled.add(function () {
+                    _this.level.gameOver();
+                });
 
                 this.level.game.add.existing(this);
             }
@@ -969,7 +1123,7 @@ var Sample;
 
             Player.prototype.write = function (text, style) {
                 var textSprite = this.game.add.text(this.x, this.y, text, style);
-                var tween = this.game.add.tween(textSprite).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
+                var tween = this.game.add.tween(textSprite).to({ alpha: 0 }, Phaser.Timer.SECOND, Phaser.Easing.Linear.None, true, 0, 0, false);
 
                 tween.onComplete.add(function () {
                     textSprite.destroy();
@@ -978,8 +1132,8 @@ var Sample;
 
             Player.prototype.makeDamage = function (damagePoint) {
                 this.damage(damagePoint);
-                this.immortal(this.immortalDefaultDuration);
                 this.write(damagePoint.toString(), Sample.settings.font.whiteWithRed);
+                this.immortal(this.immortalDefaultDuration);
             };
 
             Player.prototype.jump = function () {
@@ -1159,6 +1313,24 @@ var Sample;
             return BlackScreen;
         })(Phaser.Sprite);
         Prefab.BlackScreen = BlackScreen;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
+        var PreloadBar = (function (_super) {
+            __extends(PreloadBar, _super);
+            function PreloadBar(game, x, y) {
+                _super.call(this, game, x, y, 'preload-bar');
+
+                this.anchor.setTo(1, 1);
+
+                game.add.existing(this);
+            }
+            return PreloadBar;
+        })(Phaser.Sprite);
+        Prefab.PreloadBar = PreloadBar;
     })(Sample.Prefab || (Sample.Prefab = {}));
     var Prefab = Sample.Prefab;
 })(Sample || (Sample = {}));
@@ -1646,12 +1818,44 @@ var Sample;
 })(Sample || (Sample = {}));
 var Sample;
 (function (Sample) {
+    (function (Stories) {
+        Stories[Stories["Story1"] = 0] = "Story1";
+        Stories[Stories["Story2"] = 1] = "Story2";
+        Stories[Stories["Story3"] = 2] = "Story3";
+        Stories[Stories["Story4"] = 3] = "Story4";
+    })(Sample.Stories || (Sample.Stories = {}));
+    var Stories = Sample.Stories;
+
+    (function (Levels) {
+        Levels[Levels["Zone1Level1"] = 0] = "Zone1Level1";
+        Levels[Levels["Zone1Level2"] = 1] = "Zone1Level2";
+        Levels[Levels["Zone1Level3"] = 2] = "Zone1Level3";
+        Levels[Levels["Zone2Level1"] = 3] = "Zone2Level1";
+        Levels[Levels["Zone2Level2"] = 4] = "Zone2Level2";
+        Levels[Levels["Zone2Level3"] = 5] = "Zone2Level3";
+        Levels[Levels["Zone3Level1"] = 6] = "Zone3Level1";
+        Levels[Levels["Zone3Level2"] = 7] = "Zone3Level2";
+        Levels[Levels["Zone3Level3"] = 8] = "Zone3Level3";
+        Levels[Levels["Zone4Level1"] = 9] = "Zone4Level1";
+        Levels[Levels["Zone4Level2"] = 10] = "Zone4Level2";
+        Levels[Levels["Zone4Level3"] = 11] = "Zone4Level3";
+    })(Sample.Levels || (Sample.Levels = {}));
+    var Levels = Sample.Levels;
+
+    (function (Direction) {
+        Direction[Direction["Left"] = 0] = "Left";
+        Direction[Direction["Right"] = 1] = "Right";
+        Direction[Direction["Up"] = 2] = "Up";
+        Direction[Direction["Down"] = 3] = "Down";
+    })(Sample.Direction || (Sample.Direction = {}));
+    var Direction = Sample.Direction;
+
     var Init = (function () {
         function Init() {
         }
-        Init.HealthPoints = 1000;
+        Init.HealthPoints = 10;
         Init.ManaPoints = 500;
-        Init.CurrentLevel = 0 /* Zone1Level1 */.toString();
+        Init.FirstState = Stories[0 /* Story1 */];
         return Init;
     })();
 
@@ -1663,9 +1867,8 @@ var Sample;
             if (currentLevel) {
                 return currentLevel;
             } else {
-                currentLevel = Init.CurrentLevel.toString();
-                this.setCurrentLevel(currentLevel);
-                return currentLevel;
+                this.setCurrentLevel(Init.FirstState);
+                return Init.FirstState;
             }
         };
 
@@ -1751,30 +1954,6 @@ var Sample;
     })();
 
     Sample.settings = new SettingsClass();
-
-    (function (Levels) {
-        Levels[Levels["Zone1Level1"] = 0] = "Zone1Level1";
-        Levels[Levels["Zone1Level2"] = 1] = "Zone1Level2";
-        Levels[Levels["Zone1Level3"] = 2] = "Zone1Level3";
-        Levels[Levels["Zone2Level1"] = 3] = "Zone2Level1";
-        Levels[Levels["Zone2Level2"] = 4] = "Zone2Level2";
-        Levels[Levels["Zone2Level3"] = 5] = "Zone2Level3";
-        Levels[Levels["Zone3Level1"] = 6] = "Zone3Level1";
-        Levels[Levels["Zone3Level2"] = 7] = "Zone3Level2";
-        Levels[Levels["Zone3Level3"] = 8] = "Zone3Level3";
-        Levels[Levels["Zone4Level1"] = 9] = "Zone4Level1";
-        Levels[Levels["Zone4Level2"] = 10] = "Zone4Level2";
-        Levels[Levels["Zone4Level3"] = 11] = "Zone4Level3";
-    })(Sample.Levels || (Sample.Levels = {}));
-    var Levels = Sample.Levels;
-
-    (function (Direction) {
-        Direction[Direction["Left"] = 0] = "Left";
-        Direction[Direction["Right"] = 1] = "Right";
-        Direction[Direction["Up"] = 2] = "Up";
-        Direction[Direction["Down"] = 3] = "Down";
-    })(Sample.Direction || (Sample.Direction = {}));
-    var Direction = Sample.Direction;
 })(Sample || (Sample = {}));
 var Sample;
 (function (Sample) {
@@ -1787,21 +1966,25 @@ var Sample;
             this.state.add('preload', Sample.State.Preload);
             this.state.add('menu', Sample.State.Menu);
 
-            this.state.add(0 /* Zone1Level1 */.toString(), Sample.State.Zone1Level1);
-            this.state.add(1 /* Zone1Level2 */.toString(), Sample.State.Zone1Level2);
-            this.state.add(2 /* Zone1Level3 */.toString(), Sample.State.Zone1Level3);
+            this.state.add(Sample.Stories[0 /* Story1 */], Sample.State.Story1);
+            this.state.add(Sample.Levels[0 /* Zone1Level1 */], Sample.State.Zone1Level1);
+            this.state.add(Sample.Levels[1 /* Zone1Level2 */], Sample.State.Zone1Level2);
+            this.state.add(Sample.Levels[2 /* Zone1Level3 */], Sample.State.Zone1Level3);
 
-            this.state.add(3 /* Zone2Level1 */.toString(), Sample.State.Zone2Level1);
-            this.state.add(4 /* Zone2Level2 */.toString(), Sample.State.Zone2Level2);
-            this.state.add(5 /* Zone2Level3 */.toString(), Sample.State.Zone2Level3);
+            this.state.add(Sample.Stories[1 /* Story2 */], Sample.State.Story2);
+            this.state.add(Sample.Levels[3 /* Zone2Level1 */], Sample.State.Zone2Level1);
+            this.state.add(Sample.Levels[4 /* Zone2Level2 */], Sample.State.Zone2Level2);
+            this.state.add(Sample.Levels[5 /* Zone2Level3 */], Sample.State.Zone2Level3);
 
-            this.state.add(6 /* Zone3Level1 */.toString(), Sample.State.Zone3Level1);
-            this.state.add(7 /* Zone3Level2 */.toString(), Sample.State.Zone3Level2);
-            this.state.add(8 /* Zone3Level3 */.toString(), Sample.State.Zone3Level3);
+            this.state.add(Sample.Stories[2 /* Story3 */], Sample.State.Story3);
+            this.state.add(Sample.Levels[6 /* Zone3Level1 */], Sample.State.Zone3Level1);
+            this.state.add(Sample.Levels[7 /* Zone3Level2 */], Sample.State.Zone3Level2);
+            this.state.add(Sample.Levels[8 /* Zone3Level3 */], Sample.State.Zone3Level3);
 
-            this.state.add(9 /* Zone4Level1 */.toString(), Sample.State.Zone4Level1);
-            this.state.add(10 /* Zone4Level2 */.toString(), Sample.State.Zone4Level2);
-            this.state.add(11 /* Zone4Level3 */.toString(), Sample.State.Zone4Level3);
+            this.state.add(Sample.Stories[3 /* Story4 */], Sample.State.Story4);
+            this.state.add(Sample.Levels[9 /* Zone4Level1 */], Sample.State.Zone4Level1);
+            this.state.add(Sample.Levels[10 /* Zone4Level2 */], Sample.State.Zone4Level2);
+            this.state.add(Sample.Levels[11 /* Zone4Level3 */], Sample.State.Zone4Level3);
 
             this.state.add('gameOver', Sample.State.GameOver);
 
