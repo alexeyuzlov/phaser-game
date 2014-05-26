@@ -1067,7 +1067,7 @@ var Sample;
                 this.sitState = false;
                 this.superSpeedState = false;
                 this.superAttakState = false;
-                this.viewAroundState = false;
+                this.defensePoints = 5;
                 this.direction = 1 /* Right */;
                 this.damagePoints = 50;
                 this.manaPoints = +Sample.settings.storage.getManaPoints();
@@ -1131,6 +1131,12 @@ var Sample;
             };
 
             Player.prototype.makeDamage = function (damagePoint) {
+                if (damagePoint < this.defensePoints) {
+                    damagePoint = 1;
+                } else {
+                    damagePoint = damagePoint - this.defensePoints;
+                }
+
                 this.damage(damagePoint);
                 this.write(damagePoint.toString(), Sample.settings.font.whiteWithRed);
                 this.immortal(this.immortalDefaultDuration);
@@ -1617,6 +1623,10 @@ var Sample;
             __extends(AbstractEnemy, _super);
             function AbstractEnemy(game, x, y, sprite) {
                 _super.call(this, game, x, y, sprite);
+                this.immortalState = false;
+                this.immortalStateAt = Date.now();
+                this.immortalStateDuration = Phaser.Timer.SECOND / 3;
+                this.defensePoints = 0;
 
                 game.physics.arcade.enable(this);
                 this.alive = true;
@@ -1625,21 +1635,38 @@ var Sample;
                 game.add.existing(this);
             }
             AbstractEnemy.prototype.makeDamage = function (damagePoint) {
-                this.damage(damagePoint);
+                if (!this.immortalState) {
+                    if (damagePoint < this.defensePoints) {
+                        damagePoint = 1;
+                    } else {
+                        damagePoint = damagePoint - this.defensePoints;
+                    }
 
-                var textStyle = {
-                    font: "20px Arial",
-                    fill: "#ffffff",
-                    stroke: '#0000ff',
-                    strokeThickness: 1
-                };
+                    this.damage(damagePoint);
 
-                var text = this.game.add.text(this.x, this.y, damagePoint.toString(), textStyle);
-                var tween = this.game.add.tween(text).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
+                    var textStyle = {
+                        font: "20px Arial",
+                        fill: "#ffffff",
+                        stroke: '#0000ff',
+                        strokeThickness: 1
+                    };
 
-                tween.onComplete.add(function () {
-                    text.destroy();
-                });
+                    var text = this.game.add.text(this.x, this.y, damagePoint.toString(), textStyle);
+                    var tween = this.game.add.tween(text).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
+
+                    tween.onComplete.add(function () {
+                        text.destroy();
+                    });
+
+                    this.immortalStateAt = Date.now();
+                    this.immortalState = true;
+                }
+            };
+
+            AbstractEnemy.prototype.update = function () {
+                if (this.immortalState && Date.now() - this.immortalStateAt > this.immortalStateDuration) {
+                    this.immortalState = false;
+                }
             };
             return AbstractEnemy;
         })(Phaser.Sprite);
@@ -1658,11 +1685,14 @@ var Sample;
                 this.velocity = 100;
                 this.direction = 1 /* Right */;
                 this.damagePoints = 10;
+                this.defensePoints = 5;
 
                 this.body.gravity.y = this.gravity;
-                this.health = 10;
+                this.health = 200;
             }
             Runner.prototype.update = function () {
+                _super.prototype.update.call(this);
+
                 if (!this.inCamera)
                     return;
                 if (!this.alive)
@@ -1701,9 +1731,10 @@ var Sample;
                 this.isActive = false;
                 this.damagePoints = 10;
                 this.speed = 150;
+                this.defensePoints = 5;
 
                 this.anchor.set(0.5, 0.5);
-                this.health = 10;
+                this.health = 100;
             }
             Flier.prototype.setTarget = function (target) {
                 this.minDistance = target.width / 2;
@@ -1713,6 +1744,8 @@ var Sample;
             };
 
             Flier.prototype.update = function () {
+                _super.prototype.update.call(this);
+
                 if (!this.inCamera)
                     return;
                 if (!this.isActive)
@@ -1772,6 +1805,7 @@ var Sample;
                 this.countBullets = 1;
                 this.shotDelay = 3000;
                 this.damagePoints = 10;
+                this.defensePoints = 5;
 
                 this.body.gravity.y = this.gravity;
 
@@ -1780,13 +1814,15 @@ var Sample;
                     var bullet = new Prefab.Bullet(game, 0, 0);
                     this.bullets.add(bullet);
                 }
-                this.health = 10;
+                this.health = 100;
             }
             Shooter.prototype.setTarget = function (target) {
                 this.target = target;
             };
 
             Shooter.prototype.update = function () {
+                _super.prototype.update.call(this);
+
                 if (!this.inCamera)
                     return;
                 if (!this.alive)
@@ -1853,7 +1889,7 @@ var Sample;
     var Init = (function () {
         function Init() {
         }
-        Init.HealthPoints = 10;
+        Init.HealthPoints = 100;
         Init.ManaPoints = 500;
         Init.FirstState = Stories[0 /* Story1 */];
         return Init;

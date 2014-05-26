@@ -85,7 +85,7 @@ module Sample {
     }
 
     class Init {
-        static HealthPoints = 10;
+        static HealthPoints = 100;
         static ManaPoints = 500;
         static FirstState: string = Stories[Stories.Story1];
     }

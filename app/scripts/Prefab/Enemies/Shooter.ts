@@ -11,6 +11,8 @@ module Sample.Prefab {
 
         damagePoints: number = 10;
 
+        defensePoints:number = 5;
+
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'shooter');
 
@@ -21,7 +23,7 @@ module Sample.Prefab {
                 var bullet = new Prefab.Bullet(game, 0, 0);
                 this.bullets.add(bullet);
             }
-            this.health = 10;
+            this.health = 100;
         }
 
         setTarget(target: Phaser.Sprite) {
@@ -29,6 +31,8 @@ module Sample.Prefab {
         }
 
         update() {
+            super.update();
+
             if (!this.inCamera) return;
             if (!this.alive) return;
 

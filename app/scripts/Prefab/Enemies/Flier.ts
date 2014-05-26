@@ -8,11 +8,13 @@ module Sample.Prefab {
         damagePoints: number = 10;
         speed:number = 150;
 
+        defensePoints:number = 5;
+
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'flier');
 
             this.anchor.set(0.5, 0.5);
-            this.health = 10;
+            this.health = 100;
         }
 
         setTarget(target: Phaser.Sprite) {
@@ -23,6 +25,8 @@ module Sample.Prefab {
         }
 
         update() {
+            super.update();
+
             if (!this.inCamera) return;
             if (!this.isActive) return;
 

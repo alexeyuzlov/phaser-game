@@ -17,7 +17,8 @@ module Sample.Prefab {
         sitState:boolean = false;
         superSpeedState:boolean = false;
         superAttakState:boolean = false;
-        viewAroundState:boolean = false;
+
+        defensePoints:number = 5;
 
         direction:Direction = Direction.Right;
 
@@ -90,6 +91,12 @@ module Sample.Prefab {
         }
 
         makeDamage(damagePoint) {
+            if (damagePoint < this.defensePoints) {
+                damagePoint = 1
+            } else {
+                damagePoint = damagePoint - this.defensePoints;
+            }
+
             this.damage(damagePoint);
             this.write(damagePoint.toString(), settings.font.whiteWithRed);
             this.immortal(this.immortalDefaultDuration);

@@ -5,15 +5,18 @@ module Sample.Prefab {
         velocity:number = 100;
         direction:Direction = Direction.Right;
         damagePoints: number = 10;
+        defensePoints:number = 5;
 
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'runner');
 
             this.body.gravity.y = this.gravity;
-            this.health = 10;
+            this.health = 200;
         }
 
         update() {
+            super.update();
+
             if (!this.inCamera) return;
             if (!this.alive) return;
 
