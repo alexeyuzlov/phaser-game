@@ -7,7 +7,7 @@ module Sample.Prefab {
         distanceToTarget: number = Math.random() * 100 - 40; // from - 40 to 60 px to target
 
         constructor(game:Phaser.Game, x:number, y:number) {
-            super(game, x, y, 'iceSpike');
+            super(game, x, y, 'ice-spike');
             game.physics.arcade.enable(this);
             this.alive = true;
             this.checkWorldBounds = true;

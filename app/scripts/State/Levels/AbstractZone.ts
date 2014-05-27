@@ -22,6 +22,7 @@ module Sample.State {
 
         allEnemies:Phaser.Group;
         shooters:Phaser.Group;
+        shootersReject:Phaser.Group;
         runners:Phaser.Group;
         fliers:Phaser.Group;
 
@@ -90,9 +91,9 @@ module Sample.State {
             }
 
             this.iceSpikes = this.game.add.group();
-            index = this.map.getTilesetIndex('iceSpike');
+            index = this.map.getTilesetIndex('ice-spike');
             if (index) {
-                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'iceSpike', 0, true, false, this.iceSpikes, Prefab.IceSpike);
+                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'ice-spike', 0, true, false, this.iceSpikes, Prefab.IceSpike);
                 this.iceSpikes.forEach((ice) => {
                     ice.target = this.player;
                 }, null);
@@ -104,6 +105,7 @@ module Sample.State {
         }
 
         private getEnemiesPrefabsFromMap() {
+            this.allEnemies = this.game.add.group();
             var index:number;
 
             this.shooters = this.game.add.group();
@@ -114,12 +116,24 @@ module Sample.State {
                     shooter.setTarget(this.player);
                 }, null);
             }
+            this.allEnemies.add(this.shooters);
+
+            this.shootersReject = this.game.add.group();
+            index = this.map.getTilesetIndex('shooter-reject');
+            if (index) {
+                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'shooter-reject', 0, true, false, this.shootersReject, Prefab.ShooterReject);
+                this.shootersReject.forEach((shooterReject) => {
+                    shooterReject.setTarget(this.player);
+                }, null);
+            }
+            this.allEnemies.add(this.shootersReject);
 
             this.runners = this.game.add.group();
             index = this.map.getTilesetIndex('runner');
             if (index) {
                 this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'runner', 0, true, false, this.runners, Prefab.Runner);
             }
+            this.allEnemies.add(this.runners);
 
             this.fliers = this.game.add.group();
             index = this.map.getTilesetIndex('flier');
@@ -129,10 +143,6 @@ module Sample.State {
                     flier.setTarget(this.player);
                 }, null);
             }
-
-            this.allEnemies = this.game.add.group();
-            this.allEnemies.add(this.runners);
-            this.allEnemies.add(this.shooters);
             this.allEnemies.add(this.fliers);
         }
 
@@ -204,6 +214,7 @@ module Sample.State {
                 }
             });
 
+            this.game.physics.arcade.collide(this.shootersReject, this.layer);
             this.game.physics.arcade.collide(this.shooters, this.layer);
             this.game.physics.arcade.collide(this.runners, this.layer);
 
@@ -224,6 +235,31 @@ module Sample.State {
                     if (!this.player.immortalState) {
                         this.player.makeDamage(bullet.damagePoints);
                         this.hud.updateHealthState();
+                    }
+                });
+            }, null);
+
+            this.shootersReject.forEach((shooterReject)=> {
+                this.game.physics.arcade.overlap(this.player, shooterReject.bullets, (player, bulletReject)=> {
+                    if (this.player.attackState) {
+                        bulletReject.body.velocity.x = -bulletReject.body.velocity.x;
+                        bulletReject.rejectState = true;
+
+                    } else {
+                        bulletReject.kill();
+                        if (!this.player.immortalState) {
+                            this.player.makeDamage(bulletReject.damagePoints);
+                            this.hud.updateHealthState();
+                        }
+                    }
+                });
+
+                this.game.physics.arcade.overlap(shooterReject, shooterReject.bullets, (_shooterReject, bulletReject)=> {
+                    if (bulletReject.rejectState) {
+                        bulletReject.kill();
+                        shooterReject.makeDamage(bulletReject.damageRejectPoints);
+                    } else {
+
                     }
                 });
             }, null);

@@ -53,12 +53,15 @@ var Sample;
                 this.load.image('transparent', 'assets/images/prefabs/transparent.png');
                 this.load.image('exit', 'assets/images/prefabs/exit.png');
                 this.load.image('spike', 'assets/images/prefabs/spike.png');
-                this.load.image('iceSpike', 'assets/images/prefabs/iceSpike.png');
+                this.load.image('ice-spike', 'assets/images/prefabs/ice-spike.png');
 
                 this.load.image('runner', 'assets/images/prefabs/enemies/runner.png');
                 this.load.image('flier', 'assets/images/prefabs/enemies/flier.png');
                 this.load.image('shooter', 'assets/images/prefabs/enemies/shooter.png');
                 this.load.image('bullet', 'assets/images/prefabs/enemies/bullet.png');
+
+                this.load.image('shooter-reject', 'assets/images/prefabs/enemies/shooter-reject.png');
+                this.load.image('bullet-reject', 'assets/images/prefabs/enemies/bullet-reject.png');
             };
 
             Preload.prototype.create = function () {
@@ -155,9 +158,9 @@ var Sample;
                 }
 
                 this.iceSpikes = this.game.add.group();
-                index = this.map.getTilesetIndex('iceSpike');
+                index = this.map.getTilesetIndex('ice-spike');
                 if (index) {
-                    this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'iceSpike', 0, true, false, this.iceSpikes, Sample.Prefab.IceSpike);
+                    this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'ice-spike', 0, true, false, this.iceSpikes, Sample.Prefab.IceSpike);
                     this.iceSpikes.forEach(function (ice) {
                         ice.target = _this.player;
                     }, null);
@@ -170,6 +173,7 @@ var Sample;
 
             AbstractZone.prototype.getEnemiesPrefabsFromMap = function () {
                 var _this = this;
+                this.allEnemies = this.game.add.group();
                 var index;
 
                 this.shooters = this.game.add.group();
@@ -180,12 +184,24 @@ var Sample;
                         shooter.setTarget(_this.player);
                     }, null);
                 }
+                this.allEnemies.add(this.shooters);
+
+                this.shootersReject = this.game.add.group();
+                index = this.map.getTilesetIndex('shooter-reject');
+                if (index) {
+                    this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'shooter-reject', 0, true, false, this.shootersReject, Sample.Prefab.ShooterReject);
+                    this.shootersReject.forEach(function (shooterReject) {
+                        shooterReject.setTarget(_this.player);
+                    }, null);
+                }
+                this.allEnemies.add(this.shootersReject);
 
                 this.runners = this.game.add.group();
                 index = this.map.getTilesetIndex('runner');
                 if (index) {
                     this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'runner', 0, true, false, this.runners, Sample.Prefab.Runner);
                 }
+                this.allEnemies.add(this.runners);
 
                 this.fliers = this.game.add.group();
                 index = this.map.getTilesetIndex('flier');
@@ -195,10 +211,6 @@ var Sample;
                         flier.setTarget(_this.player);
                     }, null);
                 }
-
-                this.allEnemies = this.game.add.group();
-                this.allEnemies.add(this.runners);
-                this.allEnemies.add(this.shooters);
                 this.allEnemies.add(this.fliers);
             };
 
@@ -271,6 +283,7 @@ var Sample;
                     }
                 });
 
+                this.game.physics.arcade.collide(this.shootersReject, this.layer);
                 this.game.physics.arcade.collide(this.shooters, this.layer);
                 this.game.physics.arcade.collide(this.runners, this.layer);
 
@@ -291,6 +304,29 @@ var Sample;
                         if (!_this.player.immortalState) {
                             _this.player.makeDamage(bullet.damagePoints);
                             _this.hud.updateHealthState();
+                        }
+                    });
+                }, null);
+
+                this.shootersReject.forEach(function (shooterReject) {
+                    _this.game.physics.arcade.overlap(_this.player, shooterReject.bullets, function (player, bulletReject) {
+                        if (_this.player.attackState) {
+                            bulletReject.body.velocity.x = -bulletReject.body.velocity.x;
+                            bulletReject.rejectState = true;
+                        } else {
+                            bulletReject.kill();
+                            if (!_this.player.immortalState) {
+                                _this.player.makeDamage(bulletReject.damagePoints);
+                                _this.hud.updateHealthState();
+                            }
+                        }
+                    });
+
+                    _this.game.physics.arcade.overlap(shooterReject, shooterReject.bullets, function (_shooterReject, bulletReject) {
+                        if (bulletReject.rejectState) {
+                            bulletReject.kill();
+                            shooterReject.makeDamage(bulletReject.damageRejectPoints);
+                        } else {
                         }
                     });
                 }, null);
@@ -1386,7 +1422,7 @@ var Sample;
         var IceSpike = (function (_super) {
             __extends(IceSpike, _super);
             function IceSpike(game, x, y) {
-                _super.call(this, game, x, y, 'iceSpike');
+                _super.call(this, game, x, y, 'ice-spike');
                 this.damagePoints = 50;
                 this.distanceToTarget = Math.random() * 100 - 40;
                 game.physics.arcade.enable(this);
@@ -1771,31 +1807,6 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (Prefab) {
-        var Bullet = (function (_super) {
-            __extends(Bullet, _super);
-            function Bullet(game, x, y) {
-                _super.call(this, game, x, y, 'bullet');
-                this.speed = 300;
-                this.damagePoints = 30;
-
-                game.physics.arcade.enable(this);
-                this.anchor.set(0.5, 0.5);
-                this.kill();
-
-                this.checkWorldBounds = true;
-                this.outOfBoundsKill = true;
-
-                game.add.existing(this);
-            }
-            return Bullet;
-        })(Phaser.Sprite);
-        Prefab.Bullet = Bullet;
-    })(Sample.Prefab || (Sample.Prefab = {}));
-    var Prefab = Sample.Prefab;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (Prefab) {
         var Shooter = (function (_super) {
             __extends(Shooter, _super);
             function Shooter(game, x, y) {
@@ -1849,6 +1860,117 @@ var Sample;
             return Shooter;
         })(Prefab.AbstractEnemy);
         Prefab.Shooter = Shooter;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
+        var ShooterReject = (function (_super) {
+            __extends(ShooterReject, _super);
+            function ShooterReject(game, x, y) {
+                _super.call(this, game, x, y, 'shooter-reject');
+                this.gravity = 300;
+                this.lastBulletShotAt = 0;
+                this.countBullets = 1;
+                this.shotDelay = 3000;
+                this.damagePoints = 10;
+                this.defensePoints = 50;
+
+                this.body.gravity.y = this.gravity;
+
+                this.bullets = this.game.add.group();
+                for (var i = 0; i < this.countBullets; i++) {
+                    var bullet = new Prefab.BulletReject(game, 0, 0);
+                    this.bullets.add(bullet);
+                }
+                this.health = 100;
+            }
+            ShooterReject.prototype.setTarget = function (target) {
+                this.target = target;
+            };
+
+            ShooterReject.prototype.update = function () {
+                _super.prototype.update.call(this);
+
+                if (!this.inCamera)
+                    return;
+                if (!this.alive)
+                    return;
+
+                if (this.game.time.now - this.lastBulletShotAt < this.shotDelay)
+                    return;
+                this.lastBulletShotAt = this.game.time.now;
+
+                var bullet = this.bullets.getFirstDead();
+
+                if (bullet === null || bullet === undefined)
+                    return;
+
+                bullet.revive();
+                bullet.reset(this.x, this.y);
+
+                if (this.x > this.target.x) {
+                    bullet.body.velocity.x = -bullet.speed;
+                } else {
+                    bullet.body.velocity.x = bullet.speed;
+                }
+            };
+            return ShooterReject;
+        })(Prefab.AbstractEnemy);
+        Prefab.ShooterReject = ShooterReject;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
+        var Bullet = (function (_super) {
+            __extends(Bullet, _super);
+            function Bullet(game, x, y) {
+                _super.call(this, game, x, y, 'bullet');
+                this.speed = 300;
+                this.damagePoints = 30;
+
+                game.physics.arcade.enable(this);
+                this.anchor.set(0.5, 0.5);
+                this.kill();
+
+                this.checkWorldBounds = true;
+                this.outOfBoundsKill = true;
+
+                game.add.existing(this);
+            }
+            return Bullet;
+        })(Phaser.Sprite);
+        Prefab.Bullet = Bullet;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
+        var BulletReject = (function (_super) {
+            __extends(BulletReject, _super);
+            function BulletReject(game, x, y) {
+                _super.call(this, game, x, y, 'bullet-reject');
+                this.speed = 300;
+                this.damagePoints = 30;
+                this.damageRejectPoints = 300;
+                this.rejectState = false;
+
+                game.physics.arcade.enable(this);
+                this.anchor.set(0.5, 0.5);
+                this.kill();
+
+                this.checkWorldBounds = true;
+                this.outOfBoundsKill = true;
+
+                game.add.existing(this);
+            }
+            return BulletReject;
+        })(Phaser.Sprite);
+        Prefab.BulletReject = BulletReject;
     })(Sample.Prefab || (Sample.Prefab = {}));
     var Prefab = Sample.Prefab;
 })(Sample || (Sample = {}));

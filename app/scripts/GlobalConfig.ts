@@ -57,8 +57,10 @@
 /// <reference path='Prefab/Enemies/AbstractEnemy.ts'/>
 /// <reference path='Prefab/Enemies/Runner.ts'/>
 /// <reference path='Prefab/Enemies/Flier.ts'/>
-/// <reference path='Prefab/Enemies/Bullet.ts'/>
 /// <reference path='Prefab/Enemies/Shooter.ts'/>
+/// <reference path='Prefab/Enemies/ShooterReject.ts'/>
+/// <reference path='Prefab/Enemies/Bullet.ts'/>
+/// <reference path='Prefab/Enemies/BulletReject.ts'/>
 
 module Sample {
 

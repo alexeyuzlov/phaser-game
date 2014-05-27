@@ -20,12 +20,15 @@ module Sample.State {
             this.load.image('transparent', 'assets/images/prefabs/transparent.png');
             this.load.image('exit', 'assets/images/prefabs/exit.png');
             this.load.image('spike', 'assets/images/prefabs/spike.png');
-            this.load.image('iceSpike', 'assets/images/prefabs/iceSpike.png');
+            this.load.image('ice-spike', 'assets/images/prefabs/ice-spike.png');
 
             this.load.image('runner', 'assets/images/prefabs/enemies/runner.png');
             this.load.image('flier', 'assets/images/prefabs/enemies/flier.png');
             this.load.image('shooter', 'assets/images/prefabs/enemies/shooter.png');
             this.load.image('bullet', 'assets/images/prefabs/enemies/bullet.png');
+
+            this.load.image('shooter-reject', 'assets/images/prefabs/enemies/shooter-reject.png');
+            this.load.image('bullet-reject', 'assets/images/prefabs/enemies/bullet-reject.png');
         }
 
         create() {
