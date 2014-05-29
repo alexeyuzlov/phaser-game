@@ -11,6 +11,7 @@ module Sample.Prefab {
             super(game, x, y, 'runner');
 
             this.body.gravity.y = this.gravity;
+            this.body.collideWorldBounds = true;
             this.health = 200;
         }
 

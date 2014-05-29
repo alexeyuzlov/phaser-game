@@ -3,6 +3,7 @@
 module Sample {
     export class Game extends Phaser.Game {
         constructor() {
+
             super(640, 480, Phaser.AUTO, 'game');
 
             this.state.add('boot', State.Boot);

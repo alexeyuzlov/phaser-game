@@ -241,6 +241,8 @@ module Sample.State {
 
             this.shootersReject.forEach((shooterReject)=> {
                 this.game.physics.arcade.overlap(this.player, shooterReject.bullets, (player, bulletReject)=> {
+                    if (bulletReject.rejectState) return;
+
                     if (this.player.attackState) {
                         bulletReject.body.velocity.x = -bulletReject.body.velocity.x;
                         bulletReject.rejectState = true;
@@ -258,8 +260,6 @@ module Sample.State {
                     if (bulletReject.rejectState) {
                         bulletReject.kill();
                         shooterReject.makeDamage(bulletReject.damageRejectPoints);
-                    } else {
-
                     }
                 });
             }, null);

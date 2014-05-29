@@ -310,6 +310,9 @@ var Sample;
 
                 this.shootersReject.forEach(function (shooterReject) {
                     _this.game.physics.arcade.overlap(_this.player, shooterReject.bullets, function (player, bulletReject) {
+                        if (bulletReject.rejectState)
+                            return;
+
                         if (_this.player.attackState) {
                             bulletReject.body.velocity.x = -bulletReject.body.velocity.x;
                             bulletReject.rejectState = true;
@@ -326,7 +329,6 @@ var Sample;
                         if (bulletReject.rejectState) {
                             bulletReject.kill();
                             shooterReject.makeDamage(bulletReject.damageRejectPoints);
-                        } else {
                         }
                     });
                 }, null);
@@ -1724,6 +1726,7 @@ var Sample;
                 this.defensePoints = 5;
 
                 this.body.gravity.y = this.gravity;
+                this.body.collideWorldBounds = true;
                 this.health = 200;
             }
             Runner.prototype.update = function () {
