@@ -33,8 +33,10 @@ module Sample.Prefab {
         update() {
             super.update();
 
-            if (!this.inCamera) return;
-            if (!this.alive) return;
+            if (!this.inCamera || !this.alive) {
+                this.body.velocity.setTo(0,0);
+                return;
+            }
 
             if (this.game.time.now - this.lastBulletShotAt < this.shotDelay) return;
             this.lastBulletShotAt = this.game.time.now;

@@ -15,11 +15,25 @@ module Sample.Prefab {
             this.health = 200;
         }
 
+        toggleDirection() {
+            switch (this.direction) {
+                case Direction.Left:
+                    this.direction = Direction.Right;
+                    break;
+                case Direction.Right:
+                    this.direction = Direction.Left;
+                    break;
+                default:
+            }
+        }
+
         update() {
             super.update();
 
-            if (!this.inCamera) return;
-            if (!this.alive) return;
+            if (!this.inCamera || !this.alive) {
+                this.body.velocity.setTo(0,0);
+                return;
+            }
 
             if (this.body.blocked.left) {
                 this.direction = Direction.Right;

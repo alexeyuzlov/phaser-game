@@ -50,7 +50,7 @@ module Sample.State {
             this.layer.resizeWorld();
 
             // PREFABS SINGLE
-            this.player = new Prefab.Player(this, 220, this.game.world.height - 100);
+            this.player = new Prefab.Player(this, 220, 100);
             this.hud = new Prefab.HUD(this, 0, 0);
             this.hud.alpha = 0;
 
@@ -229,6 +229,10 @@ module Sample.State {
             this.game.physics.arcade.collide(this.shooters, this.layer);
             this.game.physics.arcade.collide(this.runners, this.layer);
 
+            this.game.physics.arcade.overlap(this.runners, this.transparents, (runner, transparent) => {
+                runner.toggleDirection();
+            });
+
             this.allEnemies.forEach((enemiesGroup) => {
                 this.game.physics.arcade.overlap(this.player, enemiesGroup, (player, enemy)=> {
                     if (player.attackState) {
@@ -292,10 +296,16 @@ module Sample.State {
             }, null);
 
             this.allPlatforms.forEach((platformsGroup) => {
-                this.game.physics.arcade.collide(this.player, platformsGroup);
-                this.game.physics.arcade.overlap(platformsGroup, this.transparents, (platform, transparent) => {
-                    platform.toggleDirection();
+                this.game.physics.arcade.collide(this.player, platformsGroup, null, (player, platform) => {
+                    if (player.y - platform.body.height > platform.y) {
+                        return false;
+                    }
+                    return true;
                 });
+                this.game.physics.arcade.overlap(platformsGroup, this.transparents, (platform, transparent) => {
+                        platform.toggleDirection(transparent);
+                    }
+                );
             }, null);
 
             this.allBottles.forEach((bottlesGroup) => {

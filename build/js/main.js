@@ -122,7 +122,7 @@ var Sample;
                 this.layer = this.map.createLayer('layer');
                 this.layer.resizeWorld();
 
-                this.player = new Sample.Prefab.Player(this, 220, this.game.world.height - 100);
+                this.player = new Sample.Prefab.Player(this, 220, 100);
                 this.hud = new Sample.Prefab.HUD(this, 0, 0);
                 this.hud.alpha = 0;
 
@@ -299,6 +299,10 @@ var Sample;
                 this.game.physics.arcade.collide(this.shooters, this.layer);
                 this.game.physics.arcade.collide(this.runners, this.layer);
 
+                this.game.physics.arcade.overlap(this.runners, this.transparents, function (runner, transparent) {
+                    runner.toggleDirection();
+                });
+
                 this.allEnemies.forEach(function (enemiesGroup) {
                     _this.game.physics.arcade.overlap(_this.player, enemiesGroup, function (player, enemy) {
                         if (player.attackState) {
@@ -360,9 +364,14 @@ var Sample;
                 }, null);
 
                 this.allPlatforms.forEach(function (platformsGroup) {
-                    _this.game.physics.arcade.collide(_this.player, platformsGroup);
+                    _this.game.physics.arcade.collide(_this.player, platformsGroup, null, function (player, platform) {
+                        if (player.y - platform.body.height > platform.y) {
+                            return false;
+                        }
+                        return true;
+                    });
                     _this.game.physics.arcade.overlap(platformsGroup, _this.transparents, function (platform, transparent) {
-                        platform.toggleDirection();
+                        platform.toggleDirection(transparent);
                     });
                 }, null);
 
@@ -1514,7 +1523,7 @@ var Sample;
 
                 game.add.existing(this);
             }
-            Platform.prototype.toggleDirection = function () {
+            Platform.prototype.toggleDirection = function (transparent) {
                 switch (this.direction) {
                     case 2 /* Up */:
                         this.direction = 3 /* Down */;
@@ -1548,8 +1557,6 @@ var Sample;
                         this.body.velocity.y = this.velocity;
                         break;
                     default:
-                        this.body.velocity.x = 0;
-                        this.body.velocity.y = 0;
                 }
             };
             return Platform;
@@ -1755,13 +1762,25 @@ var Sample;
                 this.body.collideWorldBounds = true;
                 this.health = 200;
             }
+            Runner.prototype.toggleDirection = function () {
+                switch (this.direction) {
+                    case 0 /* Left */:
+                        this.direction = 1 /* Right */;
+                        break;
+                    case 1 /* Right */:
+                        this.direction = 0 /* Left */;
+                        break;
+                    default:
+                }
+            };
+
             Runner.prototype.update = function () {
                 _super.prototype.update.call(this);
 
-                if (!this.inCamera)
+                if (!this.inCamera || !this.alive) {
+                    this.body.velocity.setTo(0, 0);
                     return;
-                if (!this.alive)
-                    return;
+                }
 
                 if (this.body.blocked.left) {
                     this.direction = 1 /* Right */;
@@ -1811,10 +1830,10 @@ var Sample;
             Flier.prototype.update = function () {
                 _super.prototype.update.call(this);
 
-                if (!this.inCamera)
+                if (!this.inCamera || !this.alive) {
+                    this.body.velocity.setTo(0, 0);
                     return;
-                if (!this.isActive)
-                    return;
+                }
 
                 var distance = Phaser.Math.distance(this.x, this.y, this.target.x, this.target.y);
 
@@ -1868,10 +1887,10 @@ var Sample;
             FlierCrash.prototype.update = function () {
                 _super.prototype.update.call(this);
 
-                if (!this.inCamera)
+                if (!this.inCamera || !this.alive) {
+                    this.body.velocity.setTo(0, 0);
                     return;
-                if (!this.isActive)
-                    return;
+                }
 
                 if (!this.isAttackOver) {
                     var distance = Phaser.Math.distance(this.x, this.y, this.target.x, this.target.y - this.target.body.height * 4);
@@ -1904,6 +1923,7 @@ var Sample;
                 egg.revive();
                 egg.reset(this.x, this.y);
                 egg.body.velocity.y = egg.speed;
+                egg.animations.play('egg');
             };
             return FlierCrash;
         })(Prefab.AbstractEnemy);
@@ -1941,10 +1961,10 @@ var Sample;
             Shooter.prototype.update = function () {
                 _super.prototype.update.call(this);
 
-                if (!this.inCamera)
+                if (!this.inCamera || !this.alive) {
+                    this.body.velocity.setTo(0, 0);
                     return;
-                if (!this.alive)
-                    return;
+                }
 
                 if (this.game.time.now - this.lastBulletShotAt < this.shotDelay)
                     return;
@@ -2000,10 +2020,10 @@ var Sample;
             ShooterReject.prototype.update = function () {
                 _super.prototype.update.call(this);
 
-                if (!this.inCamera)
+                if (!this.inCamera || !this.alive) {
+                    this.body.velocity.setTo(0, 0);
                     return;
-                if (!this.alive)
-                    return;
+                }
 
                 if (this.game.time.now - this.lastBulletShotAt < this.shotDelay)
                     return;

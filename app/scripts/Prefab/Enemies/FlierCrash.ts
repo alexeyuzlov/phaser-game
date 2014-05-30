@@ -26,6 +26,7 @@ module Sample.Prefab {
             for (var i = 0; i < this.countEggs; i++) {
                 var egg = new Prefab.Egg(game, 0, 0);
                 this.eggs.add(egg);
+
             }
         }
 
@@ -39,8 +40,10 @@ module Sample.Prefab {
         update() {
             super.update();
 
-            if (!this.inCamera) return;
-            if (!this.isActive) return;
+            if (!this.inCamera || !this.alive) {
+                this.body.velocity.setTo(0,0);
+                return;
+            }
 
             if (!this.isAttackOver) {
                 var distance = Phaser.Math.distance(this.x, this.y, this.target.x, this.target.y - this.target.body.height * 4);
@@ -71,6 +74,7 @@ module Sample.Prefab {
             egg.revive();
             egg.reset(this.x, this.y);
             egg.body.velocity.y = egg.speed;
+            egg.animations.play('egg');
         }
     }
 }

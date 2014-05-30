@@ -10,10 +10,11 @@ module Sample.Prefab {
             game.physics.arcade.enable(this);
             this.body.immovable = true;
 
+
             game.add.existing(this);
         }
 
-        toggleDirection() {
+        toggleDirection(transparent) {
             switch (this.direction) {
                 case Direction.Up :
                     this.direction = Direction.Down;
@@ -48,8 +49,7 @@ module Sample.Prefab {
                     this.body.velocity.y = this.velocity;
                     break;
                 default :
-                    this.body.velocity.x = 0;
-                    this.body.velocity.y = 0;
+                //
             }
         }
     }

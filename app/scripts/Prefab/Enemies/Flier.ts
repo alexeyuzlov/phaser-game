@@ -27,8 +27,10 @@ module Sample.Prefab {
         update() {
             super.update();
 
-            if (!this.inCamera) return;
-            if (!this.isActive) return;
+            if (!this.inCamera || !this.alive) {
+                this.body.velocity.setTo(0,0);
+                return;
+            }
 
             var distance = Phaser.Math.distance(this.x, this.y, this.target.x, this.target.y);
 
