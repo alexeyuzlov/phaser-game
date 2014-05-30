@@ -57,10 +57,13 @@
 /// <reference path='Prefab/Enemies/AbstractEnemy.ts'/>
 /// <reference path='Prefab/Enemies/Runner.ts'/>
 /// <reference path='Prefab/Enemies/Flier.ts'/>
+/// <reference path='Prefab/Enemies/FlierCrash.ts'/>
 /// <reference path='Prefab/Enemies/Shooter.ts'/>
 /// <reference path='Prefab/Enemies/ShooterReject.ts'/>
-/// <reference path='Prefab/Enemies/Bullet.ts'/>
-/// <reference path='Prefab/Enemies/BulletReject.ts'/>
+
+/// <reference path='Prefab/Bullets/Egg.ts'/>
+/// <reference path='Prefab/Bullets/Bullet.ts'/>
+/// <reference path='Prefab/Bullets/BulletReject.ts'/>
 
 module Sample {
 

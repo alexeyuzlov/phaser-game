@@ -57,11 +57,13 @@ var Sample;
 
                 this.load.image('runner', 'assets/images/prefabs/enemies/runner.png');
                 this.load.image('flier', 'assets/images/prefabs/enemies/flier.png');
+                this.load.image('flier-crash', 'assets/images/prefabs/enemies/flier-crash.png');
                 this.load.image('shooter', 'assets/images/prefabs/enemies/shooter.png');
-                this.load.image('bullet', 'assets/images/prefabs/enemies/bullet.png');
-
                 this.load.image('shooter-reject', 'assets/images/prefabs/enemies/shooter-reject.png');
-                this.load.image('bullet-reject', 'assets/images/prefabs/enemies/bullet-reject.png');
+
+                this.load.atlasXML('egg', 'assets/images/prefabs/bullets/egg.png', 'assets/images/prefabs/bullets/egg.xml');
+                this.load.image('bullet', 'assets/images/prefabs/bullets/bullet.png');
+                this.load.image('bullet-reject', 'assets/images/prefabs/bullets/bullet-reject.png');
             };
 
             Preload.prototype.create = function () {
@@ -212,6 +214,16 @@ var Sample;
                     }, null);
                 }
                 this.allEnemies.add(this.fliers);
+
+                this.fliersCrash = this.game.add.group();
+                index = this.map.getTilesetIndex('flier-crash');
+                if (index) {
+                    this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'flier-crash', 0, true, false, this.fliersCrash, Sample.Prefab.FlierCrash);
+                    this.fliersCrash.forEach(function (flierCrash) {
+                        flierCrash.setTarget(_this.player);
+                    }, null);
+                }
+                this.allEnemies.add(this.fliersCrash);
             };
 
             AbstractZone.prototype.getPlatformsPrefabsFromMap = function () {
@@ -330,6 +342,20 @@ var Sample;
                             bulletReject.kill();
                             shooterReject.makeDamage(bulletReject.damageRejectPoints);
                         }
+                    });
+                }, null);
+
+                this.fliersCrash.forEach(function (flierCrash) {
+                    _this.game.physics.arcade.collide(flierCrash.eggs, _this.player, function (player, egg) {
+                        egg.kill();
+                        if (!_this.player.immortalState) {
+                            _this.player.makeDamage(egg.damagePoints);
+                            _this.hud.updateHealthState();
+                        }
+                    });
+
+                    _this.game.physics.arcade.collide(flierCrash.eggs, _this.layer, function (egg, layer) {
+                        egg.setEggCrash();
                     });
                 }, null);
 
@@ -1404,7 +1430,7 @@ var Sample;
             __extends(Spike, _super);
             function Spike(game, x, y) {
                 _super.call(this, game, x, y, 'spike');
-                this.damagePoints = 50;
+                this.damagePoints = 10;
 
                 game.physics.arcade.enable(this);
 
@@ -1810,6 +1836,84 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (Prefab) {
+        var FlierCrash = (function (_super) {
+            __extends(FlierCrash, _super);
+            function FlierCrash(game, x, y) {
+                _super.call(this, game, x, y, 'flier-crash');
+                this.isActive = false;
+                this.isAttackOver = false;
+                this.damagePoints = 10;
+                this.speed = 100;
+                this.defensePoints = 5;
+                this.lastEggShotAt = 0;
+                this.countEggs = 10;
+                this.shotDelay = 1000;
+
+                this.anchor.set(0.5, 0.5);
+                this.health = 100;
+
+                this.eggs = this.game.add.group();
+                for (var i = 0; i < this.countEggs; i++) {
+                    var egg = new Prefab.Egg(game, 0, 0);
+                    this.eggs.add(egg);
+                }
+            }
+            FlierCrash.prototype.setTarget = function (target) {
+                this.minDistance = target.width / 2;
+
+                this.target = target;
+                this.isActive = true;
+            };
+
+            FlierCrash.prototype.update = function () {
+                _super.prototype.update.call(this);
+
+                if (!this.inCamera)
+                    return;
+                if (!this.isActive)
+                    return;
+
+                if (!this.isAttackOver) {
+                    var distance = Phaser.Math.distance(this.x, this.y, this.target.x, this.target.y - this.target.body.height * 4);
+
+                    if (distance > this.minDistance && !this.isAttackOver) {
+                        var rotation = Phaser.Math.angleBetween(this.x, this.y, this.target.x, this.target.y - this.target.body.height * 4);
+
+                        this.body.velocity.x = Math.cos(rotation) * this.speed;
+                        this.body.velocity.y = Math.sin(rotation) * this.speed;
+                    } else {
+                        this.isAttackOver = true;
+                        this.body.velocity.y = -30;
+
+                        if (this.target.x > this.x) {
+                            this.body.velocity.x = this.speed;
+                        } else {
+                            this.body.velocity.x = -this.speed;
+                        }
+                    }
+                }
+
+                if (this.game.time.now - this.lastEggShotAt < this.shotDelay)
+                    return;
+                this.lastEggShotAt = this.game.time.now;
+
+                var egg = this.eggs.getFirstDead();
+                if (egg === null || egg === undefined)
+                    return;
+
+                egg.revive();
+                egg.reset(this.x, this.y);
+                egg.body.velocity.y = egg.speed;
+            };
+            return FlierCrash;
+        })(Prefab.AbstractEnemy);
+        Prefab.FlierCrash = FlierCrash;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
         var Shooter = (function (_super) {
             __extends(Shooter, _super);
             function Shooter(game, x, y) {
@@ -1922,6 +2026,44 @@ var Sample;
             return ShooterReject;
         })(Prefab.AbstractEnemy);
         Prefab.ShooterReject = ShooterReject;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
+        var Egg = (function (_super) {
+            __extends(Egg, _super);
+            function Egg(game, x, y) {
+                _super.call(this, game, x, y, 'egg');
+                this.speed = 200;
+                this.damagePoints = 45;
+
+                game.physics.arcade.enable(this);
+                this.anchor.set(0.5, 0.5);
+                this.kill();
+
+                this.checkWorldBounds = true;
+                this.outOfBoundsKill = true;
+
+                this.animations.add('egg', ['egg.png'], 10, true);
+                this.animations.add('egg-crash', ['egg-crash.png'], 10, true);
+
+                this.animations.play('egg');
+                this.body.width = this.animations.currentFrame.width;
+                this.body.height = this.animations.currentFrame.height;
+
+                game.add.existing(this);
+            }
+            Egg.prototype.setEggCrash = function () {
+                this.animations.play('egg-crash');
+
+                this.body.width = this.animations.currentFrame.width;
+                this.body.height = this.animations.currentFrame.height;
+            };
+            return Egg;
+        })(Phaser.Sprite);
+        Prefab.Egg = Egg;
     })(Sample.Prefab || (Sample.Prefab = {}));
     var Prefab = Sample.Prefab;
 })(Sample || (Sample = {}));

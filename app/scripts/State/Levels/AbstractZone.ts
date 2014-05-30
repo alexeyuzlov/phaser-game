@@ -25,6 +25,7 @@ module Sample.State {
         shootersReject:Phaser.Group;
         runners:Phaser.Group;
         fliers:Phaser.Group;
+        fliersCrash:Phaser.Group;
 
         allBottles:Phaser.Group;
         bottlesHP:Phaser.Group;
@@ -144,6 +145,16 @@ module Sample.State {
                 }, null);
             }
             this.allEnemies.add(this.fliers);
+
+            this.fliersCrash = this.game.add.group();
+            index = this.map.getTilesetIndex('flier-crash');
+            if (index) {
+                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, 'flier-crash', 0, true, false, this.fliersCrash, Prefab.FlierCrash);
+                this.fliersCrash.forEach((flierCrash) => {
+                    flierCrash.setTarget(this.player);
+                }, null);
+            }
+            this.allEnemies.add(this.fliersCrash);
         }
 
         private getPlatformsPrefabsFromMap() {
@@ -261,6 +272,22 @@ module Sample.State {
                         bulletReject.kill();
                         shooterReject.makeDamage(bulletReject.damageRejectPoints);
                     }
+                });
+            }, null);
+
+            this.fliersCrash.forEach((flierCrash)=> {
+                this.game.physics.arcade.collide(flierCrash.eggs, this.player, (player, egg)=> {
+                    egg.kill();
+                    if (!this.player.immortalState) {
+                        this.player.makeDamage(egg.damagePoints);
+                        this.hud.updateHealthState();
+                    }
+                });
+
+                this.game.physics.arcade.collide(flierCrash.eggs, this.layer, (egg, layer)=> {
+                    egg.setEggCrash();
+
+
                 });
             }, null);
 
