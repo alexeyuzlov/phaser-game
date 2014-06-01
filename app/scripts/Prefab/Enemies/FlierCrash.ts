@@ -1,19 +1,16 @@
 module Sample.Prefab {
 
     export class FlierCrash extends AbstractEnemy {
-        isActive:boolean = false;
-        isAttackOver:boolean = false;
-
+        isActive:boolean;
+        isAttackOver:boolean;
         minDistance:number;
-        damagePoints:number = 10;
-        speed:number = 100;
-
-        defensePoints:number = 5;
-
-        lastEggShotAt:number = 0;
+        damagePoints:number;
+        velocity:number;
+        defensePoints:number;
+        lastEggShotAt:number;
         eggs:Phaser.Group;
-        countEggs:number = 10;
-        shotDelay:number = 1000;
+        countEggs:number;
+        shotDelay:number;
 
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'flier-crash');
@@ -22,29 +19,24 @@ module Sample.Prefab {
             this.health = 100;
 
             this.eggs = this.game.add.group();
+            this.countEggs = 10;
             for (var i = 0; i < this.countEggs; i++) {
                 var egg = new Prefab.Egg(game, 0, 0);
                 this.eggs.add(egg);
             }
 
             this.minDistance = this.level.player.width / 2;
-            this.isActive = true;
+            this.isAttackOver = false;
+            this.damagePoints = 10;
+            this.velocity = 100;
+            this.isActive = false;
+            this.defensePoints = 5;
+            this.lastEggShotAt = this.game.time.now;
+            this.shotDelay = 1000;
         }
 
         update() {
             super.update();
-
-            this.game.physics.arcade.collide(this.eggs, this.level.player, (player, egg)=> {
-                egg.kill();
-                if (!this.level.player.immortalState) {
-                    this.level.player.makeDamage(egg.damagePoints);
-                    this.level.hud.updateHealthState();
-                }
-            });
-
-            this.game.physics.arcade.collide(this.eggs, this.level.layer, (egg, layer)=> {
-                egg.setEggCrash();
-            });
 
             if (!this.inCamera || !this.alive) {
                 this.body.velocity.setTo(0,0);
@@ -57,16 +49,16 @@ module Sample.Prefab {
                 if (distance > this.minDistance && !this.isAttackOver) {
                     var rotation = Phaser.Math.angleBetween(this.x, this.y, this.level.player.x, this.level.player.y - this.level.player.body.height * 4);
 
-                    this.body.velocity.x = Math.cos(rotation) * this.speed;
-                    this.body.velocity.y = Math.sin(rotation) * this.speed;
+                    this.body.velocity.x = Math.cos(rotation) * this.velocity;
+                    this.body.velocity.y = Math.sin(rotation) * this.velocity;
                 } else {
                     this.isAttackOver = true;
                     this.body.velocity.y = -30;
 
                     if (this.level.player.x > this.x) {
-                        this.body.velocity.x = this.speed;
+                        this.body.velocity.x = this.velocity;
                     } else {
-                        this.body.velocity.x = -this.speed;
+                        this.body.velocity.x = -this.velocity;
                     }
                 }
             }

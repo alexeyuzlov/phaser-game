@@ -1,5 +1,5 @@
 module Sample.Prefab {
-    export class Bullet extends Phaser.Sprite {
+    export class Bullet extends AbstractPrefab {
         speed: number = 300;
         damagePoints: number = 30;
 
@@ -12,8 +12,16 @@ module Sample.Prefab {
 
             this.checkWorldBounds = true;
             this.outOfBoundsKill = true;
+        }
 
-            game.add.existing(this);
+        update() {
+            this.game.physics.arcade.collide(this, this.level.player, (bullet, player)=> {
+                bullet.kill();
+                if (!this.level.player.immortalState) {
+                    this.level.player.makeDamage(bullet.damagePoints);
+                    this.level.hud.updateHealthState();
+                }
+            });
         }
     }
 }

@@ -28,6 +28,7 @@ module Sample.State {
         bottlesHP:Phaser.Group;
         bottlesMP:Phaser.Group;
         bottlesSuper:Phaser.Group;
+        game: Game;
 
         preload() {
             // All in preload file
@@ -67,7 +68,7 @@ module Sample.State {
             this.platformsVertical = this.getPrefabsFromMap('platform-v', Prefab.PlatformVertical);
 
             // POST-SETTINGS
-            this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_TOPDOWN_TIGHT);
+            this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_LOCKON);
 
             this.blackScreen = new Prefab.BlackScreen(this.game);
             this.blackScreen.setText(this.currentLevel);
@@ -78,7 +79,7 @@ module Sample.State {
                 });
         }
 
-        getPrefabsFromMap(name: string, className: Object): Phaser.Group {
+        getPrefabsFromMap(name:string, className:Object):Phaser.Group {
             var group = this.game.add.group();
 
             var index = this.map.getTilesetIndex(name);
@@ -95,6 +96,9 @@ module Sample.State {
         }
 
         update() {
+            this.game.gameStats.stats.update();
+
+
             if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
                 this.blackScreen.setText("");
                 this.game.add.tween(this.blackScreen)

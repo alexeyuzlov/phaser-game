@@ -5,7 +5,8 @@ module Sample.Prefab {
             super(game, x, y, 'transparent');
 
             game.physics.arcade.enable(this);
-            this.body.immovable = true;
+            //this.body.immovable = true;
+            this.body.moves = false;
         }
     }
 }

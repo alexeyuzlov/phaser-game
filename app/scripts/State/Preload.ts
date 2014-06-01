@@ -6,8 +6,8 @@ module Sample.State {
 
             this.load.atlasXML('player', 'assets/images/prefabs/player/player.png', 'assets/images/prefabs/player/player.xml');
 
-            //this.load.image('transparent', 'assets/images/prefabs/transparent-debug.png');
-            this.load.image('transparent', 'assets/images/prefabs/transparent.png');
+            this.load.image('transparent', 'assets/images/prefabs/transparent-debug.png');
+            //this.load.image('transparent', 'assets/images/prefabs/transparent.png');
 
             this.load.image('hud', 'assets/images/prefabs/hud.png');
             this.load.image('ground', 'assets/images/ground.png');

@@ -1,20 +1,21 @@
 module Sample.Prefab {
     export class ShooterReject extends AbstractEnemy {
-        gravity:number = 300;
-
-        lastBulletShotAt: number = 0;
+        lastBulletShotAt: number;
         bullets: Phaser.Group;
-        countBullets: number = 1;
-        shotDelay: number = 3000;
-
-        damagePoints: number = 10;
-
-        defensePoints:number = 50;
+        countBullets: number;
+        shotDelay: number;
+        damagePoints: number;
+        defensePoints:number;
 
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'shooter-reject');
 
-            this.body.gravity.y = this.gravity;
+            this.body.gravity.y = 300;
+            this.damagePoints = 10;
+            this.defensePoints = 50;
+            this.lastBulletShotAt = this.game.time.now;
+            this.countBullets = 10;
+            this.shotDelay = Phaser.Timer.SECOND * 3;
 
             this.bullets = this.game.add.group();
             for(var i = 0; i < this.countBullets; i++) {
@@ -28,22 +29,6 @@ module Sample.Prefab {
             super.update();
 
             this.game.physics.arcade.collide(this, this.level.layer);
-
-            this.game.physics.arcade.overlap(this.level.player, this.bullets, (player, bulletReject)=> {
-                if (bulletReject.rejectState) return;
-
-                if (this.level.player.attackState) {
-                    bulletReject.body.velocity.x = -bulletReject.body.velocity.x;
-                    bulletReject.rejectState = true;
-
-                } else {
-                    bulletReject.kill();
-                    if (!this.level.player.immortalState) {
-                        this.level.player.makeDamage(bulletReject.damagePoints);
-                        this.level.hud.updateHealthState();
-                    }
-                }
-            });
 
             this.game.physics.arcade.overlap(this, this.bullets, (shooterReject, bulletReject)=> {
                 if (bulletReject.rejectState) {

@@ -1,8 +1,6 @@
 module Sample.Prefab {
 
     export class PlatformHorizontal extends Platform {
-        direction:Direction = Direction.Right;
-        velocity:number = 100;
 
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'platform-h');
@@ -10,7 +8,8 @@ module Sample.Prefab {
             game.physics.arcade.enable(this);
             this.body.immovable = true;
 
-            game.add.existing(this);
+            this.direction = Direction.Right;
+            this.body.velocity.x = this.velocity;
         }
     }
 }

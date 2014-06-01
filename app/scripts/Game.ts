@@ -1,9 +1,26 @@
 /// <reference path='GlobalConfig.ts'/>
 
 module Sample {
-    export class Game extends Phaser.Game {
-        constructor() {
 
+    export class GameStats {
+        stats: Stats;
+
+        constructor() {
+            this.stats = new Stats();
+            this.stats.setMode(0);
+
+            this.stats.domElement.style.position = 'absolute';
+            this.stats.domElement.style.left = '0px';
+            this.stats.domElement.style.top = '0px';
+
+            document.body.appendChild(this.stats.domElement);
+        }
+    }
+
+    export class Game extends Phaser.Game {
+        gameStats: GameStats = new GameStats();
+
+        constructor() {
             super(640, 480, Phaser.AUTO, 'game');
 
             this.state.add('boot', State.Boot);
@@ -47,6 +64,5 @@ window.onload = () => {
         }
     })();
 
-    /* Start instance of game */
     new Sample.Game();
 };

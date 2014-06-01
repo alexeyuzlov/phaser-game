@@ -1,9 +1,9 @@
 module Sample.Prefab {
-    export class BulletReject extends Phaser.Sprite {
-        speed: number = 300;
-        damagePoints: number = 30;
-        damageRejectPoints: number = 300;
-        rejectState: boolean = false;
+    export class BulletReject extends AbstractPrefab {
+        speed:number = 300;
+        damagePoints:number = 30;
+        damageRejectPoints:number = 300;
+        rejectState:boolean = false;
 
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'bullet-reject');
@@ -14,8 +14,24 @@ module Sample.Prefab {
 
             this.checkWorldBounds = true;
             this.outOfBoundsKill = true;
+        }
 
-            game.add.existing(this);
+        update() {
+            this.game.physics.arcade.overlap(this, this.level.player, (bulletReject, player)=> {
+                if (bulletReject.rejectState) return;
+
+                if (this.level.player.attackState) {
+                    bulletReject.body.velocity.x = -bulletReject.body.velocity.x;
+                    bulletReject.rejectState = true;
+
+                } else {
+                    bulletReject.kill();
+                    if (!this.level.player.immortalState) {
+                        this.level.player.makeDamage(bulletReject.damagePoints);
+                        this.level.hud.updateHealthState();
+                    }
+                }
+            });
         }
     }
 }

@@ -40,7 +40,7 @@ var Sample;
 
                 this.load.atlasXML('player', 'assets/images/prefabs/player/player.png', 'assets/images/prefabs/player/player.xml');
 
-                this.load.image('transparent', 'assets/images/prefabs/transparent.png');
+                this.load.image('transparent', 'assets/images/prefabs/transparent-debug.png');
 
                 this.load.image('hud', 'assets/images/prefabs/hud.png');
                 this.load.image('ground', 'assets/images/ground.png');
@@ -142,7 +142,7 @@ var Sample;
                 this.platformsHorizontal = this.getPrefabsFromMap('platform-h', Sample.Prefab.PlatformHorizontal);
                 this.platformsVertical = this.getPrefabsFromMap('platform-v', Sample.Prefab.PlatformVertical);
 
-                this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_TOPDOWN_TIGHT);
+                this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_LOCKON);
 
                 this.blackScreen = new Sample.Prefab.BlackScreen(this.game);
                 this.blackScreen.setText(this.currentLevel);
@@ -168,6 +168,8 @@ var Sample;
 
             AbstractZone.prototype.update = function () {
                 var _this = this;
+                this.game.gameStats.stats.update();
+
                 if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
                     this.blackScreen.setText("");
                     this.game.add.tween(this.blackScreen).to({ alpha: 1 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.None, true).onComplete.add(function () {
@@ -923,6 +925,8 @@ var Sample;
             function Player(game, x, y) {
                 var _this = this;
                 _super.call(this, game, x, y, 'player');
+                game.physics.arcade.enable(this);
+
                 this.gravity = 500;
                 this.acceleration = 500;
                 this.drag = 500;
@@ -939,14 +943,14 @@ var Sample;
                 this.direction = 1 /* Right */;
                 this.damagePoints = 50;
                 this.manaPoints = +Sample.settings.storage.getManaPoints();
-                this.immortalStateAt = Date.now();
-                this.attackStateAt = Date.now();
+                this.immortalStateAt = this.game.time.now;
+                this.attackStateAt = this.game.time.now;
+                ;
                 this.immortalDuration = Phaser.Timer.SECOND * 3;
                 this.immortalDefaultDuration = Phaser.Timer.SECOND * 3;
                 this.attackDuration = Phaser.Timer.SECOND / 3;
                 this.isActiveJumpKey = false;
                 this.isAttackKeyPressed = false;
-                game.physics.arcade.enable(this);
 
                 this.body.gravity.y = this.gravity;
                 this.anchor.set(0.5, 1);
@@ -982,7 +986,7 @@ var Sample;
 
             Player.prototype.immortal = function (duration) {
                 this.immortalDuration = duration;
-                this.immortalStateAt = Date.now();
+                this.immortalStateAt = this.game.time.now;
                 this.immortalState = true;
                 this.alpha = 0.5;
             };
@@ -1040,14 +1044,14 @@ var Sample;
                 if (this.game.input.keyboard.isDown(Sample.settings.keys.attack) && !this.attackState && !this.isAttackKeyPressed) {
                     this.isAttackKeyPressed = true;
                     this.attackState = true;
-                    this.attackStateAt = Date.now();
+                    this.attackStateAt = this.game.time.now;
                 }
 
                 if (!this.game.input.keyboard.isDown(Sample.settings.keys.attack)) {
                     this.isAttackKeyPressed = false;
                 }
 
-                if ((Date.now() - this.attackStateAt) > this.attackDuration) {
+                if ((this.game.time.now - this.attackStateAt) > this.attackDuration) {
                     this.attackState = false;
                 }
             };
@@ -1084,7 +1088,7 @@ var Sample;
             };
 
             Player.prototype.state = function () {
-                if (this.immortalState && (Date.now() - this.immortalStateAt) > this.immortalDuration) {
+                if (this.immortalState && (this.game.time.now - this.immortalStateAt) > this.immortalDuration) {
                     this.alpha = 1;
                     this.immortalState = false;
                 }
@@ -1210,7 +1214,8 @@ var Sample;
                 _super.call(this, game, x, y, 'transparent');
 
                 game.physics.arcade.enable(this);
-                this.body.immovable = true;
+
+                this.body.moves = false;
             }
             return Transparent;
         })(Prefab.AbstractPrefab);
@@ -1316,24 +1321,28 @@ var Sample;
             __extends(Platform, _super);
             function Platform(game, x, y, texture) {
                 _super.call(this, game, x, y, texture);
-                this.velocity = 100;
 
                 game.physics.arcade.enable(this);
                 this.body.immovable = true;
+                this.velocity = 100;
             }
-            Platform.prototype.toggleDirection = function (transparent) {
+            Platform.prototype.toggleDirection = function () {
                 switch (this.direction) {
                     case 2 /* Up */:
                         this.direction = 3 /* Down */;
+                        this.body.velocity.y = this.velocity;
                         break;
                     case 3 /* Down */:
                         this.direction = 2 /* Up */;
+                        this.body.velocity.y = -this.velocity;
                         break;
                     case 0 /* Left */:
                         this.direction = 1 /* Right */;
+                        this.body.velocity.x = this.velocity;
                         break;
                     case 1 /* Right */:
                         this.direction = 0 /* Left */;
+                        this.body.velocity.x = -this.velocity;
                         break;
                     default:
                         break;
@@ -1342,31 +1351,12 @@ var Sample;
 
             Platform.prototype.update = function () {
                 this.game.physics.arcade.collide(this.level.player, this, null, function (player, platform) {
-                    if (player.y - platform.body.height > platform.y) {
-                        return false;
-                    }
-                    return true;
+                    return player.y - platform.body.height <= platform.y;
                 });
 
-                this.game.physics.arcade.overlap(this, this.level.transparents, function (platform, transparent) {
-                    platform.toggleDirection(transparent);
+                this.game.physics.arcade.collide(this, this.level.transparents, function (platform, transparent) {
+                    platform.toggleDirection();
                 });
-
-                switch (this.direction) {
-                    case 0 /* Left */:
-                        this.body.velocity.x = -this.velocity;
-                        break;
-                    case 1 /* Right */:
-                        this.body.velocity.x = this.velocity;
-                        break;
-                    case 2 /* Up */:
-                        this.body.velocity.y = -this.velocity;
-                        break;
-                    case 3 /* Down */:
-                        this.body.velocity.y = this.velocity;
-                        break;
-                    default:
-                }
             };
             return Platform;
         })(Prefab.AbstractPrefab);
@@ -1381,13 +1371,12 @@ var Sample;
             __extends(PlatformHorizontal, _super);
             function PlatformHorizontal(game, x, y) {
                 _super.call(this, game, x, y, 'platform-h');
-                this.direction = 1 /* Right */;
-                this.velocity = 100;
 
                 game.physics.arcade.enable(this);
                 this.body.immovable = true;
 
-                game.add.existing(this);
+                this.direction = 1 /* Right */;
+                this.body.velocity.x = this.velocity;
             }
             return PlatformHorizontal;
         })(Prefab.Platform);
@@ -1402,13 +1391,12 @@ var Sample;
             __extends(PlatformVertical, _super);
             function PlatformVertical(game, x, y) {
                 _super.call(this, game, x, y, 'platform-v');
-                this.direction = 3 /* Down */;
-                this.velocity = 100;
 
                 game.physics.arcade.enable(this);
                 this.body.immovable = true;
 
-                game.add.existing(this);
+                this.direction = 3 /* Down */;
+                this.body.velocity.y = this.velocity;
             }
             return PlatformVertical;
         })(Prefab.Platform);
@@ -1424,9 +1412,6 @@ var Sample;
             function Bottle(game, x, y, texture) {
                 _super.call(this, game, x, y, texture);
                 game.physics.arcade.enable(this);
-
-                this.level = this.game.state.states[this.game.state.current];
-                game.add.existing(this);
             }
             Bottle.prototype.update = function () {
                 this.game.physics.arcade.overlap(this.level.player, this, function (player, bottle) {
@@ -1435,7 +1420,7 @@ var Sample;
                 });
             };
             return Bottle;
-        })(Phaser.Sprite);
+        })(Prefab.AbstractPrefab);
         Prefab.Bottle = Bottle;
     })(Sample.Prefab || (Sample.Prefab = {}));
     var Prefab = Sample.Prefab;
@@ -1449,8 +1434,6 @@ var Sample;
                 _super.call(this, game, x, y, 'bottle-hp');
                 this.amount = 50;
                 game.physics.arcade.enable(this);
-
-                game.add.existing(this);
             }
             BottleHP.prototype.makeAction = function () {
                 this.level.player.getHP(this.amount);
@@ -1470,8 +1453,6 @@ var Sample;
                 _super.call(this, game, x, y, 'bottle-mp');
                 this.amount = 50;
                 game.physics.arcade.enable(this);
-
-                game.add.existing(this);
             }
             BottleMP.prototype.makeAction = function () {
                 this.level.player.getMP(this.amount);
@@ -1491,8 +1472,6 @@ var Sample;
                 _super.call(this, game, x, y, 'bottle-super');
                 this.duration = Phaser.Timer.SECOND * 10;
                 game.physics.arcade.enable(this);
-
-                game.add.existing(this);
             }
             BottleSuper.prototype.makeAction = function () {
                 this.level.player.immortal(this.duration);
@@ -1577,9 +1556,13 @@ var Sample;
             __extends(Runner, _super);
             function Runner(game, x, y) {
                 _super.call(this, game, x, y, 'runner');
+
                 this.gravity = 300;
                 this.velocity = 100;
+
                 this.direction = 1 /* Right */;
+                this.body.velocity.x = this.velocity;
+
                 this.damagePoints = 10;
                 this.defensePoints = 5;
 
@@ -1591,9 +1574,11 @@ var Sample;
                 switch (this.direction) {
                     case 0 /* Left */:
                         this.direction = 1 /* Right */;
+                        this.body.velocity.x = this.velocity;
                         break;
                     case 1 /* Right */:
                         this.direction = 0 /* Left */;
+                        this.body.velocity.x = -this.velocity;
                         break;
                     default:
                 }
@@ -1604,30 +1589,12 @@ var Sample;
 
                 this.game.physics.arcade.collide(this, this.level.layer);
 
-                this.game.physics.arcade.overlap(this, this.level.transparents, function (runner, transparent) {
+                this.game.physics.arcade.collide(this, this.level.transparents, function (runner, transparent) {
                     runner.toggleDirection();
                 });
 
-                if (!this.inCamera || !this.alive) {
-                    this.body.velocity.setTo(0, 0);
-                    return;
-                }
-
-                if (this.body.blocked.left) {
-                    this.direction = 1 /* Right */;
-                } else if (this.body.blocked.right) {
-                    this.direction = 0 /* Left */;
-                }
-
-                switch (this.direction) {
-                    case 0 /* Left */:
-                        this.body.velocity.x = -this.velocity;
-                        break;
-                    case 1 /* Right */:
-                        this.body.velocity.x = this.velocity;
-                        break;
-                    default:
-                        this.body.velocity.x = 0;
+                if (this.body.blocked.left || this.body.blocked.right) {
+                    this.toggleDirection();
                 }
             };
             return Runner;
@@ -1686,42 +1653,28 @@ var Sample;
             __extends(FlierCrash, _super);
             function FlierCrash(game, x, y) {
                 _super.call(this, game, x, y, 'flier-crash');
-                this.isActive = false;
-                this.isAttackOver = false;
-                this.damagePoints = 10;
-                this.speed = 100;
-                this.defensePoints = 5;
-                this.lastEggShotAt = 0;
-                this.countEggs = 10;
-                this.shotDelay = 1000;
 
                 this.anchor.set(0.5, 0.5);
                 this.health = 100;
 
                 this.eggs = this.game.add.group();
+                this.countEggs = 10;
                 for (var i = 0; i < this.countEggs; i++) {
                     var egg = new Prefab.Egg(game, 0, 0);
                     this.eggs.add(egg);
                 }
 
                 this.minDistance = this.level.player.width / 2;
-                this.isActive = true;
+                this.isAttackOver = false;
+                this.damagePoints = 10;
+                this.velocity = 100;
+                this.isActive = false;
+                this.defensePoints = 5;
+                this.lastEggShotAt = this.game.time.now;
+                this.shotDelay = 1000;
             }
             FlierCrash.prototype.update = function () {
-                var _this = this;
                 _super.prototype.update.call(this);
-
-                this.game.physics.arcade.collide(this.eggs, this.level.player, function (player, egg) {
-                    egg.kill();
-                    if (!_this.level.player.immortalState) {
-                        _this.level.player.makeDamage(egg.damagePoints);
-                        _this.level.hud.updateHealthState();
-                    }
-                });
-
-                this.game.physics.arcade.collide(this.eggs, this.level.layer, function (egg, layer) {
-                    egg.setEggCrash();
-                });
 
                 if (!this.inCamera || !this.alive) {
                     this.body.velocity.setTo(0, 0);
@@ -1734,16 +1687,16 @@ var Sample;
                     if (distance > this.minDistance && !this.isAttackOver) {
                         var rotation = Phaser.Math.angleBetween(this.x, this.y, this.level.player.x, this.level.player.y - this.level.player.body.height * 4);
 
-                        this.body.velocity.x = Math.cos(rotation) * this.speed;
-                        this.body.velocity.y = Math.sin(rotation) * this.speed;
+                        this.body.velocity.x = Math.cos(rotation) * this.velocity;
+                        this.body.velocity.y = Math.sin(rotation) * this.velocity;
                     } else {
                         this.isAttackOver = true;
                         this.body.velocity.y = -30;
 
                         if (this.level.player.x > this.x) {
-                            this.body.velocity.x = this.speed;
+                            this.body.velocity.x = this.velocity;
                         } else {
-                            this.body.velocity.x = -this.speed;
+                            this.body.velocity.x = -this.velocity;
                         }
                     }
                 }
@@ -1774,14 +1727,13 @@ var Sample;
             __extends(Shooter, _super);
             function Shooter(game, x, y) {
                 _super.call(this, game, x, y, 'shooter');
-                this.gravity = 300;
-                this.lastBulletShotAt = 0;
-                this.countBullets = 1;
-                this.shotDelay = 3000;
+
+                this.body.gravity.y = 300;
+                this.lastBulletShotAt = this.game.time.now;
+                this.countBullets = 10;
+                this.shotDelay = Phaser.Timer.SECOND * 3;
                 this.damagePoints = 10;
                 this.defensePoints = 5;
-
-                this.body.gravity.y = this.gravity;
 
                 this.bullets = this.game.add.group();
                 for (var i = 0; i < this.countBullets; i++) {
@@ -1791,18 +1743,9 @@ var Sample;
                 this.health = 100;
             }
             Shooter.prototype.update = function () {
-                var _this = this;
                 _super.prototype.update.call(this);
 
                 this.game.physics.arcade.collide(this, this.level.layer);
-
-                this.game.physics.arcade.collide(this.level.player, this.bullets, function (player, bullet) {
-                    bullet.kill();
-                    if (!_this.level.player.immortalState) {
-                        _this.level.player.makeDamage(bullet.damagePoints);
-                        _this.level.hud.updateHealthState();
-                    }
-                });
 
                 if (!this.inCamera || !this.alive) {
                     this.body.velocity.setTo(0, 0);
@@ -1840,14 +1783,13 @@ var Sample;
             __extends(ShooterReject, _super);
             function ShooterReject(game, x, y) {
                 _super.call(this, game, x, y, 'shooter-reject');
-                this.gravity = 300;
-                this.lastBulletShotAt = 0;
-                this.countBullets = 1;
-                this.shotDelay = 3000;
+
+                this.body.gravity.y = 300;
                 this.damagePoints = 10;
                 this.defensePoints = 50;
-
-                this.body.gravity.y = this.gravity;
+                this.lastBulletShotAt = this.game.time.now;
+                this.countBullets = 10;
+                this.shotDelay = Phaser.Timer.SECOND * 3;
 
                 this.bullets = this.game.add.group();
                 for (var i = 0; i < this.countBullets; i++) {
@@ -1861,22 +1803,6 @@ var Sample;
                 _super.prototype.update.call(this);
 
                 this.game.physics.arcade.collide(this, this.level.layer);
-
-                this.game.physics.arcade.overlap(this.level.player, this.bullets, function (player, bulletReject) {
-                    if (bulletReject.rejectState)
-                        return;
-
-                    if (_this.level.player.attackState) {
-                        bulletReject.body.velocity.x = -bulletReject.body.velocity.x;
-                        bulletReject.rejectState = true;
-                    } else {
-                        bulletReject.kill();
-                        if (!_this.level.player.immortalState) {
-                            _this.level.player.makeDamage(bulletReject.damagePoints);
-                            _this.level.hud.updateHealthState();
-                        }
-                    }
-                });
 
                 this.game.physics.arcade.overlap(this, this.bullets, function (shooterReject, bulletReject) {
                     if (bulletReject.rejectState) {
@@ -1931,23 +1857,39 @@ var Sample;
                 this.checkWorldBounds = true;
                 this.outOfBoundsKill = true;
 
+                this.eggCrashState = false;
+
                 this.animations.add('egg', ['egg.png'], 10, true);
                 this.animations.add('egg-crash', ['egg-crash.png'], 10, true);
 
                 this.animations.play('egg');
-                this.body.width = this.animations.currentFrame.width;
-                this.body.height = this.animations.currentFrame.height;
-
-                game.add.existing(this);
             }
             Egg.prototype.setEggCrash = function () {
+                this.eggCrashState = true;
                 this.animations.play('egg-crash');
 
                 this.body.width = this.animations.currentFrame.width;
                 this.body.height = this.animations.currentFrame.height;
             };
+
+            Egg.prototype.update = function () {
+                var _this = this;
+                this.game.physics.arcade.collide(this, this.level.player, function (egg, player) {
+                    egg.kill();
+                    if (!_this.level.player.immortalState) {
+                        _this.level.player.makeDamage(egg.damagePoints);
+                        _this.level.hud.updateHealthState();
+                    }
+                });
+
+                this.game.physics.arcade.collide(this, this.level.layer, function (egg, layer) {
+                    if (!_this.eggCrashState) {
+                        egg.setEggCrash();
+                    }
+                });
+            };
             return Egg;
-        })(Phaser.Sprite);
+        })(Prefab.AbstractPrefab);
         Prefab.Egg = Egg;
     })(Sample.Prefab || (Sample.Prefab = {}));
     var Prefab = Sample.Prefab;
@@ -1968,11 +1910,19 @@ var Sample;
 
                 this.checkWorldBounds = true;
                 this.outOfBoundsKill = true;
-
-                game.add.existing(this);
             }
+            Bullet.prototype.update = function () {
+                var _this = this;
+                this.game.physics.arcade.collide(this, this.level.player, function (bullet, player) {
+                    bullet.kill();
+                    if (!_this.level.player.immortalState) {
+                        _this.level.player.makeDamage(bullet.damagePoints);
+                        _this.level.hud.updateHealthState();
+                    }
+                });
+            };
             return Bullet;
-        })(Phaser.Sprite);
+        })(Prefab.AbstractPrefab);
         Prefab.Bullet = Bullet;
     })(Sample.Prefab || (Sample.Prefab = {}));
     var Prefab = Sample.Prefab;
@@ -1995,11 +1945,27 @@ var Sample;
 
                 this.checkWorldBounds = true;
                 this.outOfBoundsKill = true;
-
-                game.add.existing(this);
             }
+            BulletReject.prototype.update = function () {
+                var _this = this;
+                this.game.physics.arcade.overlap(this, this.level.player, function (bulletReject, player) {
+                    if (bulletReject.rejectState)
+                        return;
+
+                    if (_this.level.player.attackState) {
+                        bulletReject.body.velocity.x = -bulletReject.body.velocity.x;
+                        bulletReject.rejectState = true;
+                    } else {
+                        bulletReject.kill();
+                        if (!_this.level.player.immortalState) {
+                            _this.level.player.makeDamage(bulletReject.damagePoints);
+                            _this.level.hud.updateHealthState();
+                        }
+                    }
+                });
+            };
             return BulletReject;
-        })(Phaser.Sprite);
+        })(Prefab.AbstractPrefab);
         Prefab.BulletReject = BulletReject;
     })(Sample.Prefab || (Sample.Prefab = {}));
     var Prefab = Sample.Prefab;
@@ -2145,10 +2111,26 @@ var Sample;
 })(Sample || (Sample = {}));
 var Sample;
 (function (Sample) {
+    var GameStats = (function () {
+        function GameStats() {
+            this.stats = new Stats();
+            this.stats.setMode(0);
+
+            this.stats.domElement.style.position = 'absolute';
+            this.stats.domElement.style.left = '0px';
+            this.stats.domElement.style.top = '0px';
+
+            document.body.appendChild(this.stats.domElement);
+        }
+        return GameStats;
+    })();
+    Sample.GameStats = GameStats;
+
     var Game = (function (_super) {
         __extends(Game, _super);
         function Game() {
             _super.call(this, 640, 480, Phaser.AUTO, 'game');
+            this.gameStats = new GameStats();
 
             this.state.add('boot', Sample.State.Boot);
             this.state.add('preload', Sample.State.Preload);

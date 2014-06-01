@@ -1,43 +1,57 @@
 module Sample.Prefab {
 
     export class Player extends AbstractPrefab {
-        gravity:number = 500;
-
-        acceleration:number = 500;
-        drag:number = 500;
-
-        maxSpeed:number = 270;
-        superSpeedPower:number = 390;
-
-        jumpPower:number = 350;
-
-        immortalState:boolean = false;
-        attackState:boolean = false;
-        moveState:boolean = false;
-        sitState:boolean = false;
-        superSpeedState:boolean = false;
-        superAttakState:boolean = false;
-
-        defensePoints:number = 5;
-
-        direction:Direction = Direction.Right;
-
-        damagePoints:number = 50;
-        manaPoints:number = +settings.storage.getManaPoints();
-
-        immortalStateAt:number = Date.now();
-        attackStateAt:number = Date.now();
-
-        immortalDuration:number = Phaser.Timer.SECOND * 3;
-        immortalDefaultDuration:number = Phaser.Timer.SECOND * 3;
-        attackDuration:number = Phaser.Timer.SECOND / 3;
-
-        isActiveJumpKey:boolean = false;
-        isAttackKeyPressed:boolean = false;
+        gravity:number;
+        acceleration:number;
+        drag:number;
+        maxSpeed:number;
+        superSpeedPower:number;
+        jumpPower:number;
+        immortalState:boolean;
+        attackState:boolean;
+        moveState:boolean;
+        sitState:boolean;
+        superSpeedState:boolean;
+        superAttakState:boolean;
+        defensePoints:number;
+        direction:Direction;
+        damagePoints:number;
+        manaPoints:number;
+        immortalStateAt:number;
+        attackStateAt:number;
+        immortalDuration:number;
+        immortalDefaultDuration:number;
+        attackDuration:number;
+        isActiveJumpKey:boolean;
+        isAttackKeyPressed:boolean;
 
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'player');
             game.physics.arcade.enable(this);
+
+            this.gravity = 500;
+            this.acceleration = 500;
+            this.drag = 500;
+            this.maxSpeed = 270;
+            this.superSpeedPower = 390;
+            this.jumpPower = 350;
+            this.immortalState = false;
+            this.attackState = false;
+            this.moveState = false;
+            this.sitState = false;
+            this.superSpeedState = false;
+            this.superAttakState = false;
+            this.defensePoints = 5;
+            this.direction = Direction.Right;
+            this.damagePoints = 50;
+            this.manaPoints = +settings.storage.getManaPoints();
+            this.immortalStateAt = this.game.time.now;
+            this.attackStateAt = this.game.time.now;;
+            this.immortalDuration = Phaser.Timer.SECOND * 3;
+            this.immortalDefaultDuration = Phaser.Timer.SECOND * 3;
+            this.attackDuration = Phaser.Timer.SECOND / 3;
+            this.isActiveJumpKey = false;
+            this.isAttackKeyPressed = false;
             
             this.body.gravity.y = this.gravity;
             this.anchor.set(0.5, 1);
@@ -74,7 +88,7 @@ module Sample.Prefab {
 
         immortal(duration) {
             this.immortalDuration = duration;
-            this.immortalStateAt = Date.now();
+            this.immortalStateAt = this.game.time.now;
             this.immortalState = true;
             this.alpha = 0.5;
         }
@@ -136,14 +150,14 @@ module Sample.Prefab {
             if (this.game.input.keyboard.isDown(settings.keys.attack) && !this.attackState && !this.isAttackKeyPressed) {
                 this.isAttackKeyPressed = true;
                 this.attackState = true;
-                this.attackStateAt = Date.now();
+                this.attackStateAt = this.game.time.now;
             }
 
             if (!this.game.input.keyboard.isDown(settings.keys.attack)) {
                 this.isAttackKeyPressed = false;
             }
 
-            if ((Date.now() - this.attackStateAt) > this.attackDuration) {
+            if ((this.game.time.now - this.attackStateAt) > this.attackDuration) {
                 this.attackState = false;
             }
         }
@@ -183,7 +197,7 @@ module Sample.Prefab {
         }
 
         state() {
-            if (this.immortalState && (Date.now() - this.immortalStateAt) > this.immortalDuration) {
+            if (this.immortalState && (this.game.time.now - this.immortalStateAt) > this.immortalDuration) {
                 this.alpha = 1;
                 this.immortalState = false;
             }

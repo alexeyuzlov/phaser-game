@@ -1,13 +1,10 @@
 module Sample.Prefab {
 
     export class Flier extends AbstractEnemy {
-        target: Phaser.Sprite;
         isActive: boolean = false;
-
         minDistance:number;
         damagePoints: number = 10;
         speed:number = 150;
-
         defensePoints:number = 5;
 
         constructor(game:Phaser.Game, x:number, y:number) {
