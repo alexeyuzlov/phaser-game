@@ -1,19 +1,27 @@
 module Sample.State {
 
     export class Zone1 extends AbstractZone {
+        tilesprite: Phaser.TileSprite;
 
         preload() {
             super.preload();
+            this.game.load.image('bg', 'assets/images/zone1.png');
             this.game.load.spritesheet('rain', 'assets/images/rain.png', 8, 8);
         }
 
         create() {
+            this.tilesprite = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'bg');
+            this.tilesprite.fixedToCamera = true;
+
             super.create();
             this.game.stage.backgroundColor = "#D7F5FF";
+
         }
 
         update() {
             super.update();
+
+            this.tilesprite.tilePosition.x -= 2;
         }
 
         rainCreate() {
