@@ -15,12 +15,8 @@ module Sample.Prefab {
 
             this.anchor.set(0.5, 0.5);
             this.health = 100;
-        }
 
-        setTarget(target: Phaser.Sprite) {
-            this.minDistance = target.width / 2;
-
-            this.target = target;
+            this.minDistance = this.level.player.width / 2;
             this.isActive = true;
         }
 
@@ -32,10 +28,10 @@ module Sample.Prefab {
                 return;
             }
 
-            var distance = Phaser.Math.distance(this.x, this.y, this.target.x, this.target.y);
+            var distance = Phaser.Math.distance(this.x, this.y, this.level.player.x, this.level.player.y);
 
             if (distance > this.minDistance) {
-                var rotation = Phaser.Math.angleBetween(this.x, this.y, this.target.x, this.target.y);
+                var rotation = Phaser.Math.angleBetween(this.x, this.y, this.level.player.x, this.level.player.y);
 
                 this.body.velocity.x = Math.cos(rotation) * this.speed;
                 this.body.velocity.y = Math.sin(rotation) * this.speed;

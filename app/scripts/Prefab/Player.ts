@@ -1,6 +1,6 @@
 module Sample.Prefab {
 
-    export class Player extends Phaser.Sprite {
+    export class Player extends AbstractPrefab {
         gravity:number = 500;
 
         acceleration:number = 500;
@@ -35,10 +35,10 @@ module Sample.Prefab {
         isActiveJumpKey:boolean = false;
         isAttackKeyPressed:boolean = false;
 
-        constructor(public level:State.AbstractZone, x:number, y:number) {
-            super(level.game, x, y, 'player');
-
-            this.level.game.physics.arcade.enable(this);
+        constructor(game:Phaser.Game, x:number, y:number) {
+            super(game, x, y, 'player');
+            game.physics.arcade.enable(this);
+            
             this.body.gravity.y = this.gravity;
             this.anchor.set(0.5, 1);
 
@@ -58,8 +58,6 @@ module Sample.Prefab {
             this.events.onKilled.add(()=> {
                 this.level.gameOver();
             });
-
-            this.level.game.add.existing(this);
         }
 
         getHP(healthPoints:number) {
@@ -205,6 +203,8 @@ module Sample.Prefab {
         }
 
         update() {
+            this.game.physics.arcade.collide(this, this.level.layer);
+
             this.move();
             this.jump();
             this.attack();

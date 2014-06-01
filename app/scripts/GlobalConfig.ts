@@ -34,6 +34,7 @@
 
 /// <reference path='State/GameOver.ts'/>
 
+/// <reference path='Prefab/AbstractPrefab.ts'/>
 /// <reference path='Prefab/Player.ts'/>
 /// <reference path='Prefab/HUD.ts'/>
 /// <reference path='Prefab/BlackScreen.ts'/>
@@ -83,10 +84,6 @@ module Sample {
         Right,
         Up,
         Down
-    }
-
-    export interface IDirection extends Phaser.Sprite {
-        direction: Direction;
     }
 
     class Init {

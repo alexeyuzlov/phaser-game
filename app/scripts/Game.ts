@@ -47,6 +47,6 @@ window.onload = () => {
         }
     })();
 
-    /* Start instance game */
+    /* Start instance of game */
     new Sample.Game();
 };

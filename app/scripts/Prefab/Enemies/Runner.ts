@@ -30,6 +30,12 @@ module Sample.Prefab {
         update() {
             super.update();
 
+            this.game.physics.arcade.collide(this, this.level.layer);
+
+            this.game.physics.arcade.overlap(this, this.level.transparents, (runner, transparent) => {
+                runner.toggleDirection();
+            });
+
             if (!this.inCamera || !this.alive) {
                 this.body.velocity.setTo(0,0);
                 return;

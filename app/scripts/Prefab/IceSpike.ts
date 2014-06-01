@@ -1,26 +1,27 @@
 module Sample.Prefab {
 
-    export class IceSpike extends Phaser.Sprite {
+    export class IceSpike extends AbstractPrefab {
         damagePoints: number = 50;
-
-        target: Phaser.Sprite;
         distanceToTarget: number = Math.random() * 100 - 40; // from - 40 to 60 px to target
 
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'ice-spike');
             game.physics.arcade.enable(this);
-            this.alive = true;
-            this.checkWorldBounds = true;
 
-            game.physics.arcade.enable(this);
-            game.add.existing(this);
+            this.checkWorldBounds = true;
         }
 
         update() {
-            if (!this.inCamera) return;
-            if (!this.alive) return;
+            this.game.physics.arcade.overlap(this.level.player, this, (player, ice) => {
+                if (!this.level.player.immortalState) {
+                    this.level.player.makeDamage(ice.damagePoints);
+                    this.level.hud.updateHealthState();
+                }
+            });
 
-            if (Math.abs(this.target.x - this.body.x) < this.distanceToTarget && this.target.y > this.body.y) {
+            if (!this.inCamera) return;
+
+            if (Math.abs(this.level.player.x - this.body.x) < this.distanceToTarget && this.level.player.y > this.body.y) {
                 this.body.gravity.y = 100;
                 this.body.acceleration.y = 1000;
             }

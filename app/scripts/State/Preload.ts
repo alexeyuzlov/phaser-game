@@ -6,6 +6,9 @@ module Sample.State {
 
             this.load.atlasXML('player', 'assets/images/prefabs/player/player.png', 'assets/images/prefabs/player/player.xml');
 
+            //this.load.image('transparent', 'assets/images/prefabs/transparent-debug.png');
+            this.load.image('transparent', 'assets/images/prefabs/transparent.png');
+
             this.load.image('hud', 'assets/images/prefabs/hud.png');
             this.load.image('ground', 'assets/images/ground.png');
 
@@ -16,8 +19,6 @@ module Sample.State {
             this.load.image('bottle-mp', 'assets/images/prefabs/bottles/bottle-mp.png');
             this.load.image('bottle-super', 'assets/images/prefabs/bottles/bottle-super.png');
 
-            //this.load.image('transparent', 'assets/images/prefabs/transparent-debug.png');
-            this.load.image('transparent', 'assets/images/prefabs/transparent.png');
             this.load.image('exit', 'assets/images/prefabs/exit.png');
             this.load.image('spike', 'assets/images/prefabs/spike.png');
             this.load.image('ice-spike', 'assets/images/prefabs/ice-spike.png');

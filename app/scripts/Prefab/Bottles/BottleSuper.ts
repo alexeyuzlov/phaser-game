@@ -1,7 +1,7 @@
 module Sample.Prefab {
 
     export class BottleSuper extends Bottle {
-        duration:number = 10000;
+        duration:number = Phaser.Timer.SECOND * 10;
 
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'bottle-super');
@@ -10,8 +10,8 @@ module Sample.Prefab {
             game.add.existing(this);
         }
 
-        makeAction(player:Prefab.Player) {
-            player.immortal(this.duration);
+        makeAction() {
+            this.level.player.immortal(this.duration);
         }
     }
 }

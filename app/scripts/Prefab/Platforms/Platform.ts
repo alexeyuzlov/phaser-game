@@ -1,6 +1,6 @@
 module Sample.Prefab {
 
-    export class Platform extends Phaser.Sprite {
+    export class Platform extends AbstractPrefab {
         direction:Direction;
         velocity:number = 100;
 
@@ -9,9 +9,6 @@ module Sample.Prefab {
 
             game.physics.arcade.enable(this);
             this.body.immovable = true;
-
-
-            game.add.existing(this);
         }
 
         toggleDirection(transparent) {
@@ -35,6 +32,18 @@ module Sample.Prefab {
         }
 
         update() {
+            this.game.physics.arcade.collide(this.level.player, this, null, (player, platform) => {
+                if (player.y - platform.body.height > platform.y) {
+                    return false;
+                }
+                return true;
+            });
+
+            this.game.physics.arcade.overlap(this, this.level.transparents, (platform, transparent) => {
+                    platform.toggleDirection(transparent);
+                }
+            );
+
             switch (this.direction) {
                 case Direction.Left :
                     this.body.velocity.x = -this.velocity;

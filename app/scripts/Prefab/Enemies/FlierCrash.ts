@@ -1,7 +1,6 @@
 module Sample.Prefab {
 
     export class FlierCrash extends AbstractEnemy {
-        target:Phaser.Sprite;
         isActive:boolean = false;
         isAttackOver:boolean = false;
 
@@ -26,19 +25,26 @@ module Sample.Prefab {
             for (var i = 0; i < this.countEggs; i++) {
                 var egg = new Prefab.Egg(game, 0, 0);
                 this.eggs.add(egg);
-
             }
-        }
 
-        setTarget(target:Phaser.Sprite) {
-            this.minDistance = target.width / 2;
-
-            this.target = target;
+            this.minDistance = this.level.player.width / 2;
             this.isActive = true;
         }
 
         update() {
             super.update();
+
+            this.game.physics.arcade.collide(this.eggs, this.level.player, (player, egg)=> {
+                egg.kill();
+                if (!this.level.player.immortalState) {
+                    this.level.player.makeDamage(egg.damagePoints);
+                    this.level.hud.updateHealthState();
+                }
+            });
+
+            this.game.physics.arcade.collide(this.eggs, this.level.layer, (egg, layer)=> {
+                egg.setEggCrash();
+            });
 
             if (!this.inCamera || !this.alive) {
                 this.body.velocity.setTo(0,0);
@@ -46,10 +52,10 @@ module Sample.Prefab {
             }
 
             if (!this.isAttackOver) {
-                var distance = Phaser.Math.distance(this.x, this.y, this.target.x, this.target.y - this.target.body.height * 4);
+                var distance = Phaser.Math.distance(this.x, this.y, this.level.player.x, this.level.player.y - this.level.player.body.height * 4);
 
                 if (distance > this.minDistance && !this.isAttackOver) {
-                    var rotation = Phaser.Math.angleBetween(this.x, this.y, this.target.x, this.target.y - this.target.body.height * 4);
+                    var rotation = Phaser.Math.angleBetween(this.x, this.y, this.level.player.x, this.level.player.y - this.level.player.body.height * 4);
 
                     this.body.velocity.x = Math.cos(rotation) * this.speed;
                     this.body.velocity.y = Math.sin(rotation) * this.speed;
@@ -57,7 +63,7 @@ module Sample.Prefab {
                     this.isAttackOver = true;
                     this.body.velocity.y = -30;
 
-                    if (this.target.x > this.x) {
+                    if (this.level.player.x > this.x) {
                         this.body.velocity.x = this.speed;
                     } else {
                         this.body.velocity.x = -this.speed;

@@ -10,8 +10,8 @@ module Sample.Prefab {
             game.add.existing(this);
         }
 
-        makeAction(player: Prefab.Player) {
-            player.getHP(this.amount);
+        makeAction() {
+            this.level.player.getHP(this.amount);
         }
     }
 }

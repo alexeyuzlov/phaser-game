@@ -2,8 +2,6 @@ module Sample.Prefab {
     export class Shooter extends AbstractEnemy {
         gravity:number = 300;
 
-        target: Phaser.Sprite;
-
         lastBulletShotAt: number = 0;
         bullets: Phaser.Group;
         countBullets: number = 1;
@@ -26,12 +24,18 @@ module Sample.Prefab {
             this.health = 100;
         }
 
-        setTarget(target: Phaser.Sprite) {
-            this.target = target;
-        }
-
         update() {
             super.update();
+
+            this.game.physics.arcade.collide(this, this.level.layer);
+
+            this.game.physics.arcade.collide(this.level.player, this.bullets, (player, bullet)=> {
+                bullet.kill();
+                if (!this.level.player.immortalState) {
+                    this.level.player.makeDamage(bullet.damagePoints);
+                    this.level.hud.updateHealthState();
+                }
+            });
 
             if (!this.inCamera || !this.alive) {
                 this.body.velocity.setTo(0,0);
@@ -48,7 +52,7 @@ module Sample.Prefab {
             bullet.revive();
             bullet.reset(this.x, this.y);
 
-            if (this.x > this.target.x) {
+            if (this.x > this.level.player.x) {
                 bullet.body.velocity.x = -bullet.speed;
             } else {
                 bullet.body.velocity.x = bullet.speed;
