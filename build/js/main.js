@@ -149,6 +149,10 @@ var Sample;
                 this.game.add.tween(this.blackScreen).to({ alpha: 0 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.None, true).onComplete.add(function () {
                     _this.hud.alpha = 1;
                 });
+
+                this.game.input.keyboard.addKey(Phaser.Keyboard.P).onDown.add(function () {
+                    _this.game.paused = !_this.game.paused;
+                });
             };
 
             AbstractZone.prototype.getPrefabsFromMap = function (name, className) {
@@ -1726,6 +1730,7 @@ var Sample;
         var Shooter = (function (_super) {
             __extends(Shooter, _super);
             function Shooter(game, x, y) {
+                var _this = this;
                 _super.call(this, game, x, y, 'shooter');
 
                 this.body.gravity.y = 300;
@@ -1741,6 +1746,10 @@ var Sample;
                     this.bullets.add(bullet);
                 }
                 this.health = 100;
+
+                this.game.onResume.add(function () {
+                    _this.lastBulletShotAt += _this.game.time.pauseDuration;
+                });
             }
             Shooter.prototype.update = function () {
                 _super.prototype.update.call(this);
@@ -1782,6 +1791,7 @@ var Sample;
         var ShooterReject = (function (_super) {
             __extends(ShooterReject, _super);
             function ShooterReject(game, x, y) {
+                var _this = this;
                 _super.call(this, game, x, y, 'shooter-reject');
 
                 this.body.gravity.y = 300;
@@ -1797,6 +1807,10 @@ var Sample;
                     this.bullets.add(bullet);
                 }
                 this.health = 100;
+
+                this.game.onResume.add(function () {
+                    _this.lastBulletShotAt += _this.game.time.pauseDuration;
+                });
             }
             ShooterReject.prototype.update = function () {
                 var _this = this;

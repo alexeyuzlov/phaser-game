@@ -77,6 +77,10 @@ module Sample.State {
                 .onComplete.add(()=> {
                     this.hud.alpha = 1;
                 });
+
+            this.game.input.keyboard.addKey(Phaser.Keyboard.P).onDown.add(() => {
+                this.game.paused = !this.game.paused;
+            });
         }
 
         getPrefabsFromMap(name:string, className:Object):Phaser.Group {

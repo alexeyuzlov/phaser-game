@@ -23,6 +23,10 @@ module Sample.Prefab {
                 this.bullets.add(bullet);
             }
             this.health = 100;
+
+            this.game.onResume.add(()=> {
+                this.lastBulletShotAt += this.game.time.pauseDuration;
+            });
         }
 
         update() {
