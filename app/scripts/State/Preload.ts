@@ -16,7 +16,6 @@ module Sample.State {
             this.load.image('platform-v', 'assets/images/prefabs/platform-v.png');
 
             this.load.image('bottle-hp', 'assets/images/prefabs/bottles/bottle-hp.png');
-            this.load.image('bottle-mp', 'assets/images/prefabs/bottles/bottle-mp.png');
             this.load.image('bottle-super', 'assets/images/prefabs/bottles/bottle-super.png');
 
             this.load.image('exit', 'assets/images/prefabs/exit.png');
@@ -35,7 +34,7 @@ module Sample.State {
         }
 
         create() {
-            this.game.state.start('menu');
+            this.game.state.start(settings.storage.getCurrentState());
         }
     }
 }

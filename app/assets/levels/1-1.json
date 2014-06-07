@@ -982,7 +982,7 @@
                  "y":1056
                 }, 
                 {
-                 "gid":19,
+                 "gid":18,
                  "height":0,
                  "name":"",
                  "properties":
@@ -1650,8 +1650,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1312,
-                 "y":960
+                 "x":1568,
+                 "y":736
                 }, 
                 {
                  "gid":16,
@@ -1668,7 +1668,7 @@
                  "y":288
                 }, 
                 {
-                 "gid":18,
+                 "gid":17,
                  "height":0,
                  "name":"",
                  "properties":
@@ -1794,7 +1794,7 @@
                  "y":128
                 }, 
                 {
-                 "gid":18,
+                 "gid":17,
                  "height":0,
                  "name":"",
                  "properties":
@@ -2074,35 +2074,7 @@
                  "y":864
                 }, 
                 {
-                 "gid":17,
-                 "height":0,
-                 "name":"",
-                 "properties":
-                    {
-
-                    },
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1568,
-                 "y":736
-                }, 
-                {
-                 "gid":17,
-                 "height":0,
-                 "name":"",
-                 "properties":
-                    {
-
-                    },
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1248,
-                 "y":288
-                }, 
-                {
-                 "gid":20,
+                 "gid":19,
                  "height":0,
                  "name":"",
                  "properties":
@@ -2381,21 +2353,6 @@
         }, 
         {
          "firstgid":17,
-         "image":"bottle-mp.png",
-         "imageheight":32,
-         "imagewidth":16,
-         "margin":0,
-         "name":"bottle-mp",
-         "properties":
-            {
-
-            },
-         "spacing":0,
-         "tileheight":32,
-         "tilewidth":16
-        }, 
-        {
-         "firstgid":18,
          "image":"bottle-super.png",
          "imageheight":32,
          "imagewidth":16,
@@ -2410,7 +2367,7 @@
          "tilewidth":16
         }, 
         {
-         "firstgid":19,
+         "firstgid":18,
          "image":"exit.png",
          "imageheight":64,
          "imagewidth":64,
@@ -2425,7 +2382,7 @@
          "tilewidth":64
         }, 
         {
-         "firstgid":20,
+         "firstgid":19,
          "image":"flier-crash.png",
          "imageheight":32,
          "imagewidth":16,

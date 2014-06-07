@@ -1,10 +1,22 @@
 module Sample.State {
 
     export class Zone3 extends AbstractZone {
+        bg: Phaser.TileSprite;
 
         preload() {
             super.preload();
+            this.game.load.image('bg', 'assets/images/zone3.png');
             this.game.load.spritesheet('snowflake', 'assets/images/snowflake.png', 16, 16);
+        }
+
+        create() {
+            this.bg = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'bg');
+            this.bg.fixedToCamera = true;
+
+            super.create();
+
+            this.player.body.drag.x = 10;
+            this.createSnowFlakes();
         }
 
         createSnowFlakes() {
@@ -27,15 +39,10 @@ module Sample.State {
             emitter.start(false, 20000, 200, 0);
         }
 
-        create() {
-            super.create();
-
-            this.player.body.drag.x = 10;
-            this.createSnowFlakes();
-        }
-
         update() {
             super.update();
+
+            this.bg.tilePosition.x = -this.player.x / 50;
         }
     }
 }

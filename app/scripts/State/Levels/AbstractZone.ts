@@ -1,9 +1,6 @@
 module Sample.State {
 
     export class AbstractZone extends Phaser.State {
-        currentLevel:string;
-        nextLevel:string;
-
         map:Phaser.Tilemap;
         layer:Phaser.TilemapLayer;
 
@@ -26,9 +23,9 @@ module Sample.State {
         fliersCrash:Phaser.Group;
 
         bottlesHP:Phaser.Group;
-        bottlesMP:Phaser.Group;
         bottlesSuper:Phaser.Group;
-        game: Game;
+
+        game:Game;
 
         preload() {
             // All in preload file
@@ -36,7 +33,7 @@ module Sample.State {
         }
 
         create() {
-            settings.storage.setCurrentLevel(this.currentLevel.toString());
+            settings.storage.setCurrentState(this.game.state.current);
             this.game.stage.backgroundColor = "#000000";
 
             // MAP AND LAYERS
@@ -49,15 +46,16 @@ module Sample.State {
 
             // PREFABS SINGLE
             this.player = new Prefab.Player(this.game, 220, 100);
+
             this.hud = new Prefab.HUD(this.game, 0, 0);
             this.hud.alpha = 0;
 
+            // PREFABS MULTIPLE
             this.transparents = this.getPrefabsFromMap('transparent', Prefab.Transparent);
             this.exits = this.getPrefabsFromMap('exit', Prefab.Exit);
             this.spikes = this.getPrefabsFromMap('spike', Prefab.Spike);
             this.iceSpikes = this.getPrefabsFromMap('ice-spike', Prefab.IceSpike);
             this.bottlesHP = this.getPrefabsFromMap('bottle-hp', Prefab.BottleHP);
-            this.bottlesMP = this.getPrefabsFromMap('bottle-mp', Prefab.BottleMP);
             this.bottlesSuper = this.getPrefabsFromMap('bottle-super', Prefab.BottleSuper);
             this.shooters = this.getPrefabsFromMap('shooter', Prefab.Shooter);
             this.shootersReject = this.getPrefabsFromMap('shooter-reject', Prefab.ShooterReject);
@@ -71,7 +69,7 @@ module Sample.State {
             this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_LOCKON);
 
             this.blackScreen = new Prefab.BlackScreen(this.game);
-            this.blackScreen.setText(this.currentLevel);
+            this.blackScreen.setText(this.game.state.current);
             this.game.add.tween(this.blackScreen)
                 .to({ alpha: 0 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.None, true)
                 .onComplete.add(()=> {
@@ -102,7 +100,6 @@ module Sample.State {
         update() {
             this.game.gameStats.stats.update();
 
-
             if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
                 this.blackScreen.setText("");
                 this.game.add.tween(this.blackScreen)
@@ -118,14 +115,30 @@ module Sample.State {
             this.game.add.tween(this.blackScreen)
                 .to({ alpha: 1 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.None, true)
                 .onComplete.add(()=> {
-                    this.game.state.start(this.currentLevel);
+                    this.game.state.start(this.game.state.current);
                 });
         }
 
         startNextLevel() {
             settings.storage.setHealthPoints(this.player.health.toString());
-            settings.storage.setManaPoints(this.player.manaPoints.toString());
-            this.game.state.start(this.nextLevel);
+            this.game.state.start(this.getNextLevel());
+        }
+
+        getNextLevel() {
+            switch (this.game.state.current) {
+                case Levels[Levels.Zone1Level1]:
+                    return Levels[Levels.Zone2Level1];
+                    break;
+                case Levels[Levels.Zone2Level1]:
+                    return Levels[Levels.Zone3Level1];
+                    break;
+                case Levels[Levels.Zone3Level1]:
+                    return Levels[Levels.Zone4Level1];
+                    break;
+                case Levels[Levels.Zone4Level1]:
+                    return 'gameOver';
+                    break;
+            }
         }
     }
 }

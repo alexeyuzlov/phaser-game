@@ -5,18 +5,13 @@ module Sample.Prefab {
         acceleration:number;
         drag:number;
         maxSpeed:number;
-        superSpeedPower:number;
         jumpPower:number;
         immortalState:boolean;
         attackState:boolean;
         moveState:boolean;
-        sitState:boolean;
-        superSpeedState:boolean;
-        superAttakState:boolean;
         defensePoints:number;
         direction:Direction;
         damagePoints:number;
-        manaPoints:number;
         immortalStateAt:number;
         attackStateAt:number;
         immortalDuration:number;
@@ -33,18 +28,13 @@ module Sample.Prefab {
             this.acceleration = 500;
             this.drag = 500;
             this.maxSpeed = 270;
-            this.superSpeedPower = 390;
             this.jumpPower = 350;
             this.immortalState = false;
             this.attackState = false;
             this.moveState = false;
-            this.sitState = false;
-            this.superSpeedState = false;
-            this.superAttakState = false;
             this.defensePoints = 5;
             this.direction = Direction.Right;
             this.damagePoints = 50;
-            this.manaPoints = +settings.storage.getManaPoints();
             this.immortalStateAt = this.game.time.now;
             this.attackStateAt = this.game.time.now;;
             this.immortalDuration = Phaser.Timer.SECOND * 3;
@@ -78,12 +68,6 @@ module Sample.Prefab {
             this.health += +healthPoints;
             this.level.hud.updateHealthState();
             this.write(healthPoints.toString() + 'HP', settings.font.whiteWithBlue);
-        }
-
-        getMP(manaPoints:number) {
-            this.manaPoints += +manaPoints;
-            this.level.hud.updateManaState();
-            this.write(manaPoints.toString() + 'MP', settings.font.whiteWithRed);
         }
 
         immortal(duration) {
@@ -162,40 +146,6 @@ module Sample.Prefab {
             }
         }
 
-        superSpeed() {
-            if (this.manaPoints >= 0 && this.game.input.keyboard.isDown(settings.keys.superSpeed) && this.body.blocked.down && !this.attackState) {
-                this.superSpeedState = true;
-            }
-
-            if (this.manaPoints <= 0 || !this.game.input.keyboard.isDown(settings.keys.superSpeed)) {
-                this.superSpeedState = false;
-            }
-
-            if (this.superSpeedState) {
-                this.manaPoints--;
-                this.level.hud.updateManaState();
-                this.body.maxVelocity.x = this.superSpeedPower;
-            } else {
-                this.body.maxVelocity.x = this.maxSpeed;
-            }
-        }
-
-        superAttack() {
-            // distance attack
-            //if (this.manaPoints <= 0) return;
-        }
-
-        // ! wrong !
-        sit() {
-            if (this.game.input.keyboard.isDown(settings.keys.sit)) {
-                this.sitState = true;
-            }
-
-            if (!this.body.touching.up && !this.game.input.keyboard.isDown(settings.keys.sit)) {
-                this.sitState = false;
-            }
-        }
-
         state() {
             if (this.immortalState && (this.game.time.now - this.immortalStateAt) > this.immortalDuration) {
                 this.alpha = 1;
@@ -206,8 +156,6 @@ module Sample.Prefab {
                 this.animations.play('attack');
             } else if (this.moveState) {
                 this.animations.play('walk');
-            } else if (this.sitState) {
-                this.animations.play('sit');
             } else {
                 this.animations.play('stay');
             }
@@ -222,9 +170,6 @@ module Sample.Prefab {
             this.move();
             this.jump();
             this.attack();
-            this.sit();
-            this.superSpeed();
-            this.superAttack();
 
             this.state();
         }

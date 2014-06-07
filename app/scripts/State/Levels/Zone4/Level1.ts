@@ -1,8 +1,6 @@
 module Sample.State {
 
     export class Zone4Level1 extends Zone4 {
-        currentLevel: string = Levels[Levels.Zone4Level1];
-        nextLevel:string = Levels[Levels.Zone4Level2];
 
         preload() {
             super.preload();
@@ -11,6 +9,9 @@ module Sample.State {
 
         create() {
             super.create();
+
+            this.player.x = 36;
+            this.player.y = this.game.world.height - 97;
         }
 
         update() {
