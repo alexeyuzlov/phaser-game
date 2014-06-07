@@ -1,3 +1,20 @@
+var Sample;
+(function (Sample) {
+    var GameStats = (function () {
+        function GameStats() {
+            this.stats = new Stats();
+            this.stats.setMode(0);
+
+            this.stats.domElement.style.position = 'absolute';
+            this.stats.domElement.style.left = '0px';
+            this.stats.domElement.style.top = '0px';
+
+            document.body.appendChild(this.stats.domElement);
+        }
+        return GameStats;
+    })();
+    Sample.GameStats = GameStats;
+})(Sample || (Sample = {}));
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -49,7 +66,6 @@ var Sample;
                 this.load.image('platform-v', 'assets/images/prefabs/platform-v.png');
 
                 this.load.image('bottle-hp', 'assets/images/prefabs/bottles/bottle-hp.png');
-                this.load.image('bottle-mp', 'assets/images/prefabs/bottles/bottle-mp.png');
                 this.load.image('bottle-super', 'assets/images/prefabs/bottles/bottle-super.png');
 
                 this.load.image('exit', 'assets/images/prefabs/exit.png');
@@ -68,136 +84,11 @@ var Sample;
             };
 
             Preload.prototype.create = function () {
-                this.game.state.start('menu');
+                this.game.state.start(Sample.settings.storage.getCurrentState());
             };
             return Preload;
         })(Phaser.State);
         State.Preload = Preload;
-    })(Sample.State || (Sample.State = {}));
-    var State = Sample.State;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (State) {
-        var Menu = (function (_super) {
-            __extends(Menu, _super);
-            function Menu() {
-                _super.apply(this, arguments);
-            }
-            Menu.prototype.preload = function () {
-            };
-
-            Menu.prototype.create = function () {
-                this.game.stage.backgroundColor = '#000000';
-            };
-
-            Menu.prototype.update = function () {
-                this.game.state.start(Sample.settings.storage.getCurrentLevel());
-            };
-            return Menu;
-        })(Phaser.State);
-        State.Menu = Menu;
-    })(Sample.State || (Sample.State = {}));
-    var State = Sample.State;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (State) {
-        var AbstractZone = (function (_super) {
-            __extends(AbstractZone, _super);
-            function AbstractZone() {
-                _super.apply(this, arguments);
-            }
-            AbstractZone.prototype.preload = function () {
-            };
-
-            AbstractZone.prototype.create = function () {
-                var _this = this;
-                Sample.settings.storage.setCurrentLevel(this.currentLevel.toString());
-                this.game.stage.backgroundColor = "#000000";
-
-                this.map = this.game.add.tilemap('map');
-                this.map.addTilesetImage('ground');
-                this.map.setCollisionBetween(1, 5);
-
-                this.layer = this.map.createLayer('layer');
-                this.layer.resizeWorld();
-
-                this.player = new Sample.Prefab.Player(this.game, 220, 100);
-                this.hud = new Sample.Prefab.HUD(this.game, 0, 0);
-                this.hud.alpha = 0;
-
-                this.transparents = this.getPrefabsFromMap('transparent', Sample.Prefab.Transparent);
-                this.exits = this.getPrefabsFromMap('exit', Sample.Prefab.Exit);
-                this.spikes = this.getPrefabsFromMap('spike', Sample.Prefab.Spike);
-                this.iceSpikes = this.getPrefabsFromMap('ice-spike', Sample.Prefab.IceSpike);
-                this.bottlesHP = this.getPrefabsFromMap('bottle-hp', Sample.Prefab.BottleHP);
-                this.bottlesMP = this.getPrefabsFromMap('bottle-mp', Sample.Prefab.BottleMP);
-                this.bottlesSuper = this.getPrefabsFromMap('bottle-super', Sample.Prefab.BottleSuper);
-                this.shooters = this.getPrefabsFromMap('shooter', Sample.Prefab.Shooter);
-                this.shootersReject = this.getPrefabsFromMap('shooter-reject', Sample.Prefab.ShooterReject);
-                this.runners = this.getPrefabsFromMap('runner', Sample.Prefab.Runner);
-                this.fliers = this.getPrefabsFromMap('flier', Sample.Prefab.Flier);
-                this.fliersCrash = this.getPrefabsFromMap('flier-crash', Sample.Prefab.FlierCrash);
-                this.platformsHorizontal = this.getPrefabsFromMap('platform-h', Sample.Prefab.PlatformHorizontal);
-                this.platformsVertical = this.getPrefabsFromMap('platform-v', Sample.Prefab.PlatformVertical);
-
-                this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_LOCKON);
-
-                this.blackScreen = new Sample.Prefab.BlackScreen(this.game);
-                this.blackScreen.setText(this.currentLevel);
-                this.game.add.tween(this.blackScreen).to({ alpha: 0 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.None, true).onComplete.add(function () {
-                    _this.hud.alpha = 1;
-                });
-
-                this.game.input.keyboard.addKey(Phaser.Keyboard.P).onDown.add(function () {
-                    _this.game.paused = !_this.game.paused;
-                });
-            };
-
-            AbstractZone.prototype.getPrefabsFromMap = function (name, className) {
-                var group = this.game.add.group();
-
-                var index = this.map.getTilesetIndex(name);
-
-                if (index) {
-                    this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, name, 0, true, false, group, className);
-                }
-
-                return group;
-            };
-
-            AbstractZone.prototype.render = function () {
-            };
-
-            AbstractZone.prototype.update = function () {
-                var _this = this;
-                this.game.gameStats.stats.update();
-
-                if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-                    this.blackScreen.setText("");
-                    this.game.add.tween(this.blackScreen).to({ alpha: 1 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.None, true).onComplete.add(function () {
-                        _this.startNextLevel();
-                    });
-                }
-            };
-
-            AbstractZone.prototype.gameOver = function () {
-                var _this = this;
-                this.blackScreen.setText("Game Over. Reload Level.");
-                this.game.add.tween(this.blackScreen).to({ alpha: 1 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.None, true).onComplete.add(function () {
-                    _this.game.state.start(_this.currentLevel);
-                });
-            };
-
-            AbstractZone.prototype.startNextLevel = function () {
-                Sample.settings.storage.setHealthPoints(this.player.health.toString());
-                Sample.settings.storage.setManaPoints(this.player.manaPoints.toString());
-                this.game.state.start(this.nextLevel);
-            };
-            return AbstractZone;
-        })(Phaser.State);
-        State.AbstractZone = AbstractZone;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
 })(Sample || (Sample = {}));
@@ -249,59 +140,6 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (State) {
-        var Zone1 = (function (_super) {
-            __extends(Zone1, _super);
-            function Zone1() {
-                _super.apply(this, arguments);
-            }
-            Zone1.prototype.preload = function () {
-                _super.prototype.preload.call(this);
-                this.game.load.image('bg', 'assets/images/zone1.png');
-                this.game.load.spritesheet('rain', 'assets/images/rain.png', 8, 8);
-            };
-
-            Zone1.prototype.create = function () {
-                this.tilesprite = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'bg');
-                this.tilesprite.fixedToCamera = true;
-
-                _super.prototype.create.call(this);
-                this.game.stage.backgroundColor = "#D7F5FF";
-            };
-
-            Zone1.prototype.update = function () {
-                _super.prototype.update.call(this);
-
-                this.tilesprite.tilePosition.x -= 2;
-            };
-
-            Zone1.prototype.rainCreate = function () {
-                var emitter = this.game.add.emitter(this.game.world.centerX, 0, 1000);
-
-                emitter.width = this.game.world.width + this.game.world.width * 0.2;
-                emitter.angle = 20;
-
-                emitter.makeParticles('rain');
-
-                emitter.minParticleScale = 0.2;
-                emitter.maxParticleScale = 0.7;
-
-                emitter.setYSpeed(100, 700);
-                emitter.setXSpeed(-5, 5);
-
-                emitter.minRotation = 0;
-                emitter.maxRotation = 0;
-
-                emitter.start(false, 3000, 5, 0);
-            };
-            return Zone1;
-        })(State.AbstractZone);
-        State.Zone1 = Zone1;
-    })(Sample.State || (Sample.State = {}));
-    var State = Sample.State;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (State) {
         var Story1 = (function (_super) {
             __extends(Story1, _super);
             function Story1() {
@@ -329,12 +167,182 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (State) {
+        var AbstractZone = (function (_super) {
+            __extends(AbstractZone, _super);
+            function AbstractZone() {
+                _super.apply(this, arguments);
+            }
+            AbstractZone.prototype.preload = function () {
+            };
+
+            AbstractZone.prototype.create = function () {
+                var _this = this;
+                Sample.settings.storage.setCurrentState(this.game.state.current);
+                this.game.stage.backgroundColor = "#000000";
+
+                this.map = this.game.add.tilemap('map');
+                this.map.addTilesetImage('ground');
+                this.map.setCollisionBetween(1, 5);
+
+                this.layer = this.map.createLayer('layer');
+                this.layer.resizeWorld();
+
+                this.player = new Sample.Prefab.Player(this.game, 220, 100);
+
+                this.hud = new Sample.Prefab.HUD(this.game, 0, 0);
+                this.hud.alpha = 0;
+
+                this.transparents = this.getPrefabsFromMap('transparent', Sample.Prefab.Transparent);
+                this.exits = this.getPrefabsFromMap('exit', Sample.Prefab.Exit);
+                this.spikes = this.getPrefabsFromMap('spike', Sample.Prefab.Spike);
+                this.iceSpikes = this.getPrefabsFromMap('ice-spike', Sample.Prefab.IceSpike);
+                this.bottlesHP = this.getPrefabsFromMap('bottle-hp', Sample.Prefab.BottleHP);
+                this.bottlesSuper = this.getPrefabsFromMap('bottle-super', Sample.Prefab.BottleSuper);
+                this.shooters = this.getPrefabsFromMap('shooter', Sample.Prefab.Shooter);
+                this.shootersReject = this.getPrefabsFromMap('shooter-reject', Sample.Prefab.ShooterReject);
+                this.runners = this.getPrefabsFromMap('runner', Sample.Prefab.Runner);
+                this.fliers = this.getPrefabsFromMap('flier', Sample.Prefab.Flier);
+                this.fliersCrash = this.getPrefabsFromMap('flier-crash', Sample.Prefab.FlierCrash);
+                this.platformsHorizontal = this.getPrefabsFromMap('platform-h', Sample.Prefab.PlatformHorizontal);
+                this.platformsVertical = this.getPrefabsFromMap('platform-v', Sample.Prefab.PlatformVertical);
+
+                this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_LOCKON);
+
+                this.blackScreen = new Sample.Prefab.BlackScreen(this.game);
+                this.blackScreen.setText(this.game.state.current);
+                this.game.add.tween(this.blackScreen).to({ alpha: 0 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.None, true).onComplete.add(function () {
+                    _this.hud.alpha = 1;
+                });
+
+                this.game.input.keyboard.addKey(Phaser.Keyboard.P).onDown.add(function () {
+                    _this.game.paused = !_this.game.paused;
+                });
+            };
+
+            AbstractZone.prototype.getPrefabsFromMap = function (name, className) {
+                var group = this.game.add.group();
+
+                var index = this.map.getTilesetIndex(name);
+
+                if (index) {
+                    this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, name, 0, true, false, group, className);
+                }
+
+                return group;
+            };
+
+            AbstractZone.prototype.render = function () {
+            };
+
+            AbstractZone.prototype.update = function () {
+                var _this = this;
+                this.game.gameStats.stats.update();
+
+                if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+                    this.blackScreen.setText("");
+                    this.game.add.tween(this.blackScreen).to({ alpha: 1 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.None, true).onComplete.add(function () {
+                        _this.startNextLevel();
+                    });
+                }
+            };
+
+            AbstractZone.prototype.gameOver = function () {
+                var _this = this;
+                this.blackScreen.setText("Game Over. Reload Level.");
+                this.game.add.tween(this.blackScreen).to({ alpha: 1 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.None, true).onComplete.add(function () {
+                    _this.game.state.start(_this.game.state.current);
+                });
+            };
+
+            AbstractZone.prototype.startNextLevel = function () {
+                Sample.settings.storage.setHealthPoints(this.player.health.toString());
+                this.game.state.start(this.getNextLevel());
+            };
+
+            AbstractZone.prototype.getNextLevel = function () {
+                switch (this.game.state.current) {
+                    case Sample.Levels[0 /* Zone1Level1 */]:
+                        return Sample.Levels[1 /* Zone2Level1 */];
+                        break;
+                    case Sample.Levels[1 /* Zone2Level1 */]:
+                        return Sample.Levels[2 /* Zone3Level1 */];
+                        break;
+                    case Sample.Levels[2 /* Zone3Level1 */]:
+                        return Sample.Levels[3 /* Zone4Level1 */];
+                        break;
+                    case Sample.Levels[3 /* Zone4Level1 */]:
+                        return 'gameOver';
+                        break;
+                }
+            };
+            return AbstractZone;
+        })(Phaser.State);
+        State.AbstractZone = AbstractZone;
+    })(Sample.State || (Sample.State = {}));
+    var State = Sample.State;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (State) {
+        var Zone1 = (function (_super) {
+            __extends(Zone1, _super);
+            function Zone1() {
+                _super.apply(this, arguments);
+            }
+            Zone1.prototype.preload = function () {
+                _super.prototype.preload.call(this);
+                this.game.load.image('bg', 'assets/images/zone1.png');
+                this.game.load.spritesheet('rain', 'assets/images/rain.png', 8, 8);
+            };
+
+            Zone1.prototype.create = function () {
+                this.bg = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'bg');
+                this.bg.fixedToCamera = true;
+
+                _super.prototype.create.call(this);
+
+                this.game.stage.backgroundColor = "#D7F5FF";
+
+                this.rainCreate();
+            };
+
+            Zone1.prototype.update = function () {
+                _super.prototype.update.call(this);
+                this.bg.tilePosition.x -= 2;
+            };
+
+            Zone1.prototype.rainCreate = function () {
+                var emitter = this.game.add.emitter(this.game.world.centerX, -this.game.world.centerY, 2000);
+
+                emitter.width = this.game.world.width + this.game.world.width * 0.2;
+                emitter.angle = 20;
+
+                emitter.makeParticles('rain');
+
+                emitter.minParticleScale = 0.2;
+                emitter.maxParticleScale = 0.7;
+
+                emitter.setYSpeed(100, 700);
+                emitter.setXSpeed(-5, 5);
+
+                emitter.minRotation = 0;
+                emitter.maxRotation = 0;
+
+                emitter.start(false, 10000, 5, 0);
+            };
+            return Zone1;
+        })(State.AbstractZone);
+        State.Zone1 = Zone1;
+    })(Sample.State || (Sample.State = {}));
+    var State = Sample.State;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (State) {
         var Zone1Level1 = (function (_super) {
             __extends(Zone1Level1, _super);
             function Zone1Level1() {
                 _super.apply(this, arguments);
-                this.currentLevel = Sample.Levels[0 /* Zone1Level1 */];
-                this.nextLevel = Sample.Levels[1 /* Zone1Level2 */];
             }
             Zone1Level1.prototype.preload = function () {
                 _super.prototype.preload.call(this);
@@ -357,64 +365,6 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (State) {
-        var Zone1Level2 = (function (_super) {
-            __extends(Zone1Level2, _super);
-            function Zone1Level2() {
-                _super.apply(this, arguments);
-                this.currentLevel = Sample.Levels[1 /* Zone1Level2 */];
-                this.nextLevel = Sample.Levels[2 /* Zone1Level3 */];
-            }
-            Zone1Level2.prototype.preload = function () {
-                _super.prototype.preload.call(this);
-                this.game.load.tilemap('map', 'assets/levels/1-2.json', null, Phaser.Tilemap.TILED_JSON);
-            };
-
-            Zone1Level2.prototype.create = function () {
-                _super.prototype.create.call(this);
-                this.rainCreate();
-            };
-
-            Zone1Level2.prototype.update = function () {
-                _super.prototype.update.call(this);
-            };
-            return Zone1Level2;
-        })(State.Zone1);
-        State.Zone1Level2 = Zone1Level2;
-    })(Sample.State || (Sample.State = {}));
-    var State = Sample.State;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (State) {
-        var Zone1Level3 = (function (_super) {
-            __extends(Zone1Level3, _super);
-            function Zone1Level3() {
-                _super.apply(this, arguments);
-                this.currentLevel = Sample.Levels[2 /* Zone1Level3 */];
-                this.nextLevel = Sample.Stories[1 /* Story2 */];
-            }
-            Zone1Level3.prototype.preload = function () {
-                _super.prototype.preload.call(this);
-                this.game.load.tilemap('map', 'assets/levels/1-3.json', null, Phaser.Tilemap.TILED_JSON);
-            };
-
-            Zone1Level3.prototype.create = function () {
-                _super.prototype.create.call(this);
-                this.rainCreate();
-            };
-
-            Zone1Level3.prototype.update = function () {
-                _super.prototype.update.call(this);
-            };
-            return Zone1Level3;
-        })(State.Zone1);
-        State.Zone1Level3 = Zone1Level3;
-    })(Sample.State || (Sample.State = {}));
-    var State = Sample.State;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (State) {
         var Zone2 = (function (_super) {
             __extends(Zone2, _super);
             function Zone2() {
@@ -422,14 +372,19 @@ var Sample;
                 this.lightRadius = 100;
             }
             Zone2.prototype.preload = function () {
+                this.game.load.image('bg', 'assets/images/zone2.png');
                 _super.prototype.preload.call(this);
             };
 
             Zone2.prototype.create = function () {
-                _super.prototype.create.call(this);
-                this.game.stage.backgroundColor = "#330169";
-                this.shadowTexture = this.game.add.bitmapData(this.map.widthInPixels, this.map.heightInPixels);
+                this.bg = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'bg');
+                this.bg.fixedToCamera = true;
 
+                _super.prototype.create.call(this);
+
+                this.game.stage.backgroundColor = "#330169";
+
+                this.shadowTexture = this.game.add.bitmapData(this.map.widthInPixels, this.map.heightInPixels);
                 this.lightSprite = this.game.add.image(0, 0, this.shadowTexture);
                 this.lightSprite.blendMode = PIXI.blendModes.MULTIPLY;
             };
@@ -437,10 +392,12 @@ var Sample;
             Zone2.prototype.update = function () {
                 _super.prototype.update.call(this);
                 this.shadowUpdate();
+
+                this.bg.tilePosition.x = -this.player.x / 5;
             };
 
             Zone2.prototype.shadowUpdate = function () {
-                this.shadowTexture.context.fillStyle = '#444444';
+                this.shadowTexture.context.fillStyle = '#222222';
                 this.shadowTexture.context.fillRect(0, 0, this.map.widthInPixels, this.map.heightInPixels);
 
                 var gradient = this.shadowTexture.context.createRadialGradient(this.player.body.x, this.player.body.y, this.lightRadius * 0.75, this.player.body.x, this.player.body.y, this.lightRadius);
@@ -463,39 +420,10 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (State) {
-        var Story2 = (function (_super) {
-            __extends(Story2, _super);
-            function Story2() {
-                _super.apply(this, arguments);
-                this.nextLevel = Sample.Levels[3 /* Zone2Level1 */];
-                this.content = [' ', 'Story Zone2'];
-            }
-            Story2.prototype.preload = function () {
-                _super.prototype.preload.call(this);
-            };
-
-            Story2.prototype.create = function () {
-                _super.prototype.create.call(this);
-            };
-
-            Story2.prototype.update = function () {
-                _super.prototype.update.call(this);
-            };
-            return Story2;
-        })(State.AbstractStory);
-        State.Story2 = Story2;
-    })(Sample.State || (Sample.State = {}));
-    var State = Sample.State;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (State) {
         var Zone2Level1 = (function (_super) {
             __extends(Zone2Level1, _super);
             function Zone2Level1() {
                 _super.apply(this, arguments);
-                this.currentLevel = Sample.Levels[3 /* Zone2Level1 */];
-                this.nextLevel = Sample.Levels[4 /* Zone2Level2 */];
             }
             Zone2Level1.prototype.preload = function () {
                 _super.prototype.preload.call(this);
@@ -518,62 +446,6 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (State) {
-        var Zone2Level2 = (function (_super) {
-            __extends(Zone2Level2, _super);
-            function Zone2Level2() {
-                _super.apply(this, arguments);
-                this.currentLevel = Sample.Levels[4 /* Zone2Level2 */];
-                this.nextLevel = Sample.Levels[5 /* Zone2Level3 */];
-            }
-            Zone2Level2.prototype.preload = function () {
-                _super.prototype.preload.call(this);
-                this.game.load.tilemap('map', 'assets/levels/2-2.json', null, Phaser.Tilemap.TILED_JSON);
-            };
-
-            Zone2Level2.prototype.create = function () {
-                _super.prototype.create.call(this);
-            };
-
-            Zone2Level2.prototype.update = function () {
-                _super.prototype.update.call(this);
-            };
-            return Zone2Level2;
-        })(State.Zone2);
-        State.Zone2Level2 = Zone2Level2;
-    })(Sample.State || (Sample.State = {}));
-    var State = Sample.State;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (State) {
-        var Zone2Level3 = (function (_super) {
-            __extends(Zone2Level3, _super);
-            function Zone2Level3() {
-                _super.apply(this, arguments);
-                this.currentLevel = Sample.Levels[5 /* Zone2Level3 */];
-                this.nextLevel = Sample.Stories[2 /* Story3 */];
-            }
-            Zone2Level3.prototype.preload = function () {
-                _super.prototype.preload.call(this);
-                this.game.load.tilemap('map', 'assets/levels/2-3.json', null, Phaser.Tilemap.TILED_JSON);
-            };
-
-            Zone2Level3.prototype.create = function () {
-                _super.prototype.create.call(this);
-            };
-
-            Zone2Level3.prototype.update = function () {
-                _super.prototype.update.call(this);
-            };
-            return Zone2Level3;
-        })(State.Zone2);
-        State.Zone2Level3 = Zone2Level3;
-    })(Sample.State || (Sample.State = {}));
-    var State = Sample.State;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (State) {
         var Zone3 = (function (_super) {
             __extends(Zone3, _super);
             function Zone3() {
@@ -581,7 +453,18 @@ var Sample;
             }
             Zone3.prototype.preload = function () {
                 _super.prototype.preload.call(this);
+                this.game.load.image('bg', 'assets/images/zone3.png');
                 this.game.load.spritesheet('snowflake', 'assets/images/snowflake.png', 16, 16);
+            };
+
+            Zone3.prototype.create = function () {
+                this.bg = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'bg');
+                this.bg.fixedToCamera = true;
+
+                _super.prototype.create.call(this);
+
+                this.player.body.drag.x = 10;
+                this.createSnowFlakes();
             };
 
             Zone3.prototype.createSnowFlakes = function () {
@@ -604,15 +487,10 @@ var Sample;
                 emitter.start(false, 20000, 200, 0);
             };
 
-            Zone3.prototype.create = function () {
-                _super.prototype.create.call(this);
-
-                this.player.body.drag.x = 10;
-                this.createSnowFlakes();
-            };
-
             Zone3.prototype.update = function () {
                 _super.prototype.update.call(this);
+
+                this.bg.tilePosition.x = -this.player.x / 50;
             };
             return Zone3;
         })(State.AbstractZone);
@@ -623,39 +501,10 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (State) {
-        var Story3 = (function (_super) {
-            __extends(Story3, _super);
-            function Story3() {
-                _super.apply(this, arguments);
-                this.nextLevel = Sample.Levels[6 /* Zone3Level1 */];
-                this.content = [' ', 'Story Zone3'];
-            }
-            Story3.prototype.preload = function () {
-                _super.prototype.preload.call(this);
-            };
-
-            Story3.prototype.create = function () {
-                _super.prototype.create.call(this);
-            };
-
-            Story3.prototype.update = function () {
-                _super.prototype.update.call(this);
-            };
-            return Story3;
-        })(State.AbstractStory);
-        State.Story3 = Story3;
-    })(Sample.State || (Sample.State = {}));
-    var State = Sample.State;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (State) {
         var Zone3Level1 = (function (_super) {
             __extends(Zone3Level1, _super);
             function Zone3Level1() {
                 _super.apply(this, arguments);
-                this.currentLevel = Sample.Levels[6 /* Zone3Level1 */];
-                this.nextLevel = Sample.Levels[7 /* Zone3Level2 */];
             }
             Zone3Level1.prototype.preload = function () {
                 _super.prototype.preload.call(this);
@@ -678,72 +527,20 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (State) {
-        var Zone3Level2 = (function (_super) {
-            __extends(Zone3Level2, _super);
-            function Zone3Level2() {
-                _super.apply(this, arguments);
-                this.currentLevel = Sample.Levels[7 /* Zone3Level2 */];
-                this.nextLevel = Sample.Levels[8 /* Zone3Level3 */];
-            }
-            Zone3Level2.prototype.preload = function () {
-                _super.prototype.preload.call(this);
-                this.game.load.tilemap('map', 'assets/levels/3-2.json', null, Phaser.Tilemap.TILED_JSON);
-            };
-
-            Zone3Level2.prototype.create = function () {
-                _super.prototype.create.call(this);
-            };
-
-            Zone3Level2.prototype.update = function () {
-                _super.prototype.update.call(this);
-            };
-            return Zone3Level2;
-        })(State.Zone3);
-        State.Zone3Level2 = Zone3Level2;
-    })(Sample.State || (Sample.State = {}));
-    var State = Sample.State;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (State) {
-        var Zone3Level3 = (function (_super) {
-            __extends(Zone3Level3, _super);
-            function Zone3Level3() {
-                _super.apply(this, arguments);
-                this.currentLevel = Sample.Levels[8 /* Zone3Level3 */];
-                this.nextLevel = Sample.Stories[3 /* Story4 */];
-            }
-            Zone3Level3.prototype.preload = function () {
-                _super.prototype.preload.call(this);
-                this.game.load.tilemap('map', 'assets/levels/3-3.json', null, Phaser.Tilemap.TILED_JSON);
-            };
-
-            Zone3Level3.prototype.create = function () {
-                _super.prototype.create.call(this);
-            };
-
-            Zone3Level3.prototype.update = function () {
-                _super.prototype.update.call(this);
-            };
-            return Zone3Level3;
-        })(State.Zone3);
-        State.Zone3Level3 = Zone3Level3;
-    })(Sample.State || (Sample.State = {}));
-    var State = Sample.State;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (State) {
         var Zone4 = (function (_super) {
             __extends(Zone4, _super);
             function Zone4() {
                 _super.apply(this, arguments);
             }
             Zone4.prototype.preload = function () {
+                this.game.load.image('bg', 'assets/images/zone4.jpg');
                 _super.prototype.preload.call(this);
             };
 
             Zone4.prototype.create = function () {
+                this.bg = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'bg');
+                this.bg.fixedToCamera = true;
+
                 _super.prototype.create.call(this);
             };
 
@@ -759,39 +556,10 @@ var Sample;
 var Sample;
 (function (Sample) {
     (function (State) {
-        var Story4 = (function (_super) {
-            __extends(Story4, _super);
-            function Story4() {
-                _super.apply(this, arguments);
-                this.nextLevel = Sample.Levels[9 /* Zone4Level1 */];
-                this.content = [' ', 'Story Zone4'];
-            }
-            Story4.prototype.preload = function () {
-                _super.prototype.preload.call(this);
-            };
-
-            Story4.prototype.create = function () {
-                _super.prototype.create.call(this);
-            };
-
-            Story4.prototype.update = function () {
-                _super.prototype.update.call(this);
-            };
-            return Story4;
-        })(State.AbstractStory);
-        State.Story4 = Story4;
-    })(Sample.State || (Sample.State = {}));
-    var State = Sample.State;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (State) {
         var Zone4Level1 = (function (_super) {
             __extends(Zone4Level1, _super);
             function Zone4Level1() {
                 _super.apply(this, arguments);
-                this.currentLevel = Sample.Levels[9 /* Zone4Level1 */];
-                this.nextLevel = Sample.Levels[10 /* Zone4Level2 */];
             }
             Zone4Level1.prototype.preload = function () {
                 _super.prototype.preload.call(this);
@@ -800,6 +568,9 @@ var Sample;
 
             Zone4Level1.prototype.create = function () {
                 _super.prototype.create.call(this);
+
+                this.player.x = 36;
+                this.player.y = this.game.world.height - 97;
             };
 
             Zone4Level1.prototype.update = function () {
@@ -808,62 +579,6 @@ var Sample;
             return Zone4Level1;
         })(State.Zone4);
         State.Zone4Level1 = Zone4Level1;
-    })(Sample.State || (Sample.State = {}));
-    var State = Sample.State;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (State) {
-        var Zone4Level2 = (function (_super) {
-            __extends(Zone4Level2, _super);
-            function Zone4Level2() {
-                _super.apply(this, arguments);
-                this.currentLevel = Sample.Levels[10 /* Zone4Level2 */];
-                this.nextLevel = Sample.Levels[11 /* Zone4Level3 */];
-            }
-            Zone4Level2.prototype.preload = function () {
-                _super.prototype.preload.call(this);
-                this.game.load.tilemap('map', 'assets/levels/4-2.json', null, Phaser.Tilemap.TILED_JSON);
-            };
-
-            Zone4Level2.prototype.create = function () {
-                _super.prototype.create.call(this);
-            };
-
-            Zone4Level2.prototype.update = function () {
-                _super.prototype.update.call(this);
-            };
-            return Zone4Level2;
-        })(State.Zone4);
-        State.Zone4Level2 = Zone4Level2;
-    })(Sample.State || (Sample.State = {}));
-    var State = Sample.State;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (State) {
-        var Zone4Level3 = (function (_super) {
-            __extends(Zone4Level3, _super);
-            function Zone4Level3() {
-                _super.apply(this, arguments);
-                this.currentLevel = Sample.Levels[11 /* Zone4Level3 */];
-                this.nextLevel = 'gameOver';
-            }
-            Zone4Level3.prototype.preload = function () {
-                _super.prototype.preload.call(this);
-                this.game.load.tilemap('map', 'assets/levels/4-3.json', null, Phaser.Tilemap.TILED_JSON);
-            };
-
-            Zone4Level3.prototype.create = function () {
-                _super.prototype.create.call(this);
-            };
-
-            Zone4Level3.prototype.update = function () {
-                _super.prototype.update.call(this);
-            };
-            return Zone4Level3;
-        })(State.Zone4);
-        State.Zone4Level3 = Zone4Level3;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
 })(Sample || (Sample = {}));
@@ -941,18 +656,13 @@ var Sample;
                 this.acceleration = 500;
                 this.drag = 500;
                 this.maxSpeed = 270;
-                this.superSpeedPower = 390;
                 this.jumpPower = 350;
                 this.immortalState = false;
                 this.attackState = false;
                 this.moveState = false;
-                this.sitState = false;
-                this.superSpeedState = false;
-                this.superAttakState = false;
                 this.defensePoints = 5;
                 this.direction = 1 /* Right */;
                 this.damagePoints = 50;
-                this.manaPoints = +Sample.settings.storage.getManaPoints();
                 this.immortalStateAt = this.game.time.now;
                 this.attackStateAt = this.game.time.now;
                 ;
@@ -986,12 +696,6 @@ var Sample;
                 this.health += +healthPoints;
                 this.level.hud.updateHealthState();
                 this.write(healthPoints.toString() + 'HP', Sample.settings.font.whiteWithBlue);
-            };
-
-            Player.prototype.getMP = function (manaPoints) {
-                this.manaPoints += +manaPoints;
-                this.level.hud.updateManaState();
-                this.write(manaPoints.toString() + 'MP', Sample.settings.font.whiteWithRed);
             };
 
             Player.prototype.immortal = function (duration) {
@@ -1066,37 +770,6 @@ var Sample;
                 }
             };
 
-            Player.prototype.superSpeed = function () {
-                if (this.manaPoints >= 0 && this.game.input.keyboard.isDown(Sample.settings.keys.superSpeed) && this.body.blocked.down && !this.attackState) {
-                    this.superSpeedState = true;
-                }
-
-                if (this.manaPoints <= 0 || !this.game.input.keyboard.isDown(Sample.settings.keys.superSpeed)) {
-                    this.superSpeedState = false;
-                }
-
-                if (this.superSpeedState) {
-                    this.manaPoints--;
-                    this.level.hud.updateManaState();
-                    this.body.maxVelocity.x = this.superSpeedPower;
-                } else {
-                    this.body.maxVelocity.x = this.maxSpeed;
-                }
-            };
-
-            Player.prototype.superAttack = function () {
-            };
-
-            Player.prototype.sit = function () {
-                if (this.game.input.keyboard.isDown(Sample.settings.keys.sit)) {
-                    this.sitState = true;
-                }
-
-                if (!this.body.touching.up && !this.game.input.keyboard.isDown(Sample.settings.keys.sit)) {
-                    this.sitState = false;
-                }
-            };
-
             Player.prototype.state = function () {
                 if (this.immortalState && (this.game.time.now - this.immortalStateAt) > this.immortalDuration) {
                     this.alpha = 1;
@@ -1107,8 +780,6 @@ var Sample;
                     this.animations.play('attack');
                 } else if (this.moveState) {
                     this.animations.play('walk');
-                } else if (this.sitState) {
-                    this.animations.play('sit');
                 } else {
                     this.animations.play('stay');
                 }
@@ -1123,9 +794,6 @@ var Sample;
                 this.move();
                 this.jump();
                 this.attack();
-                this.sit();
-                this.superSpeed();
-                this.superAttack();
 
                 this.state();
             };
@@ -1148,17 +816,9 @@ var Sample;
                 this.healthState = game.add.text(8, 8, "", Sample.settings.font.whiteBig);
                 this.updateHealthState();
                 this.addChild(this.healthState);
-
-                this.manaState = game.add.text(150, 8, "", Sample.settings.font.whiteBig);
-                this.updateManaState();
-                this.addChild(this.manaState);
             }
             HUD.prototype.updateHealthState = function () {
                 this.healthState.text = "Health: " + this.level.player.health;
-            };
-
-            HUD.prototype.updateManaState = function () {
-                this.manaState.text = "Mana: " + this.level.player.manaPoints;
             };
 
             HUD.prototype.update = function () {
@@ -1451,25 +1111,6 @@ var Sample;
             return BottleHP;
         })(Prefab.Bottle);
         Prefab.BottleHP = BottleHP;
-    })(Sample.Prefab || (Sample.Prefab = {}));
-    var Prefab = Sample.Prefab;
-})(Sample || (Sample = {}));
-var Sample;
-(function (Sample) {
-    (function (Prefab) {
-        var BottleMP = (function (_super) {
-            __extends(BottleMP, _super);
-            function BottleMP(game, x, y) {
-                _super.call(this, game, x, y, 'bottle-mp');
-                this.amount = 50;
-                game.physics.arcade.enable(this);
-            }
-            BottleMP.prototype.makeAction = function () {
-                this.level.player.getMP(this.amount);
-            };
-            return BottleMP;
-        })(Prefab.Bottle);
-        Prefab.BottleMP = BottleMP;
     })(Sample.Prefab || (Sample.Prefab = {}));
     var Prefab = Sample.Prefab;
 })(Sample || (Sample = {}));
@@ -2002,17 +1643,9 @@ var Sample;
 
     (function (Levels) {
         Levels[Levels["Zone1Level1"] = 0] = "Zone1Level1";
-        Levels[Levels["Zone1Level2"] = 1] = "Zone1Level2";
-        Levels[Levels["Zone1Level3"] = 2] = "Zone1Level3";
-        Levels[Levels["Zone2Level1"] = 3] = "Zone2Level1";
-        Levels[Levels["Zone2Level2"] = 4] = "Zone2Level2";
-        Levels[Levels["Zone2Level3"] = 5] = "Zone2Level3";
-        Levels[Levels["Zone3Level1"] = 6] = "Zone3Level1";
-        Levels[Levels["Zone3Level2"] = 7] = "Zone3Level2";
-        Levels[Levels["Zone3Level3"] = 8] = "Zone3Level3";
-        Levels[Levels["Zone4Level1"] = 9] = "Zone4Level1";
-        Levels[Levels["Zone4Level2"] = 10] = "Zone4Level2";
-        Levels[Levels["Zone4Level3"] = 11] = "Zone4Level3";
+        Levels[Levels["Zone2Level1"] = 1] = "Zone2Level1";
+        Levels[Levels["Zone3Level1"] = 2] = "Zone3Level1";
+        Levels[Levels["Zone4Level1"] = 3] = "Zone4Level1";
     })(Sample.Levels || (Sample.Levels = {}));
     var Levels = Sample.Levels;
 
@@ -2028,7 +1661,6 @@ var Sample;
         function Init() {
         }
         Init.HealthPoints = 100;
-        Init.ManaPoints = 500;
         Init.FirstState = Stories[0 /* Story1 */];
         return Init;
     })();
@@ -2036,18 +1668,18 @@ var Sample;
     var Storage = (function () {
         function Storage() {
         }
-        Storage.prototype.getCurrentLevel = function () {
+        Storage.prototype.getCurrentState = function () {
             var currentLevel = localStorage.getItem('currentLevel');
             if (currentLevel) {
                 return currentLevel;
             } else {
-                this.setCurrentLevel(Init.FirstState);
+                this.setCurrentState(Init.FirstState);
                 return Init.FirstState;
             }
         };
 
-        Storage.prototype.setCurrentLevel = function (currentLevel) {
-            localStorage.setItem('currentLevel', currentLevel);
+        Storage.prototype.setCurrentState = function (currentState) {
+            localStorage.setItem('currentLevel', currentState);
         };
 
         Storage.prototype.getHealthPoints = function () {
@@ -2063,21 +1695,6 @@ var Sample;
 
         Storage.prototype.setHealthPoints = function (healthPoints) {
             localStorage.setItem('healthPoints', healthPoints);
-        };
-
-        Storage.prototype.getManaPoints = function () {
-            var manaPoints = localStorage.getItem('manaPoints');
-            if (manaPoints) {
-                return manaPoints;
-            } else {
-                manaPoints = Init.ManaPoints.toString();
-                this.setManaPoints(manaPoints);
-                return manaPoints;
-            }
-        };
-
-        Storage.prototype.setManaPoints = function (manaPoints) {
-            localStorage.setItem('manaPoints', manaPoints);
         };
         return Storage;
     })();
@@ -2116,12 +1733,8 @@ var Sample;
             this.keys = {
                 moveLeft: Phaser.Keyboard.LEFT,
                 moveRight: Phaser.Keyboard.RIGHT,
-                sit: Phaser.Keyboard.DOWN,
                 jump: Phaser.Keyboard.Z,
-                attack: Phaser.Keyboard.X,
-                superAttack: Phaser.Keyboard.A,
-                superSpeed: Phaser.Keyboard.S,
-                superkey: Phaser.Keyboard.SPACEBAR
+                attack: Phaser.Keyboard.X
             };
         }
         return SettingsClass;
@@ -2131,50 +1744,21 @@ var Sample;
 })(Sample || (Sample = {}));
 var Sample;
 (function (Sample) {
-    var GameStats = (function () {
-        function GameStats() {
-            this.stats = new Stats();
-            this.stats.setMode(0);
-
-            this.stats.domElement.style.position = 'absolute';
-            this.stats.domElement.style.left = '0px';
-            this.stats.domElement.style.top = '0px';
-
-            document.body.appendChild(this.stats.domElement);
-        }
-        return GameStats;
-    })();
-    Sample.GameStats = GameStats;
-
     var Game = (function (_super) {
         __extends(Game, _super);
         function Game() {
             _super.call(this, 640, 480, Phaser.AUTO, 'game');
-            this.gameStats = new GameStats();
+            this.gameStats = new Sample.GameStats();
 
             this.state.add('boot', Sample.State.Boot);
             this.state.add('preload', Sample.State.Preload);
-            this.state.add('menu', Sample.State.Menu);
 
             this.state.add(Sample.Stories[0 /* Story1 */], Sample.State.Story1);
+
             this.state.add(Sample.Levels[0 /* Zone1Level1 */], Sample.State.Zone1Level1);
-            this.state.add(Sample.Levels[1 /* Zone1Level2 */], Sample.State.Zone1Level2);
-            this.state.add(Sample.Levels[2 /* Zone1Level3 */], Sample.State.Zone1Level3);
-
-            this.state.add(Sample.Stories[1 /* Story2 */], Sample.State.Story2);
-            this.state.add(Sample.Levels[3 /* Zone2Level1 */], Sample.State.Zone2Level1);
-            this.state.add(Sample.Levels[4 /* Zone2Level2 */], Sample.State.Zone2Level2);
-            this.state.add(Sample.Levels[5 /* Zone2Level3 */], Sample.State.Zone2Level3);
-
-            this.state.add(Sample.Stories[2 /* Story3 */], Sample.State.Story3);
-            this.state.add(Sample.Levels[6 /* Zone3Level1 */], Sample.State.Zone3Level1);
-            this.state.add(Sample.Levels[7 /* Zone3Level2 */], Sample.State.Zone3Level2);
-            this.state.add(Sample.Levels[8 /* Zone3Level3 */], Sample.State.Zone3Level3);
-
-            this.state.add(Sample.Stories[3 /* Story4 */], Sample.State.Story4);
-            this.state.add(Sample.Levels[9 /* Zone4Level1 */], Sample.State.Zone4Level1);
-            this.state.add(Sample.Levels[10 /* Zone4Level2 */], Sample.State.Zone4Level2);
-            this.state.add(Sample.Levels[11 /* Zone4Level3 */], Sample.State.Zone4Level3);
+            this.state.add(Sample.Levels[1 /* Zone2Level1 */], Sample.State.Zone2Level1);
+            this.state.add(Sample.Levels[2 /* Zone3Level1 */], Sample.State.Zone3Level1);
+            this.state.add(Sample.Levels[3 /* Zone4Level1 */], Sample.State.Zone4Level1);
 
             this.state.add('gameOver', Sample.State.GameOver);
 
