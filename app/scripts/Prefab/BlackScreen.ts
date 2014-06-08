@@ -21,5 +21,9 @@ module Sample.Prefab {
         setText(text:string) {
             this.text.text = text;
         }
+
+        update() {
+            this.bringToTop();
+        }
     }
 }

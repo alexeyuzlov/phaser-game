@@ -9,9 +9,6 @@ module Sample.State {
 
         create() {
             super.create();
-
-            this.player.x = 36;
-            this.player.y = this.game.world.height - 97;
         }
 
         update() {

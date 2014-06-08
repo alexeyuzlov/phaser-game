@@ -45,7 +45,7 @@ module Sample.State {
             this.layer.resizeWorld();
 
             // PREFABS SINGLE
-            this.player = new Prefab.Player(this.game, 220, 100);
+            this.player = new Prefab.Player(this.game, 36, this.game.world.height - 97);
 
             this.hud = new Prefab.HUD(this.game, 0, 0);
             this.hud.alpha = 0;

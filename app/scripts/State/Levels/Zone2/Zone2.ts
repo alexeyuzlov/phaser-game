@@ -2,7 +2,7 @@ module Sample.State {
 
     export class Zone2 extends AbstractZone {
         bg: Phaser.TileSprite;
-        lightRadius:number = 100;
+        lightRadius:number = 150;
         shadowTexture:Phaser.BitmapData;
         lightSprite:Phaser.Image;
 
