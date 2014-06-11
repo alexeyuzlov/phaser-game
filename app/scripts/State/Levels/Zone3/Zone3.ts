@@ -2,6 +2,7 @@ module Sample.State {
 
     export class Zone3 extends AbstractZone {
         bg: Phaser.TileSprite;
+        emitter: Phaser.Particles.Arcade.Emitter;
 
         preload() {
             super.preload();
@@ -20,26 +21,28 @@ module Sample.State {
         }
 
         createSnowFlakes() {
-            var emitter = this.game.add.emitter(this.game.world.centerX, 0, 500);
+            this.emitter = this.game.add.emitter(this.game.world.centerX, 0, 100);
 
-            emitter.width = this.game.world.width;
+            this.emitter.width = this.game.world.width;
 
-            emitter.makeParticles('snowflake');
+            this.emitter.makeParticles('snowflake');
 
-            emitter.minParticleScale = 0.2;
-            emitter.maxParticleScale = 1.5;
-            emitter.gravity = 5;
+            this.emitter.minParticleScale = 0.2;
+            this.emitter.maxParticleScale = 1.5;
+            this.emitter.gravity = 5;
 
-            emitter.setYSpeed(5, 10);
-            emitter.setXSpeed(-15, 15);
+            this.emitter.setYSpeed(5, 10);
+            this.emitter.setXSpeed(-15, 15);
 
-            emitter.minRotation = 0;
-            emitter.maxRotation = 0;
+            this.emitter.minRotation = 0;
+            this.emitter.maxRotation = 0;
 
-            emitter.start(false, 20000, 200, 0);
+            this.emitter.start(false, 20000, 200, 0);
         }
 
         update() {
+            this.emitter.emitY = this.camera.y;
+
             super.update();
 
             this.bg.tilePosition.x = -this.player.x / 50;

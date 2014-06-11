@@ -9,6 +9,8 @@ module Sample.State {
 
         create() {
             super.create();
+
+            this.player.y = 100;
         }
 
         update() {

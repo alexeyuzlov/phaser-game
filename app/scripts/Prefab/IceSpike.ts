@@ -1,7 +1,7 @@
 module Sample.Prefab {
 
     export class IceSpike extends AbstractPrefab {
-        damagePoints: number = 50;
+        damagePoints: number = 10;
         distanceToTarget: number = Math.random() * 100 - 40; // from - 40 to 60 px to target
 
         constructor(game:Phaser.Game, x:number, y:number) {

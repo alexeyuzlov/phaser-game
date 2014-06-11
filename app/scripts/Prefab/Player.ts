@@ -48,6 +48,7 @@ module Sample.Prefab {
 
             this.body.drag.x = this.drag;
             this.body.maxVelocity.x = this.maxSpeed;
+            this.body.maxVelocity.y = this.jumpPower * 2;
 
             this.body.collideWorldBounds = true;
             this.alive = true;
