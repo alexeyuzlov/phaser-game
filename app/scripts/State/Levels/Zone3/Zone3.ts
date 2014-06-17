@@ -31,7 +31,7 @@ module Sample.State {
             this.emitter.maxParticleScale = 1.5;
             this.emitter.gravity = 5;
 
-            this.emitter.setYSpeed(5, 10);
+            this.emitter.setYSpeed(5, 20);
             this.emitter.setXSpeed(-15, 15);
 
             this.emitter.minRotation = 0;

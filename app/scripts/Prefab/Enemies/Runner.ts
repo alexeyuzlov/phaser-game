@@ -16,12 +16,17 @@ module Sample.Prefab {
             this.direction = Direction.Right;
             this.body.velocity.x = this.velocity;
 
-            this.damagePoints = 10;
-            this.defensePoints = 5;
+            this.damagePoints = 9;
+            this.defensePoints = 3;
 
             this.body.gravity.y = this.gravity;
             this.body.collideWorldBounds = true;
-            this.health = 200;
+            this.health = 90;
+
+            this.anchor.set(0.5, 1);
+
+            this.animations.add('walk', Phaser.Animation.generateFrameNames('runner-', 1, 4, '.png', 0), 5, true);
+            this.animations.play('walk');
         }
 
         toggleDirection() {
@@ -29,10 +34,12 @@ module Sample.Prefab {
                 case Direction.Left:
                     this.direction = Direction.Right;
                     this.body.velocity.x = this.velocity;
+                    this.scale.x = 1;
                     break;
                 case Direction.Right:
                     this.direction = Direction.Left;
                     this.body.velocity.x = -this.velocity;
+                    this.scale.x = -1;
                     break;
                 default:
             }

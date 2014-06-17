@@ -28,6 +28,11 @@ module Sample.Prefab {
             this.game.onResume.add(()=> {
                 this.lastBulletShotAt += this.game.time.pauseDuration;
             });
+
+            this.animations.add('stay', ['shooter-stay-1.png'], 10, true);
+            this.animations.add('shot', ['shooter-shot-1.png'], 10, true);
+            this.animations.play('stay');
+            this.anchor.set(0.5, 0.5);
         }
 
         update() {
@@ -38,6 +43,12 @@ module Sample.Prefab {
             if (!this.inCamera || !this.alive) {
                 this.body.velocity.setTo(0,0);
                 return;
+            }
+
+            if (this.game.time.now - this.lastBulletShotAt < Phaser.Timer.SECOND / 4) {
+                this.animations.play('shot');
+            } else {
+                this.animations.play('stay');
             }
 
             if (this.game.time.now - this.lastBulletShotAt < this.shotDelay) return;
@@ -51,8 +62,12 @@ module Sample.Prefab {
             bullet.reset(this.x, this.y);
 
             if (this.x > this.level.player.x) {
+                this.scale.x = -1;
+                bullet.scale.x = -1;
                 bullet.body.velocity.x = -bullet.speed;
             } else {
+                this.scale.x = 1;
+                bullet.scale.x = 1;
                 bullet.body.velocity.x = bullet.speed;
             }
         }

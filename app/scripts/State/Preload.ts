@@ -22,11 +22,13 @@ module Sample.State {
             this.load.image('spike', 'assets/images/prefabs/spike.png');
             this.load.image('ice-spike', 'assets/images/prefabs/ice-spike.png');
 
-            this.load.image('runner', 'assets/images/prefabs/enemies/runner.png');
-            this.load.image('flier', 'assets/images/prefabs/enemies/flier.png');
-            this.load.image('flier-crash', 'assets/images/prefabs/enemies/flier-crash.png');
-            this.load.image('shooter', 'assets/images/prefabs/enemies/shooter.png');
-            this.load.image('shooter-reject', 'assets/images/prefabs/enemies/shooter-reject.png');
+            this.load.atlasXML('runner', 'assets/images/prefabs/enemies/runner.png', 'assets/images/prefabs/enemies/runner.xml');
+
+            this.load.atlasXML('flier', 'assets/images/prefabs/enemies/flier.png', 'assets/images/prefabs/enemies/flier.xml');
+            this.load.atlasXML('flier-crash', 'assets/images/prefabs/enemies/flier.png', 'assets/images/prefabs/enemies/flier.xml');
+
+            this.load.atlasXML('shooter', 'assets/images/prefabs/enemies/shooter.png', 'assets/images/prefabs/enemies/shooter.xml');
+            this.load.atlasXML('shooter-reject', 'assets/images/prefabs/enemies/shooter.png', 'assets/images/prefabs/enemies/shooter.xml');
 
             this.load.atlasXML('egg', 'assets/images/prefabs/bullets/egg.png', 'assets/images/prefabs/bullets/egg.xml');
             this.load.image('bullet', 'assets/images/prefabs/bullets/bullet.png');

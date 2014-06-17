@@ -5,16 +5,19 @@ module Sample.Prefab {
         minDistance:number;
         damagePoints: number = 10;
         speed:number = 150;
-        defensePoints:number = 5;
+        defensePoints:number = 7;
 
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'flier');
 
             this.anchor.set(0.5, 0.5);
-            this.health = 100;
+            this.health = 84;
 
             this.minDistance = this.level.player.width / 2;
             this.isActive = true;
+
+            this.animations.add('fly', Phaser.Animation.generateFrameNames('flier-', 1, 4, '.png', 0), 20, true);
+            this.animations.play('fly');
         }
 
         update() {

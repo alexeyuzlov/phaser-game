@@ -16,7 +16,7 @@ module Sample.Prefab {
             super(game, x, y, 'flier-crash');
 
             this.anchor.set(0.5, 0.5);
-            this.health = 100;
+            this.health = 52;
 
             this.eggs = this.game.add.group();
             this.countEggs = 10;
@@ -27,12 +27,15 @@ module Sample.Prefab {
 
             this.minDistance = this.level.player.width / 2;
             this.isAttackOver = false;
-            this.damagePoints = 10;
+            this.damagePoints = 11;
             this.velocity = 100;
             this.isActive = false;
-            this.defensePoints = 5;
+            this.defensePoints = 6;
             this.lastEggShotAt = this.game.time.now;
-            this.shotDelay = 1000;
+            this.shotDelay = 1500;
+
+            this.animations.add('fly', Phaser.Animation.generateFrameNames('flier-', 1, 4, '.png', 0), 20, true);
+            this.animations.play('fly');
         }
 
         update() {
@@ -46,13 +49,12 @@ module Sample.Prefab {
             if (!this.isAttackOver) {
                 var distance = Phaser.Math.distance(this.x, this.y, this.level.player.x, this.level.player.y - this.level.player.body.height * 4);
 
-                if (distance > this.minDistance && !this.isAttackOver) {
+                if (distance > this.minDistance) {
                     var rotation = Phaser.Math.angleBetween(this.x, this.y, this.level.player.x, this.level.player.y - this.level.player.body.height * 4);
 
                     this.body.velocity.x = Math.cos(rotation) * this.velocity;
                     this.body.velocity.y = Math.sin(rotation) * this.velocity;
                 } else {
-                    this.isAttackOver = true;
                     this.body.velocity.y = -30;
 
                     if (this.level.player.x > this.x) {

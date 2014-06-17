@@ -21,6 +21,7 @@ module Sample.Prefab {
                 if (bulletReject.rejectState) return;
 
                 if (this.level.player.attackState) {
+                    bulletReject.scale.x = (bulletReject.scale.x == 1) ? -1 : 1;
                     bulletReject.body.velocity.x = -bulletReject.body.velocity.x;
                     bulletReject.rejectState = true;
 

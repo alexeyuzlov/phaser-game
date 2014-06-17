@@ -58,7 +58,6 @@ module Sample.Prefab {
             this.animations.add('stay', ['player-walk-1.png'], 10, true)
             this.animations.add('walk', Phaser.Animation.generateFrameNames('player-walk-', 1, 4, '.png', 0), 15, true);
             this.animations.add('attack', Phaser.Animation.generateFrameNames('player-attack-', 1, 3, '.png', 0), 10, true);
-            this.animations.add('sit', ['player-sit-1.png'], 10, true);
 
             this.events.onKilled.add(()=> {
                 this.level.gameOver();

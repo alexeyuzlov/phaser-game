@@ -1,7 +1,7 @@
 module Sample.Prefab {
     export class Egg extends AbstractPrefab {
-        speed:number = 200;
-        damagePoints:number = 45;
+        speed:number = 180;
+        damagePoints:number = 35;
         eggCrashState:boolean;
 
         constructor(game:Phaser.Game, x:number, y:number) {
@@ -33,7 +33,8 @@ module Sample.Prefab {
         update() {
             this.game.physics.arcade.collide(this, this.level.player, (egg, player)=> {
                 egg.kill();
-                if (!this.level.player.immortalState) {
+
+                if (!this.level.player.immortalState && !this.level.player.attackState) {
                     this.level.player.makeDamage(egg.damagePoints);
                     this.level.hud.updateHealthState();
                 }
