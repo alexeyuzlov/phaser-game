@@ -2970,48 +2970,6 @@
                  "y":3168
                 }, 
                 {
-                 "gid":11,
-                 "height":0,
-                 "name":"",
-                 "properties":
-                    {
-
-                    },
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":832,
-                 "y":2368
-                }, 
-                {
-                 "gid":7,
-                 "height":0,
-                 "name":"",
-                 "properties":
-                    {
-
-                    },
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":768,
-                 "y":2368
-                }, 
-                {
-                 "gid":7,
-                 "height":0,
-                 "name":"",
-                 "properties":
-                    {
-
-                    },
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":864,
-                 "y":2368
-                }, 
-                {
                  "gid":7,
                  "height":0,
                  "name":"",

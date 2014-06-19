@@ -585,10 +585,89 @@ var Sample;
 
                 var bossTweens = this.getPrefabsFromMap('tween');
                 this.boss = new Sample.Prefab.Boss(this.game, bossTweens);
+
+                this.lightningBitmap = this.game.add.bitmapData(200, 1000);
+                this.lightning = this.game.add.image(this.game.width / 2, 0, this.lightningBitmap);
+                this.lightning.anchor.setTo(0.5, 0);
+                this.lightning.fixedToCamera = true;
+
+                this.flash = this.game.add.graphics(0, 0);
+                this.flash.beginFill(0xffffff, 1);
+                this.flash.drawRect(0, 0, this.game.width, this.game.height);
+                this.flash.endFill();
+                this.flash.alpha = 0;
+                this.flash.fixedToCamera = true;
             };
 
             Zone4Level1.prototype.update = function () {
                 _super.prototype.update.call(this);
+
+                if (this.game.input.activePointer.justPressed(20)) {
+                    this.lightning.rotation = Phaser.Math.angleBetween(this.lightning.x, this.lightning.y, this.camera.x + this.game.input.activePointer.x, this.camera.y + this.game.input.activePointer.y) - Math.PI / 2;
+
+                    var distance = Phaser.Math.distance(this.lightning.x, this.lightning.y, this.camera.x + this.game.input.activePointer.x, this.camera.y + this.game.input.activePointer.y);
+
+                    this.createLightningTexture(this.lightningBitmap.width / 2, 0, 100, 3, false, distance);
+
+                    this.lightning.alpha = 1;
+
+                    this.game.add.tween(this.lightning).to({ alpha: 0.5 }, 100, Phaser.Easing.Bounce.Out).to({ alpha: 1.0 }, 100, Phaser.Easing.Bounce.Out).to({ alpha: 0.5 }, 100, Phaser.Easing.Bounce.Out).to({ alpha: 1.0 }, 100, Phaser.Easing.Bounce.Out).to({ alpha: 0 }, 250, Phaser.Easing.Cubic.In).start();
+
+                    this.flash.alpha = 1;
+                    this.game.add.tween(this.flash).to({ alpha: 0 }, 100, Phaser.Easing.Cubic.In).start();
+                }
+            };
+
+            Zone4Level1.prototype.createLightningTexture = function (x, y, segments, boltWidth, branch, distance) {
+                var ctx = this.lightningBitmap.context;
+                var width = this.lightningBitmap.width;
+                var height = this.lightningBitmap.height;
+
+                if (!branch)
+                    ctx.clearRect(0, 0, width, height);
+
+                for (var i = 0; i < segments; i++) {
+                    ctx.strokeStyle = 'rgb(255, 255, 255)';
+                    ctx.lineWidth = boltWidth;
+
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+
+                    if (branch) {
+                        x += this.game.rnd.integerInRange(-10, 10);
+                    } else {
+                        x += this.game.rnd.integerInRange(-30, 30);
+                    }
+                    if (x <= 10)
+                        x = 10;
+                    if (x >= width - 10)
+                        x = width - 10;
+
+                    if (branch) {
+                        y += this.game.rnd.integerInRange(10, 20);
+                    } else {
+                        y += this.game.rnd.integerInRange(20, distance / segments);
+                    }
+                    if ((!branch && i == segments - 1) || y > distance) {
+                        y = distance;
+                        if (!branch)
+                            x = width / 2;
+                    }
+
+                    ctx.lineTo(x, y);
+                    ctx.stroke();
+
+                    if (y >= distance)
+                        break;
+
+                    if (!branch) {
+                        if (Phaser.Math.chanceRoll(20)) {
+                            this.createLightningTexture(x, y, 10, 1, true, distance);
+                        }
+                    }
+                }
+
+                this.lightningBitmap.dirty = true;
             };
             return Zone4Level1;
         })(State.Zone4);
