@@ -50,6 +50,7 @@
 /// <reference path='Prefab/Enemies/FlierCrash.ts'/>
 /// <reference path='Prefab/Enemies/Shooter.ts'/>
 /// <reference path='Prefab/Enemies/ShooterReject.ts'/>
+/// <reference path='Prefab/Enemies/Boss.ts'/>
 
 /// <reference path='Prefab/Bullets/Egg.ts'/>
 /// <reference path='Prefab/Bullets/Bullet.ts'/>

@@ -57,7 +57,9 @@ var Sample;
 
                 this.load.atlasXML('player', 'assets/images/prefabs/player/player.png', 'assets/images/prefabs/player/player.xml');
 
-                this.load.image('transparent', 'assets/images/prefabs/transparent-debug.png');
+                this.load.image('tween', 'assets/images/prefabs/transparent.png');
+
+                this.load.image('transparent', 'assets/images/prefabs/transparent.png');
 
                 this.load.image('hud', 'assets/images/prefabs/hud.png');
                 this.load.image('ground', 'assets/images/ground.png');
@@ -75,10 +77,12 @@ var Sample;
                 this.load.atlasXML('runner', 'assets/images/prefabs/enemies/runner.png', 'assets/images/prefabs/enemies/runner.xml');
 
                 this.load.atlasXML('flier', 'assets/images/prefabs/enemies/flier.png', 'assets/images/prefabs/enemies/flier.xml');
-                this.load.atlasXML('flier-crash', 'assets/images/prefabs/enemies/flier.png', 'assets/images/prefabs/enemies/flier.xml');
+                this.load.atlasXML('flier-crash', 'assets/images/prefabs/enemies/flier-crash.png', 'assets/images/prefabs/enemies/flier-crash.xml');
 
                 this.load.atlasXML('shooter', 'assets/images/prefabs/enemies/shooter.png', 'assets/images/prefabs/enemies/shooter.xml');
-                this.load.atlasXML('shooter-reject', 'assets/images/prefabs/enemies/shooter.png', 'assets/images/prefabs/enemies/shooter.xml');
+                this.load.atlasXML('shooter-reject', 'assets/images/prefabs/enemies/shooter-reject.png', 'assets/images/prefabs/enemies/shooter-reject.xml');
+
+                this.load.atlasXML('boss', 'assets/images/prefabs/enemies/boss.png', 'assets/images/prefabs/enemies/boss.xml');
 
                 this.load.atlasXML('egg', 'assets/images/prefabs/bullets/egg.png', 'assets/images/prefabs/bullets/egg.xml');
                 this.load.image('bullet', 'assets/images/prefabs/bullets/bullet.png');
@@ -189,7 +193,7 @@ var Sample;
                 this.layer = this.map.createLayer('layer');
                 this.layer.resizeWorld();
 
-                this.player = new Sample.Prefab.Player(this.game, 36, this.game.world.height - 127);
+                this.player = new Sample.Prefab.Player(this.game, 36, this.game.world.height - 200);
 
                 this.hud = new Sample.Prefab.HUD(this.game, 0, 0);
                 this.hud.alpha = 0;
@@ -226,8 +230,10 @@ var Sample;
 
                 var index = this.map.getTilesetIndex(name);
 
-                if (index) {
+                if (className && index) {
                     this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, name, 0, true, false, group, className);
+                } else if (index) {
+                    this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, name, 0, true, false, group);
                 }
 
                 return group;
@@ -574,6 +580,11 @@ var Sample;
 
             Zone4Level1.prototype.create = function () {
                 _super.prototype.create.call(this);
+
+                this.player.x = this.game.world.width - 600;
+
+                var bossTweens = this.getPrefabsFromMap('tween');
+                this.boss = new Sample.Prefab.Boss(this.game, bossTweens);
             };
 
             Zone4Level1.prototype.update = function () {
@@ -1147,6 +1158,8 @@ var Sample;
             __extends(AbstractEnemy, _super);
             function AbstractEnemy(game, x, y, sprite) {
                 _super.call(this, game, x, y, sprite);
+                this.defensePoints = 0;
+                this.damagePoints = 0;
 
                 game.physics.arcade.enable(this);
                 this.alive = true;
@@ -1341,7 +1354,7 @@ var Sample;
                 this.lastEggShotAt = this.game.time.now;
                 this.shotDelay = 1500;
 
-                this.animations.add('fly', Phaser.Animation.generateFrameNames('flier-', 1, 4, '.png', 0), 20, true);
+                this.animations.add('fly', Phaser.Animation.generateFrameNames('flier-crash-', 1, 4, '.png', 0), 20, true);
                 this.animations.play('fly');
             }
             FlierCrash.prototype.update = function () {
@@ -1493,8 +1506,8 @@ var Sample;
                     _this.lastBulletShotAt += _this.game.time.pauseDuration;
                 });
 
-                this.animations.add('stay', ['shooter-stay-1.png'], 10, true);
-                this.animations.add('shot', ['shooter-shot-1.png'], 10, true);
+                this.animations.add('stay', ['shooter-reject-stay-1.png'], 10, true);
+                this.animations.add('shot', ['shooter-reject-shot-1.png'], 10, true);
                 this.animations.play('stay');
                 this.anchor.set(0.5, 0.5);
             }
@@ -1516,7 +1529,7 @@ var Sample;
                     return;
                 }
 
-                if (this.game.time.now - this.lastBulletShotAt < Phaser.Timer.SECOND / 4) {
+                if (this.game.time.now - this.lastBulletShotAt < Phaser.Timer.SECOND / 3) {
                     this.animations.play('shot');
                 } else {
                     this.animations.play('stay');
@@ -1547,6 +1560,68 @@ var Sample;
             return ShooterReject;
         })(Prefab.AbstractEnemy);
         Prefab.ShooterReject = ShooterReject;
+    })(Sample.Prefab || (Sample.Prefab = {}));
+    var Prefab = Sample.Prefab;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (Prefab) {
+        var Boss = (function (_super) {
+            __extends(Boss, _super);
+            function Boss(game, bossTweens) {
+                _super.call(this, game, bossTweens.children[0].x, bossTweens.children[0].y, 'boss');
+                this.lastEventAt = 0;
+                this.eventDuration = Phaser.Timer.SECOND * 3;
+                this.inAction = false;
+                this.health = 1000;
+
+                this.activeTweenID = 0;
+                this.bossTweens = bossTweens;
+
+                this.anchor.set(0.5, 1);
+            }
+            Boss.prototype.generateAction = function () {
+                var _this = this;
+                var actionRandom = Math.random() * 100;
+
+                if (actionRandom > 90) {
+                    this.alpha = 0.5;
+
+                    this.inAction = false;
+                } else if (actionRandom > 70 && actionRandom <= 90) {
+                    this.inAction = false;
+                } else {
+                    this.lastEventAt = this.game.time.now;
+
+                    var tween = this.game.add.tween(this);
+
+                    do {
+                        var rand = Math.floor(Math.random() * this.bossTweens.children.length);
+                    } while(rand == this.activeTweenID);
+                    this.activeTweenID = rand;
+
+                    tween.to({
+                        x: this.bossTweens.children[this.activeTweenID].x,
+                        y: this.bossTweens.children[this.activeTweenID].y
+                    }, Math.random() * 1000 + 2000, Phaser.Easing.Quadratic.In, true, 0, 0, false);
+
+                    tween.onComplete.add(function () {
+                        _this.inAction = false;
+                    });
+                }
+            };
+
+            Boss.prototype.update = function () {
+                _super.prototype.update.call(this);
+
+                if (!this.inAction) {
+                    this.inAction = true;
+                    this.generateAction();
+                }
+            };
+            return Boss;
+        })(Prefab.AbstractEnemy);
+        Prefab.Boss = Boss;
     })(Sample.Prefab || (Sample.Prefab = {}));
     var Prefab = Sample.Prefab;
 })(Sample || (Sample = {}));

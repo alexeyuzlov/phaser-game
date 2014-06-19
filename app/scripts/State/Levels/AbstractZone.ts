@@ -45,7 +45,7 @@ module Sample.State {
             this.layer.resizeWorld();
 
             // PREFABS SINGLE
-            this.player = new Prefab.Player(this.game, 36, this.game.world.height - 127);
+            this.player = new Prefab.Player(this.game, 36, this.game.world.height - 200);
 
             this.hud = new Prefab.HUD(this.game, 0, 0);
             this.hud.alpha = 0;
@@ -81,13 +81,15 @@ module Sample.State {
             });
         }
 
-        getPrefabsFromMap(name:string, className:Object):Phaser.Group {
+        getPrefabsFromMap(name:string, className?:Object):Phaser.Group {
             var group = this.game.add.group();
 
             var index = this.map.getTilesetIndex(name);
 
-            if (index) {
+            if (className && index) {
                 this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, name, 0, true, false, group, className);
+            } else if (index) {
+                this.map.createFromObjects('objects', this.map.tilesets[index].firstgid, name, 0, true, false, group);
             }
 
             return group;

@@ -34,7 +34,7 @@ module Sample.Prefab {
             this.lastEggShotAt = this.game.time.now;
             this.shotDelay = 1500;
 
-            this.animations.add('fly', Phaser.Animation.generateFrameNames('flier-', 1, 4, '.png', 0), 20, true);
+            this.animations.add('fly', Phaser.Animation.generateFrameNames('flier-crash-', 1, 4, '.png', 0), 20, true);
             this.animations.play('fly');
         }
 

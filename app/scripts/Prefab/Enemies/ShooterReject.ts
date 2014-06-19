@@ -28,8 +28,8 @@ module Sample.Prefab {
                 this.lastBulletShotAt += this.game.time.pauseDuration;
             });
 
-            this.animations.add('stay', ['shooter-stay-1.png'], 10, true);
-            this.animations.add('shot', ['shooter-shot-1.png'], 10, true);
+            this.animations.add('stay', ['shooter-reject-stay-1.png'], 10, true);
+            this.animations.add('shot', ['shooter-reject-shot-1.png'], 10, true);
             this.animations.play('stay');
             this.anchor.set(0.5, 0.5);
         }
@@ -51,7 +51,7 @@ module Sample.Prefab {
                 return;
             }
 
-            if (this.game.time.now - this.lastBulletShotAt < Phaser.Timer.SECOND / 4) {
+            if (this.game.time.now - this.lastBulletShotAt < Phaser.Timer.SECOND / 3) {
                 this.animations.play('shot');
             } else {
                 this.animations.play('stay');

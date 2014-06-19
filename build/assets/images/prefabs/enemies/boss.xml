@@ -1,0 +1,4 @@
+<TextureAtlas imagePath="boss.png">
+	<SubTexture name="boss-1.png" x="0" y="102" width="103" height="100"/>
+	<SubTexture name="boss-2.png" x="0" y="0" width="103" height="100"/>
+</TextureAtlas>

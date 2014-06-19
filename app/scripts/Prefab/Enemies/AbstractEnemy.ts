@@ -4,7 +4,8 @@ module Sample.Prefab {
         immortalState: boolean;
         immortalStateAt: number;
         immortalStateDuration: number;
-        defensePoints: number;
+        defensePoints: number = 0;
+        damagePoints: number = 0;
 
         constructor(game:Phaser.Game, x:number, y:number, sprite:string) {
             super(game, x, y, sprite);
