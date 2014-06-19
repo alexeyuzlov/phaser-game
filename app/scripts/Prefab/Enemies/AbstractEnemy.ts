@@ -22,7 +22,6 @@ module Sample.Prefab {
 
         makeDamage(damagePoint) {
             if (!this.immortalState) {
-
                 if (damagePoint < this.defensePoints) {
                     damagePoint = 1
                 } else {

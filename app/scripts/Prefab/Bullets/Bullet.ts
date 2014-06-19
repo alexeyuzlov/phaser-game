@@ -1,7 +1,7 @@
 module Sample.Prefab {
     export class Bullet extends AbstractPrefab {
         speed: number = 300;
-        damagePoints: number = 30;
+        damagePoints: number = 20;
 
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'bullet');

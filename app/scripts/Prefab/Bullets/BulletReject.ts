@@ -1,7 +1,7 @@
 module Sample.Prefab {
     export class BulletReject extends AbstractPrefab {
         speed:number = 300;
-        damagePoints:number = 30;
+        damagePoints:number = 25;
         damageRejectPoints:number = 300;
         rejectState:boolean = false;
 
