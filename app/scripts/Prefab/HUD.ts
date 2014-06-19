@@ -8,17 +8,22 @@ module Sample.Prefab {
 
             this.fixedToCamera = true;
 
-            this.healthState = game.add.text(8, 8, "", settings.font.whiteBig);
+            var font = {
+                font: "13px Arial",
+                fill: "#ffffff"
+            };
+
+            this.healthState = game.add.text(14, 1, "", font);
             this.updateHealthState();
             this.addChild(this.healthState);
         }
 
         updateHealthState() {
-            this.healthState.text = "Health: " + this.level.player.health;
+            this.healthState.text = this.level.player.health.toString();
         }
 
         update() {
-            this.bringToTop();
+
         }
     }
 }

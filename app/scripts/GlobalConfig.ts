@@ -7,6 +7,9 @@
 
 /// <reference path='State/Stories/AbstractStory.ts'/>
 /// <reference path='State/Stories/Story1.ts'/>
+/// <reference path='State/Stories/Story2.ts'/>
+/// <reference path='State/Stories/Story3.ts'/>
+/// <reference path='State/Stories/Story4.ts'/>
 
 /// <reference path='State/Levels/AbstractZone.ts'/>
 

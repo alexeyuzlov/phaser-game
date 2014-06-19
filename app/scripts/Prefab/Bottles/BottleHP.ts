@@ -1,7 +1,7 @@
 module Sample.Prefab {
 
     export class BottleHP extends Bottle {
-        amount: number = 50;
+        amount: number = 30;
 
         constructor(game:Phaser.Game, x:number, y:number) {
             super(game, x, y, 'bottle-hp');

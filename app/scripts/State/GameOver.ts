@@ -1,6 +1,14 @@
 module Sample.State {
     export class GameOver extends Phaser.State {
-        content: string[] = [' ', 'You win!', 'You win!!!'];
+        content: string[] = [
+            ' ',
+            'Выбравшись из лабиринтов замка, твои глаза ослепил солнечный свет.',
+            'Ты рад окончанию истории, приключившийся с тобой.',
+            'Немного оглядевшись, ты увидел кусок бумаги под камнем.',
+            'Достав ее, ты прочитал',
+            'Продолжение следует...',
+            ' '
+        ];
         text;
         index = 0;
         line = '';
@@ -9,6 +17,8 @@ module Sample.State {
             this.game.stage.backgroundColor = '#000000';
 
             this.text = this.game.add.text(10, 10, '', settings.font.whiteBig);
+            this.text.wordWrap = true;
+            this.text.wordWrapWidth = this.game.width;
             this.nextLine();
         }
 
@@ -19,7 +29,7 @@ module Sample.State {
                 this.line = '';
                 this.game.time.events.repeat(80, this.content[this.index].length + 1, this.updateLine, this);
             } else {
-                // FINAL HERE
+                // HERE LAST ACTION
             }
         }
 

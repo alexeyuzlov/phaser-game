@@ -15,6 +15,8 @@ module Sample.State {
             this.game.stage.backgroundColor = '#000000';
 
             this.text = this.game.add.text(10, 10, '', settings.font.whiteBig);
+            this.text.wordWrap = true;
+            this.text.wordWrapWidth = this.game.width;
             this.nextLine();
         }
 

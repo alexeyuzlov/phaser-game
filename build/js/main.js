@@ -115,6 +115,8 @@ var Sample;
                 this.game.stage.backgroundColor = '#000000';
 
                 this.text = this.game.add.text(10, 10, '', Sample.settings.font.whiteBig);
+                this.text.wordWrap = true;
+                this.text.wordWrapWidth = this.game.width;
                 this.nextLine();
             };
 
@@ -151,7 +153,13 @@ var Sample;
             function Story1() {
                 _super.apply(this, arguments);
                 this.nextLevel = Sample.Levels[0 /* Zone1Level1 */];
-                this.content = [' ', 'Story Zone1'];
+                this.content = [
+                    '',
+                    'Ты спишь. Видишь, как миры, будто картины, сменяют друг друга.',
+                    'На одной изображен летний день, на другой - кромешная ночь.',
+                    'Их объединяет одно: чувство ужаса и страха смерти главного героя, исходящие от картины!',
+                    'Ты просыпаешься. И вместо привычных желаний ты испытываешь дежавю...'
+                ];
             }
             Story1.prototype.preload = function () {
                 _super.prototype.preload.call(this);
@@ -167,6 +175,103 @@ var Sample;
             return Story1;
         })(State.AbstractStory);
         State.Story1 = Story1;
+    })(Sample.State || (Sample.State = {}));
+    var State = Sample.State;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (State) {
+        var Story2 = (function (_super) {
+            __extends(Story2, _super);
+            function Story2() {
+                _super.apply(this, arguments);
+                this.nextLevel = Sample.Levels[1 /* Zone2Level1 */];
+                this.content = [
+                    '',
+                    'Все как во сне: ты увидел луг и боролся за жизнь.',
+                    'Ты шел долго и, найдя укромное место, прилег.',
+                    'Над головой сгущались тучи, солнце уходило за горизонт.',
+                    'Стало совсем темно, но тебе поможет твое дежавю...'
+                ];
+            }
+            Story2.prototype.preload = function () {
+                _super.prototype.preload.call(this);
+            };
+
+            Story2.prototype.create = function () {
+                _super.prototype.create.call(this);
+            };
+
+            Story2.prototype.update = function () {
+                _super.prototype.update.call(this);
+            };
+            return Story2;
+        })(State.AbstractStory);
+        State.Story2 = Story2;
+    })(Sample.State || (Sample.State = {}));
+    var State = Sample.State;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (State) {
+        var Story3 = (function (_super) {
+            __extends(Story3, _super);
+            function Story3() {
+                _super.apply(this, arguments);
+                this.nextLevel = Sample.Levels[2 /* Zone3Level1 */];
+                this.content = [
+                    '',
+                    'Целую ночь ты шел по холмам, усыпанным камнями.',
+                    'Когда забрезжил утренний свет, ты увидел, что тропинка поднимается в гору.',
+                    'Один из путников одолжил тебе коньки: «На твоём пути встретиться немало горных озер!»'
+                ];
+            }
+            Story3.prototype.preload = function () {
+                _super.prototype.preload.call(this);
+            };
+
+            Story3.prototype.create = function () {
+                _super.prototype.create.call(this);
+            };
+
+            Story3.prototype.update = function () {
+                _super.prototype.update.call(this);
+            };
+            return Story3;
+        })(State.AbstractStory);
+        State.Story3 = Story3;
+    })(Sample.State || (Sample.State = {}));
+    var State = Sample.State;
+})(Sample || (Sample = {}));
+var Sample;
+(function (Sample) {
+    (function (State) {
+        var Story4 = (function (_super) {
+            __extends(Story4, _super);
+            function Story4() {
+                _super.apply(this, arguments);
+                this.nextLevel = Sample.Levels[3 /* Zone4Level1 */];
+                this.content = [
+                    '',
+                    'Поднявшись на вершину горы, ты оказался перед замком.',
+                    'Страх неизвестности охватил тебя.',
+                    '«Вспомниная сон, только так я смогу, наконец, выбраться отсюда!» - собрав все мужество, ты двинулся вперед...'
+                ];
+            }
+            Story4.prototype.preload = function () {
+                _super.prototype.preload.call(this);
+            };
+
+            Story4.prototype.create = function () {
+                _super.prototype.create.call(this);
+            };
+
+            Story4.prototype.update = function () {
+                _super.prototype.update.call(this);
+            };
+            return Story4;
+        })(State.AbstractStory);
+        State.Story4 = Story4;
     })(Sample.State || (Sample.State = {}));
     var State = Sample.State;
 })(Sample || (Sample = {}));
@@ -193,9 +298,9 @@ var Sample;
                 this.layer = this.map.createLayer('layer');
                 this.layer.resizeWorld();
 
-                this.player = new Sample.Prefab.Player(this.game, 36, this.game.world.height - 200);
+                this.player = new Sample.Prefab.Player(this.game, 120, this.game.world.height - 200);
 
-                this.hud = new Sample.Prefab.HUD(this.game, 0, 0);
+                this.hud = new Sample.Prefab.HUD(this.game, 10, 10);
                 this.hud.alpha = 0;
 
                 this.transparents = this.getPrefabsFromMap('transparent', Sample.Prefab.Transparent);
@@ -243,15 +348,7 @@ var Sample;
             };
 
             AbstractZone.prototype.update = function () {
-                var _this = this;
                 this.game.gameStats.stats.update();
-
-                if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-                    this.blackScreen.setText("");
-                    this.game.add.tween(this.blackScreen).to({ alpha: 1 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.None, true).onComplete.add(function () {
-                        _this.startNextLevel();
-                    });
-                }
             };
 
             AbstractZone.prototype.gameOver = function () {
@@ -270,13 +367,13 @@ var Sample;
             AbstractZone.prototype.getNextLevel = function () {
                 switch (this.game.state.current) {
                     case Sample.Levels[0 /* Zone1Level1 */]:
-                        return Sample.Levels[1 /* Zone2Level1 */];
+                        return Sample.Stories[1 /* Story2 */];
                         break;
                     case Sample.Levels[1 /* Zone2Level1 */]:
-                        return Sample.Levels[2 /* Zone3Level1 */];
+                        return Sample.Stories[2 /* Story3 */];
                         break;
                     case Sample.Levels[2 /* Zone3Level1 */]:
-                        return Sample.Levels[3 /* Zone4Level1 */];
+                        return Sample.Stories[3 /* Story4 */];
                         break;
                     case Sample.Levels[3 /* Zone4Level1 */]:
                         return 'gameOver';
@@ -400,6 +497,8 @@ var Sample;
             Zone2.prototype.update = function () {
                 _super.prototype.update.call(this);
                 this.shadowUpdate();
+
+                this.hud.bringToTop();
 
                 this.bg.tilePosition.x = -this.player.x / 5;
             };
@@ -581,93 +680,12 @@ var Sample;
             Zone4Level1.prototype.create = function () {
                 _super.prototype.create.call(this);
 
-                this.player.x = this.game.world.width - 600;
-
                 var bossTweens = this.getPrefabsFromMap('tween');
                 this.boss = new Sample.Prefab.Boss(this.game, bossTweens);
-
-                this.lightningBitmap = this.game.add.bitmapData(200, 1000);
-                this.lightning = this.game.add.image(this.game.width / 2, 0, this.lightningBitmap);
-                this.lightning.anchor.setTo(0.5, 0);
-                this.lightning.fixedToCamera = true;
-
-                this.flash = this.game.add.graphics(0, 0);
-                this.flash.beginFill(0xffffff, 1);
-                this.flash.drawRect(0, 0, this.game.width, this.game.height);
-                this.flash.endFill();
-                this.flash.alpha = 0;
-                this.flash.fixedToCamera = true;
             };
 
             Zone4Level1.prototype.update = function () {
                 _super.prototype.update.call(this);
-
-                if (this.game.input.activePointer.justPressed(20)) {
-                    this.lightning.rotation = Phaser.Math.angleBetween(this.lightning.x, this.lightning.y, this.camera.x + this.game.input.activePointer.x, this.camera.y + this.game.input.activePointer.y) - Math.PI / 2;
-
-                    var distance = Phaser.Math.distance(this.lightning.x, this.lightning.y, this.camera.x + this.game.input.activePointer.x, this.camera.y + this.game.input.activePointer.y);
-
-                    this.createLightningTexture(this.lightningBitmap.width / 2, 0, 100, 3, false, distance);
-
-                    this.lightning.alpha = 1;
-
-                    this.game.add.tween(this.lightning).to({ alpha: 0.5 }, 100, Phaser.Easing.Bounce.Out).to({ alpha: 1.0 }, 100, Phaser.Easing.Bounce.Out).to({ alpha: 0.5 }, 100, Phaser.Easing.Bounce.Out).to({ alpha: 1.0 }, 100, Phaser.Easing.Bounce.Out).to({ alpha: 0 }, 250, Phaser.Easing.Cubic.In).start();
-
-                    this.flash.alpha = 1;
-                    this.game.add.tween(this.flash).to({ alpha: 0 }, 100, Phaser.Easing.Cubic.In).start();
-                }
-            };
-
-            Zone4Level1.prototype.createLightningTexture = function (x, y, segments, boltWidth, branch, distance) {
-                var ctx = this.lightningBitmap.context;
-                var width = this.lightningBitmap.width;
-                var height = this.lightningBitmap.height;
-
-                if (!branch)
-                    ctx.clearRect(0, 0, width, height);
-
-                for (var i = 0; i < segments; i++) {
-                    ctx.strokeStyle = 'rgb(255, 255, 255)';
-                    ctx.lineWidth = boltWidth;
-
-                    ctx.beginPath();
-                    ctx.moveTo(x, y);
-
-                    if (branch) {
-                        x += this.game.rnd.integerInRange(-10, 10);
-                    } else {
-                        x += this.game.rnd.integerInRange(-30, 30);
-                    }
-                    if (x <= 10)
-                        x = 10;
-                    if (x >= width - 10)
-                        x = width - 10;
-
-                    if (branch) {
-                        y += this.game.rnd.integerInRange(10, 20);
-                    } else {
-                        y += this.game.rnd.integerInRange(20, distance / segments);
-                    }
-                    if ((!branch && i == segments - 1) || y > distance) {
-                        y = distance;
-                        if (!branch)
-                            x = width / 2;
-                    }
-
-                    ctx.lineTo(x, y);
-                    ctx.stroke();
-
-                    if (y >= distance)
-                        break;
-
-                    if (!branch) {
-                        if (Phaser.Math.chanceRoll(20)) {
-                            this.createLightningTexture(x, y, 10, 1, true, distance);
-                        }
-                    }
-                }
-
-                this.lightningBitmap.dirty = true;
             };
             return Zone4Level1;
         })(State.Zone4);
@@ -682,7 +700,15 @@ var Sample;
             __extends(GameOver, _super);
             function GameOver() {
                 _super.apply(this, arguments);
-                this.content = [' ', 'You win!', 'You win!!!'];
+                this.content = [
+                    ' ',
+                    'Выбравшись из лабиринтов замка, твои глаза ослепил солнечный свет.',
+                    'Ты рад окончанию истории, приключившийся с тобой.',
+                    'Немного оглядевшись, ты увидел кусок бумаги под камнем.',
+                    'Достав ее, ты прочитал',
+                    'Продолжение следует...',
+                    ' '
+                ];
                 this.index = 0;
                 this.line = '';
             }
@@ -690,6 +716,8 @@ var Sample;
                 this.game.stage.backgroundColor = '#000000';
 
                 this.text = this.game.add.text(10, 10, '', Sample.settings.font.whiteBig);
+                this.text.wordWrap = true;
+                this.text.wordWrapWidth = this.game.width;
                 this.nextLine();
             };
 
@@ -906,16 +934,20 @@ var Sample;
 
                 this.fixedToCamera = true;
 
-                this.healthState = game.add.text(8, 8, "", Sample.settings.font.whiteBig);
+                var font = {
+                    font: "13px Arial",
+                    fill: "#ffffff"
+                };
+
+                this.healthState = game.add.text(14, 1, "", font);
                 this.updateHealthState();
                 this.addChild(this.healthState);
             }
             HUD.prototype.updateHealthState = function () {
-                this.healthState.text = "Health: " + this.level.player.health;
+                this.healthState.text = this.level.player.health.toString();
             };
 
             HUD.prototype.update = function () {
-                this.bringToTop();
             };
             return HUD;
         })(Prefab.AbstractPrefab);
@@ -1199,7 +1231,7 @@ var Sample;
             __extends(BottleHP, _super);
             function BottleHP(game, x, y) {
                 _super.call(this, game, x, y, 'bottle-hp');
-                this.amount = 50;
+                this.amount = 30;
                 game.physics.arcade.enable(this);
             }
             BottleHP.prototype.makeAction = function () {
@@ -1680,20 +1712,36 @@ var Sample;
 
                 this.anchor.set(0.5, 1);
 
+                this.lightningBitmap = this.game.add.bitmapData(200, 1000);
+                this.lightning = this.game.add.image(this.game.width / 2, 0, this.lightningBitmap);
+                this.lightning.anchor.setTo(0.5, 0);
+                this.lightning.fixedToCamera = true;
+
+                this.flash = this.game.add.graphics(0, 0);
+                this.flash.beginFill(0xffffff, 1);
+                this.flash.drawRect(0, 0, this.game.width, this.game.height);
+                this.flash.endFill();
+                this.flash.alpha = 0;
+                this.flash.fixedToCamera = true;
+
                 this.events.onKilled.add(function () {
+                    _this.boom();
+
+                    _this.game.add.tween(_this.level.blackScreen).to({ alpha: 1 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.None, true).onComplete.add(function () {
+                        _this.level.startNextLevel();
+                    });
                 });
             }
             Boss.prototype.generateAction = function () {
                 var _this = this;
                 this.lastEventAt = this.game.time.now;
 
-                var tween = this.game.add.tween(this);
-
                 do {
                     var rand = Math.floor(Math.random() * this.bossTweens.children.length);
                 } while(rand == this.activeTweenID);
                 this.activeTweenID = rand;
 
+                var tween = this.game.add.tween(this);
                 tween.to({
                     x: this.bossTweens.children[this.activeTweenID].x,
                     y: this.bossTweens.children[this.activeTweenID].y
@@ -1706,6 +1754,9 @@ var Sample;
 
             Boss.prototype.update = function () {
                 var _this = this;
+                if (!this.alive)
+                    return;
+
                 this.game.physics.arcade.overlap(this, this.bullets, function (shooterReject, bulletReject) {
                     if (bulletReject.rejectState) {
                         bulletReject.kill();
@@ -1760,6 +1811,73 @@ var Sample;
                 if (this.immortalState && Date.now() - this.immortalStateAt > this.immortalStateDuration) {
                     this.immortalState = false;
                 }
+            };
+
+            Boss.prototype.boom = function () {
+                this.lightning.rotation = Phaser.Math.angleBetween(this.lightning.x, this.lightning.y, this.x, this.y) - Math.PI / 2;
+
+                var distance = Phaser.Math.distance(this.lightning.x, this.lightning.y, this.x, this.y);
+
+                this.createLightningTexture(this.lightningBitmap.width / 2, 0, 100, 3, false, distance);
+
+                this.lightning.alpha = 1;
+
+                this.game.add.tween(this.lightning).to({ alpha: 0.5 }, 100, Phaser.Easing.Bounce.Out).to({ alpha: 1.0 }, 100, Phaser.Easing.Bounce.Out).to({ alpha: 0.5 }, 100, Phaser.Easing.Bounce.Out).to({ alpha: 1.0 }, 100, Phaser.Easing.Bounce.Out).to({ alpha: 0 }, 250, Phaser.Easing.Cubic.In).start();
+
+                this.flash.alpha = 1;
+                this.game.add.tween(this.flash).to({ alpha: 0 }, 100, Phaser.Easing.Cubic.In).start();
+            };
+
+            Boss.prototype.createLightningTexture = function (x, y, segments, boltWidth, branch, distance) {
+                var ctx = this.lightningBitmap.context;
+                var width = this.lightningBitmap.width;
+                var height = this.lightningBitmap.height;
+
+                if (!branch)
+                    ctx.clearRect(0, 0, width, height);
+
+                for (var i = 0; i < segments; i++) {
+                    ctx.strokeStyle = 'rgb(255, 255, 255)';
+                    ctx.lineWidth = boltWidth;
+
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+
+                    if (branch) {
+                        x += this.game.rnd.integerInRange(-10, 10);
+                    } else {
+                        x += this.game.rnd.integerInRange(-30, 30);
+                    }
+                    if (x <= 10)
+                        x = 10;
+                    if (x >= width - 10)
+                        x = width - 10;
+
+                    if (branch) {
+                        y += this.game.rnd.integerInRange(10, 20);
+                    } else {
+                        y += this.game.rnd.integerInRange(20, distance / segments);
+                    }
+                    if ((!branch && i == segments - 1) || y > distance) {
+                        y = distance;
+                        if (!branch)
+                            x = width / 2;
+                    }
+
+                    ctx.lineTo(x, y);
+                    ctx.stroke();
+
+                    if (y >= distance)
+                        break;
+
+                    if (!branch) {
+                        if (Phaser.Math.chanceRoll(20)) {
+                            this.createLightningTexture(x, y, 10, 1, true, distance);
+                        }
+                    }
+                }
+
+                this.lightningBitmap.dirty = true;
             };
             return Boss;
         })(Prefab.AbstractEnemy);
@@ -2022,6 +2140,9 @@ var Sample;
             this.state.add('preload', Sample.State.Preload);
 
             this.state.add(Sample.Stories[0 /* Story1 */], Sample.State.Story1);
+            this.state.add(Sample.Stories[1 /* Story2 */], Sample.State.Story2);
+            this.state.add(Sample.Stories[2 /* Story3 */], Sample.State.Story3);
+            this.state.add(Sample.Stories[3 /* Story4 */], Sample.State.Story4);
 
             this.state.add(Sample.Levels[0 /* Zone1Level1 */], Sample.State.Zone1Level1);
             this.state.add(Sample.Levels[1 /* Zone2Level1 */], Sample.State.Zone2Level1);

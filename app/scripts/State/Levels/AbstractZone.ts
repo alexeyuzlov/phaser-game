@@ -45,9 +45,9 @@ module Sample.State {
             this.layer.resizeWorld();
 
             // PREFABS SINGLE
-            this.player = new Prefab.Player(this.game, 36, this.game.world.height - 200);
+            this.player = new Prefab.Player(this.game, 120, this.game.world.height - 200);
 
-            this.hud = new Prefab.HUD(this.game, 0, 0);
+            this.hud = new Prefab.HUD(this.game, 10, 10);
             this.hud.alpha = 0;
 
             // PREFABS MULTIPLE
@@ -102,14 +102,20 @@ module Sample.State {
         update() {
             this.game.gameStats.stats.update();
 
-            if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-                this.blackScreen.setText("");
-                this.game.add.tween(this.blackScreen)
+            /*
+            DEBUG FEATURE
+
+             if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+                 this.blackScreen.setText("");
+                 this.game.add.tween(this.blackScreen)
                     .to({ alpha: 1 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.None, true)
                     .onComplete.add(()=> {
                         this.startNextLevel();
                     });
-            }
+             }
+
+            */
+
         }
 
         gameOver() {
@@ -129,13 +135,16 @@ module Sample.State {
         getNextLevel() {
             switch (this.game.state.current) {
                 case Levels[Levels.Zone1Level1]:
-                    return Levels[Levels.Zone2Level1];
+                    //return Levels[Levels.Zone2Level1];
+                    return Stories[Stories.Story2];
                     break;
                 case Levels[Levels.Zone2Level1]:
-                    return Levels[Levels.Zone3Level1];
+                    //return Levels[Levels.Zone3Level1];
+                    return Stories[Stories.Story3];
                     break;
                 case Levels[Levels.Zone3Level1]:
-                    return Levels[Levels.Zone4Level1];
+                    //return Levels[Levels.Zone4Level1];
+                    return Stories[Stories.Story4];
                     break;
                 case Levels[Levels.Zone4Level1]:
                     return 'gameOver';

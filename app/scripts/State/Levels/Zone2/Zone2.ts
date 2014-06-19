@@ -28,6 +28,8 @@ module Sample.State {
             super.update();
             this.shadowUpdate();
 
+            this.hud.bringToTop();
+
             this.bg.tilePosition.x = -this.player.x / 5;
         }
 
