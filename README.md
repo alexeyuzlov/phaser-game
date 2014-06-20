@@ -1,4 +1,4 @@
-sample v 1.0
+Dejavu v 1.0
 ======
 Play: http://sentika.meximas.com/
 
