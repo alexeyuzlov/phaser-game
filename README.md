@@ -1,7 +1,8 @@
-sample
+sample v 1.0
 ======
+Play: http://sentika.meximas.com/
+
 html5 game powered by Phaser framework
-version 1.0
 
 Controls
 ------
