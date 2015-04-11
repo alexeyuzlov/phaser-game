@@ -1,6 +1,6 @@
 Dejavu 1.0
 ======
-Play: http://sentika.meximas.com/
+Play: http://sentika.github.io
 
 html5 game powered by Phaser framework
 
