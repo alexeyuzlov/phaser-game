@@ -1,14 +1,17 @@
 {
-    "name": "sample",
-    "version": "0.2.0",
-    "dependencies": {},
-    "devDependencies": {
-        "grunt": "*",
-        "grunt-typescript": "*",
-        "grunt-contrib-copy": "*",
-        "grunt-open": "*",
-        "grunt-contrib-connect": "*",
-        "connect-livereload": "*",
-        "grunt-contrib-watch": "*"
-    }
+  "name": "sample",
+  "version": "0.2.0",
+  "dependencies": {},
+  "scripts": {
+    "grunt": "./node_modules/.bin/grunt"
+  },
+  "devDependencies": {
+    "grunt": "*",
+    "grunt-typescript": "*",
+    "grunt-contrib-copy": "*",
+    "grunt-open": "*",
+    "grunt-contrib-connect": "*",
+    "connect-livereload": "*",
+    "grunt-contrib-watch": "*"
+  }
 }

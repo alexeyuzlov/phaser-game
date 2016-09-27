@@ -3,8 +3,6 @@
 module Sample {
 
     export class Game extends Phaser.Game {
-        gameStats: GameStats = new GameStats();
-
         constructor() {
             super(640, 480, Phaser.AUTO, 'game');
 

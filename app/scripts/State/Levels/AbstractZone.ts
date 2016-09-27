@@ -100,8 +100,6 @@ module Sample.State {
         }
 
         update() {
-            this.game.gameStats.stats.update();
-
             /*
             DEBUG FEATURE
 
