@@ -3,15 +3,17 @@
   "version": "0.2.0",
   "dependencies": {},
   "scripts": {
+    "bower": "./node_modules/.bin/bower install",
     "grunt": "./node_modules/.bin/grunt"
   },
   "devDependencies": {
-    "grunt": "*",
-    "grunt-typescript": "*",
-    "grunt-contrib-copy": "*",
-    "grunt-open": "*",
-    "grunt-contrib-connect": "*",
+    "bower": "1.8.8",
     "connect-livereload": "*",
-    "grunt-contrib-watch": "*"
+    "grunt": "*",
+    "grunt-contrib-connect": "*",
+    "grunt-contrib-copy": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-open": "*",
+    "grunt-typescript": "*"
   }
 }
