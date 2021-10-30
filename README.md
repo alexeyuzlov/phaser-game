@@ -1,5 +1,11 @@
 Dejavu 1.0
 ======
+Buld
+--
+- npm i
+- npx bower install
+- npx grunt 
+
 Play: http://sentika.github.io
 
 html5 game powered by Phaser framework
